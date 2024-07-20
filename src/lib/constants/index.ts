@@ -26,9 +26,9 @@ export const GEOCODE_URL = `https://maps.googleapis.com/maps/api/geocode/json?`;
 export let API_BASE_URL: string;
 
 if (__DEV__) {
-  API_BASE_URL = 'http://192.168.122.1:8080';
+  API_BASE_URL = '';
   console.log('__DEVELOPMENT__');
 } else {
-  API_BASE_URL = 'https://barbershop-api-j6an.onrender.com';
+  API_BASE_URL = 'https://barbershop-api-x8ba.onrender.com';
   console.log('__PRODUCTION__');
 }
