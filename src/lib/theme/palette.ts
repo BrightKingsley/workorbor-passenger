@@ -1,4 +1,5 @@
 export const colors = {
+  beigedarker: '#d8d3c7',
   beige: '#E0DED7',
   grayblue: '#C1C7D3',
   graygreen: '#C1D3C7',

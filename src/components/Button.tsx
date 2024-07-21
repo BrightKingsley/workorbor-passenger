@@ -12,6 +12,7 @@ import {
   StyleSheet,
   TextProps,
   TextStyle,
+  TouchableOpacityProps,
   ViewProps,
   ViewStyle,
 } from 'react-native';
@@ -20,11 +21,8 @@ import {
   ColorValue,
   GestureResponderEvent,
 } from 'react-native';
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from 'react-native-gesture-handler';
-import Animated, {AnimatedStyle} from 'react-native-reanimated';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';

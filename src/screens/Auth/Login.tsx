@@ -20,6 +20,7 @@ import {
 import useApi from '#/hooks/useApi';
 import {WaterWave} from '#/assets/images';
 import {hexWithOpacity} from '#/lib/ui/helpers';
+import t from '../../../locales/translate';
 
 export default function Login() {
   const navigation = useNavigation<NavigationProps>();
@@ -66,12 +67,12 @@ export default function Login() {
               <Text
                 family="Bold"
                 style={[a.text_2xl, a.leading_snug, a.font_bold]}>
-                Welcome Back
+                {t('welcome')}
               </Text>
               <View style={[a.flex_row, a.gap_sm, a.mt_2xs]}>
                 <Text
                   style={[a.font_normal, a.text_('16'), a.text_('#000000CC')]}>
-                  Don’t have an account?
+                  {t('signupPrompt')}
                 </Text>
                 <TouchableOpacity onPress={handleSignUpPress} style={[]}>
                   <Text
@@ -81,7 +82,7 @@ export default function Login() {
                       a.solid,
                       a.decoration_tint_(colors.beige),
                     ]}>
-                    SignUp
+                    {t('signup')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -90,7 +91,7 @@ export default function Login() {
           <View style={[a.bg_(colors.light), a.flex_1, a.py_md]}>
             <Column style={[a.w_90, a.self_center]}>
               <TextInput
-                label="Email Address"
+                label={t('email')}
                 labelStyle={[a.text_(colors.darkgray)]}
                 containerStyle={[a.mt_2xl]}
                 inputStyle={[]}
@@ -99,14 +100,13 @@ export default function Login() {
                   setError(false);
                   setEmail(text);
                 }}
-                placeholder="Email Address"
                 textContentType="emailAddress"
                 keyboardType="email-address"
                 style={[a.px_0, a.py_0, a.mt_sm, a.rounded_full]}
               />
 
               <TextInput
-                label="Password"
+                label={t('enter_password')}
                 labelStyle={[a.text_(colors.darkgray)]}
                 containerStyle={[a.mt_2xl]}
                 value={password}
@@ -114,7 +114,6 @@ export default function Login() {
                   setError(false);
                   setPassword(text);
                 }}
-                placeholder={'Enter Password'}
                 textContentType="password"
                 style={[a.px_0, a.py_0, a.mt_sm, a.rounded_full]}
               />
@@ -141,7 +140,7 @@ export default function Login() {
                       ]}
                     />
                   </View>
-                  <Text>Remember Me</Text>
+                  <Text>{t('remember_me')}</Text>
                 </Row>
               </TouchableWithoutFeedback>
 
@@ -152,7 +151,7 @@ export default function Login() {
                     a.mt_sm,
                     a.text_(hexWithOpacity(colors.error, 0.5)),
                   ]}>
-                  Please enter correct credentials
+                  {t('please_enter_correct_details')}
                 </Text>
               )}
 
@@ -163,7 +162,7 @@ export default function Login() {
                 shape="round"
                 color="primary"
                 style={[a.mt_2xl]}>
-                <ButtonText>Login</ButtonText>
+                <ButtonText>{t('login')}</ButtonText>
               </Button>
 
               <Column style={[a.mt_md]}>
@@ -173,7 +172,7 @@ export default function Login() {
                   shape="round"
                   color="primary">
                   <ButtonText style={[a.text_(colors.beige)]}>
-                    Forgot your password?
+                    {t('forgot_password')}
                   </ButtonText>
                 </Button>
               </Column>

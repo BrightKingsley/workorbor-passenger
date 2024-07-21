@@ -1,18 +1,20 @@
-import * as React from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
+import * as React from 'react';
 import {
   Animated,
   StyleSheet,
   TouchableOpacity,
-  View,
   useAnimatedValue,
+  View,
 } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {usePalette} from '#/lib/theme/usePalette';
-import {Text} from './Themed';
+
 import {HITSLOP_30} from '#/lib/constants';
 import {a} from '#/lib/style/atoms';
+import {usePalette} from '#/lib/theme/usePalette';
 import {NavigationProps} from '#/navigation/types';
+
+import {Text} from './Themed';
 
 export interface ViewHeaderProps {
   title?: string;
@@ -43,7 +45,7 @@ export default function ViewHeader({
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate('HomeTab');
+      navigation.navigate('Home');
     }
   }, [navigation]);
 

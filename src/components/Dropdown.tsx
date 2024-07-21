@@ -9,6 +9,7 @@ import Animated, {
 
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
+import t from '$/locales/translate';
 
 import Row from './Row';
 import {Text} from './Themed';
@@ -45,7 +46,7 @@ const Dropdown: React.FC<DropdownProps> = ({items, onSelect}) => {
     <Animated.View
       style={[a.mx_lg, a.self_center, a.w_full, a.z_50, a.relative, a.mt_md]}>
       <Row style={[a.ml_xs]}>
-        <Text style={{}}>Select Gender</Text>
+        <Text style={{}}>{t('select_gender')}</Text>
       </Row>
       <TouchableOpacity
         style={[
@@ -57,7 +58,7 @@ const Dropdown: React.FC<DropdownProps> = ({items, onSelect}) => {
           a.z_50,
         ]}
         onPress={toggleDropdown}>
-        <Text style={[a.text_(colors.darkgray)]}>Select an item</Text>
+        <Text style={[a.text_(colors.darkgray)]}>{t('select_an_item')}</Text>
       </TouchableOpacity>
       <Animated.View
         style={[

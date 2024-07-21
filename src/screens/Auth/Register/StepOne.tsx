@@ -1,6 +1,7 @@
 import TextInput from '#/components/TextInput';
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
+import t from '$/locales/translate';
 
 import {useFormContext} from './state';
 
@@ -25,7 +26,7 @@ export default function StepOne() {
         value={firstname.value}
         errorText={firstname.error}
         onChangeText={text => setFirstname({value: text, error: ''})}
-        label="Firstname"
+        label={t('firstname')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[]}
         textContentType="name"
@@ -37,7 +38,7 @@ export default function StepOne() {
         value={lastname.value}
         errorText={lastname.error}
         onChangeText={text => setLastname({value: text, error: ''})}
-        label="Lastname"
+        label={t('lastname')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
         placeholder="Kingsley"
@@ -48,7 +49,7 @@ export default function StepOne() {
         value={email.value}
         errorText={email.error}
         onChangeText={text => setEmail({value: text, error: ''})}
-        label="Email"
+        label={t('email')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
         placeholder="briggskvngzz@gmail.com"
@@ -60,7 +61,7 @@ export default function StepOne() {
         value={password.value}
         errorText={password.error}
         onChangeText={text => setPassword({value: text, error: ''})}
-        label="Password"
+        label={t('password')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
         placeholder={'******'}
@@ -71,7 +72,7 @@ export default function StepOne() {
         value={retypePassword.value}
         errorText={retypePassword.error}
         onChangeText={text => setRetypePassword({value: text, error: ''})}
-        label="Password Confirmation"
+        label={t('password_confirmation')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
         placeholder={'******'}

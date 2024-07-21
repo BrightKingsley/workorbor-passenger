@@ -73,13 +73,13 @@ export function Text({
   if (!loaded) return null;
 
   return (
-    <UITextView
-      selectable={selectable}
-      uiTextView
+    <DefaultText
+      // selectable={selectable}
+      // uiTextView
       style={[{color, fontFamily: getFontFamily(family)}, nts]}
       {...otherProps}>
       {children}
-    </UITextView>
+    </DefaultText>
   );
 }
 

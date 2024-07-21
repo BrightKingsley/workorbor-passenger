@@ -27,6 +27,7 @@ export let API_BASE_URL: string;
 
 if (__DEV__) {
   API_BASE_URL = '';
+  API_BASE_URL = 'https://barbershop-api-x8ba.onrender.com';
   console.log('__DEVELOPMENT__');
 } else {
   API_BASE_URL = 'https://barbershop-api-x8ba.onrender.com';

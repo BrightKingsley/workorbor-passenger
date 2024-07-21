@@ -107,8 +107,6 @@ const styles = StyleSheet.create({
   switchContainer: {
     width: 50,
     height: 25,
-    // backgroundColor: 'rgba(255, 255, 255, 0.10)',
-    // backgroundColor: 'red',
   },
   switchInner: {
     width: 15,

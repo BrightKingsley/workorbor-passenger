@@ -76,7 +76,7 @@ export default function TextInput({
 
   const {loaded} = useLoadedFonts();
 
-  const InputComponent = AltComponent || DefaultTextInput; // If alt component is not provided, use DefaultTextInput. AltComponent should inherit all props of a regular TextInput or BottomSheetTextInput
+  const InputComponent = AltComponent || DefaultTextInput; // If alt component is not provided, use DefaultTextInput. AltComponent should inherit all props of a regular TextInput
 
   return (
     <>
@@ -122,7 +122,7 @@ export default function TextInput({
             cursorColor="black"
             autoCorrect
             secureTextEntry={
-              textInputProps.textContentType === 'password'
+              textInputProps.textContentType === 'password' && value
                 ? showPassword
                   ? false
                   : true
