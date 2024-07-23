@@ -74,7 +74,7 @@ export default function App() {
             <Root />
           </RouteContainer>
         </View>
-        <View
+        {/* <View
           style={[
             a.absolute,
             a.rounded_md,
@@ -85,12 +85,12 @@ export default function App() {
           <TouchableOpacity
             style={[a.p_md, a.rounded_md]}
             onPress={() => {
-              console.log();
+              console.log();est
               switchLanguage(i18n.locale === 'he' ? 'en' : 'he');
             }}>
             <Text>Change to {i18n.locale === 'he' ? 'en' : 'he'}</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </LocalizationProvider>
     </ReduxProviders>
   );

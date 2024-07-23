@@ -20,7 +20,6 @@ import {
   View,
 } from 'react-native';
 import * as Location from 'expo-location';
-import useLocationService from '#/hooks/useLocationService';
 import {useAppDispatch} from '#/hooks/store';
 import React from 'react';
 

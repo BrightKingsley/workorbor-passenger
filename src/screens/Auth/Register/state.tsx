@@ -3,6 +3,7 @@ import React, {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import {Alert} from 'react-native';
@@ -61,23 +62,23 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
   const {signup} = useApi();
 
   const [firstname, setFirstname] = useState<FormField>({
-    value: 'Bright',
+    value: '',
     error: '',
   });
   const [lastname, setLastname] = useState<FormField>({
-    value: 'Kingsley',
+    value: '',
     error: '',
   });
   const [referee, setReferee] = useState<FormField>({
-    value: 'Kingsley',
+    value: '',
     error: '',
   });
   const [gender, setGender] = useState<FormField>({
-    value: 'Kingsley',
+    value: '',
     error: '',
   });
   const [email, setEmail] = useState<FormField>({
-    value: 'briggskvngzz@gmail.com',
+    value: '',
     error: '',
   });
   const [dateOfBirth, setDateOfBirth] = useState<FormField>({
@@ -89,23 +90,28 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     error: '',
   });
   const [phoneNumber, setPhoneNumber] = useState<FormField>({
-    value: '08021248576',
+    value: '',
     error: '',
   });
   const [password, setPassword] = useState<FormField>({
-    value: '@Test1234',
+    value: '',
     error: '',
   });
   const [retypePassword, setRetypePassword] = useState<FormField>({
-    value: '@Test1234',
+    value: '',
     error: '',
   });
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('EFFECT: ', {phoneNumber});
+  }, [phoneNumber]);
 
   const passwordCorrect =
     retypePassword.value !== '' && retypePassword.value === password.value;
 
   const handleSignUpPress = useCallback(async () => {
+    console.log({phoneNumber: phoneNumber.value});
     const firstNameValidation = validateName(firstname.value);
     const lastNameValidation = validateName(lastname.value);
     const emailValidation = validateEmail(email.value);
@@ -116,14 +122,13 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
       retypePassword.value,
     );
 
+    console.log({phoneNumberValidation});
+
     setFirstname(firstNameValidation);
     setLastname(lastNameValidation);
     setEmail(emailValidation);
     setPassword(passwordValidation);
     setRetypePassword(retypePasswordValidation);
-    setPhoneNumber(phoneNumberValidation);
-    setPhoneNumber(phoneNumberValidation);
-    setPhoneNumber(phoneNumberValidation);
     setPhoneNumber(phoneNumberValidation);
 
     if (
@@ -134,7 +139,7 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
       retypePasswordValidation.error ||
       phoneNumberValidation.error
     )
-      return Alert.alert('Please enter valid credentials');
+      return;
     setLoading(true);
     await signup({
       email: email.value,
@@ -157,6 +162,7 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     anniversary.value,
     dateOfBirth.value,
     retypePassword.value,
+    password,
     setFirstname,
     setLastname,
     setEmail,

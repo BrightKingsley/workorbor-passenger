@@ -9,7 +9,7 @@ import {useFormContext} from './state';
 export default function StepTwo() {
   const {
     phoneNumber,
-    setFirstname,
+    setPhoneNumber,
     referee,
     gender,
     setReferee,
@@ -23,7 +23,9 @@ export default function StepTwo() {
       <TextInput
         value={phoneNumber.value}
         errorText={phoneNumber.error}
-        onChangeText={text => setFirstname({value: text, error: ''})}
+        onChangeText={text => {
+          setPhoneNumber({value: text, error: ''});
+        }}
         label={t('phone_number')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[]}
