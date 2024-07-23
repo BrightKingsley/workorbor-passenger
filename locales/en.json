@@ -19,5 +19,8 @@
   "anniversary_day": "Anniversary Day",
   "select_gender": "Select Gender",
   "refer_by": "Referred By",
-  "forgot_password": "Forgot your password?"
+  "forgot_password": "Forgot your password?",
+  "M": "M",
+  "F": "F",
+  "other": "other"
 }

@@ -2,7 +2,7 @@ import {io, Socket as BaseSocket} from 'socket.io-client';
 
 import {API_BASE_URL} from '../../constants';
 import sk from '../../constants/socket';
-import {InnerKeys} from '../objects';
+import {InnerKeys} from '../helpers/objects';
 
 // type EventName = keyof {[key in InnerKeys<typeof sk>]: string};
 type EventName = InnerKeys<typeof sk>;

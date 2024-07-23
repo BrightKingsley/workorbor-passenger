@@ -24,11 +24,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-localization",
-      "expo-build-properties",
-      "expo-font"
-    ],
+    "plugins": ["expo-localization", "expo-build-properties", "expo-font"],
     "extra": {
       "supportsRTL": true
     }

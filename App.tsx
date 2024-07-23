@@ -3,7 +3,14 @@ import * as Localization from 'expo-localization';
 import {StatusBar} from 'expo-status-bar';
 import {reloadAsync} from 'expo-updates';
 import React, {useEffect, useState} from 'react';
-import {Button, I18nManager, Pressable, StyleSheet, View} from 'react-native';
+import {
+  Button,
+  I18nManager,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {RootSiblingParent} from 'react-native-root-siblings';
@@ -14,11 +21,11 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Text} from '#/components/Themed';
 import useLoadedFonts from '#/hooks/useLoadedFonts';
 import {a} from '#/lib/style/atoms';
-import {Splash} from '#/lib/utils/Splash';
 import RouteContainer, {Navigator} from '#/navigation/Navigation';
 import {ReduxProviders} from '#/store/provider';
+import {Splash} from '$/src/components/Splash';
 
-import i18n, {getStoredLanguage, setLanguage} from './locales';
+import i18n, {IS_RTL, setLanguage} from './locales';
 import {LocalizationProvider} from './locales/localizationContext';
 import t from './locales/translate';
 import {Row} from './src/components';
@@ -53,26 +60,9 @@ function Root() {
 }
 
 export default function App() {
-  useEffect(() => {
-    console.log('LOCALE: ', i18n.locale);
-    // const [{textDirection, languageTag}] = Localization.getLocales();
-    // console.log({textDirection, languageTag});
-    // const isRTL = textDirection === 'rtl';
-    // I18nManager.forceRTL(isRTL);
-    // (async () => {
-    //   await setLanguage(languageTag);
-    // })();
-    getStoredLanguage();
-  }, []);
-
   const switchLanguage = async (lang: string) => {
-    i18n.locale = lang;
-    const isRTL = lang === 'he';
-    I18nManager.allowRTL(isRTL);
-    I18nManager.forceRTL(isRTL);
     await setLanguage(lang);
-    await AsyncStorage.setItem('appLanguage', lang);
-    reloadAsync(); // Reload the app to apply changes
+    reloadAsync();
   };
 
   return (
@@ -92,17 +82,14 @@ export default function App() {
             a.bottom_(4),
             a.left_(6),
           ]}>
-          <Pressable
-            android_ripple={{
-              color: hexWithOpacity(colors.darkgray, 0.4),
-            }}
+          <TouchableOpacity
             style={[a.p_md, a.rounded_md]}
             onPress={() => {
               console.log();
-              switchLanguage(i18n.locale == 'he' ? 'en-US' : 'he');
+              switchLanguage(i18n.locale === 'he' ? 'en' : 'he');
             }}>
-            <Text>Change to {i18n.locale == 'he' ? 'en-US' : 'he'}</Text>
-          </Pressable>
+            <Text>Change to {i18n.locale === 'he' ? 'en' : 'he'}</Text>
+          </TouchableOpacity>
         </View>
       </LocalizationProvider>
     </ReduxProviders>

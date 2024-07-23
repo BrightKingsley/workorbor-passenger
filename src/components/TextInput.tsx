@@ -162,7 +162,8 @@ export default function TextInput({
 }
 
 export const DateInput = (
-  props: Props & ComponentProps<typeof DefaultTextInput>,
+  props: Props &
+    ComponentProps<typeof DefaultTextInput> & {getDate(dateValue: Date): void},
 ) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
@@ -170,7 +171,9 @@ export const DateInput = (
   const onChange = (event: any, selectedDate: any) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
+    console.log({currentDate});
     setDate(currentDate);
+    props.getDate(currentDate);
   };
 
   const formatDate = (date: moment.MomentInput) => {

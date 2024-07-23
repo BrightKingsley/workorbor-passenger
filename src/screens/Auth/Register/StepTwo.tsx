@@ -7,8 +7,16 @@ import t from '$/locales/translate';
 import {useFormContext} from './state';
 
 export default function StepTwo() {
-  const {phoneNumber, setFirstname, referee, gender, setReferee, setGender} =
-    useFormContext();
+  const {
+    phoneNumber,
+    setFirstname,
+    referee,
+    gender,
+    setReferee,
+    setGender,
+    setDateOfBirth,
+    setAnniversary,
+  } = useFormContext();
 
   return (
     <>
@@ -26,23 +34,27 @@ export default function StepTwo() {
       />
 
       <DateInput
+        getDate={date => setDateOfBirth({value: date.toString(), error: ''})}
         label={t('date_of_birth')}
         containerStyle={[a.mt_2xl]}
         style={[a.px_0, a.py_0, a.mt_sm]}
       />
 
       <DateInput
+        getDate={date => setAnniversary({value: date.toString(), error: ''})}
         label={t('anniversary_day')}
         containerStyle={[a.mt_2xl]}
         style={[a.px_0, a.py_0, a.mt_sm]}
       />
 
       <Dropdown
+        selected={gender.value}
         items={[
           {label: 'M', value: 'M'},
           {label: 'F', value: 'F'},
+          {label: 'Other', value: 'other'},
         ]}
-        onSelect={({value}) => console.log({value})}
+        onSelect={value => setGender({value, error: ''})}
       />
 
       <TextInput

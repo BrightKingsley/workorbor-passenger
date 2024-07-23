@@ -22,11 +22,12 @@ import ResetPassword from '#/screens/Auth/ResetPassword';
 import VerifyOtp from '#/screens/Auth/VerifyOtp';
 import Home from '#/screens/Home';
 
+import {useAppSelector} from '../hooks/store';
 import {AllNavigatorParams} from './types';
 
 const navigationRef = createNavigationContainerRef<AllNavigatorParams>();
 
-function AuthStackHeader({navigation}: NativeStackHeaderProps) {
+function StackHeader({navigation}: NativeStackHeaderProps) {
   return Platform.OS === 'ios' ? null : (
     <View
       style={[
@@ -48,16 +49,17 @@ function AuthStackHeader({navigation}: NativeStackHeaderProps) {
 
 const Stack = createNativeStackNavigator<AllNavigatorParams>();
 export function Navigator() {
+  const {isAuthenticated} = useAppSelector(state => state.auth);
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName={isAuthenticated ? 'Home' : 'Login'}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="Login" getComponent={() => LoginScreen} />
       <Stack.Screen name="SignUp" getComponent={() => RegisterScreen} />
       <Stack.Screen
         options={{
           headerShown: true,
-          header: AuthStackHeader,
+          header: StackHeader,
         }}
         name="ForgotPassword"
         getComponent={() => ForgotPassword}
@@ -65,7 +67,7 @@ export function Navigator() {
       <Stack.Screen
         options={{
           headerShown: true,
-          header: AuthStackHeader,
+          header: StackHeader,
         }}
         name="VerifyOtp"
         getComponent={() => VerifyOtp}
@@ -73,7 +75,7 @@ export function Navigator() {
       <Stack.Screen
         options={{
           headerShown: true,
-          header: AuthStackHeader,
+          header: StackHeader,
         }}
         name="ResetPassword"
         getComponent={() => ResetPassword}
@@ -81,7 +83,7 @@ export function Navigator() {
       <Stack.Screen
         options={{
           headerShown: false,
-          header: AuthStackHeader,
+          header: StackHeader,
         }}
         name="Home"
         getComponent={() => Home}

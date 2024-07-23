@@ -18,7 +18,7 @@ import {
 
 type Gender = 'M' | 'F';
 
-type FormField = {value: string | Gender; error: string};
+export type FormField = {value: string | Gender; error: string};
 
 interface FormContextProps {
   firstname: FormField;
@@ -32,7 +32,11 @@ interface FormContextProps {
   email: FormField;
   setEmail: React.Dispatch<React.SetStateAction<FormField>>;
   phoneNumber: FormField;
+  dateOfBirth: FormField;
+  setDateOfBirth: React.Dispatch<React.SetStateAction<FormField>>;
+  anniversary: FormField;
   setPhoneNumber: React.Dispatch<React.SetStateAction<FormField>>;
+  setAnniversary: React.Dispatch<React.SetStateAction<FormField>>;
   password: FormField;
   setPassword: React.Dispatch<React.SetStateAction<FormField>>;
   retypePassword: FormField;
@@ -76,6 +80,14 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     value: 'briggskvngzz@gmail.com',
     error: '',
   });
+  const [dateOfBirth, setDateOfBirth] = useState<FormField>({
+    value: new Date().toString(),
+    error: '',
+  });
+  const [anniversary, setAnniversary] = useState<FormField>({
+    value: new Date().toString(),
+    error: '',
+  });
   const [phoneNumber, setPhoneNumber] = useState<FormField>({
     value: '08021248576',
     error: '',
@@ -110,6 +122,9 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     setPassword(passwordValidation);
     setRetypePassword(retypePasswordValidation);
     setPhoneNumber(phoneNumberValidation);
+    setPhoneNumber(phoneNumberValidation);
+    setPhoneNumber(phoneNumberValidation);
+    setPhoneNumber(phoneNumberValidation);
 
     if (
       firstNameValidation.error ||
@@ -127,6 +142,10 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
       firstname: firstname.value,
       lastname: lastname.value,
       phoneNumber: phoneNumber.value,
+      anniversary: anniversary.value,
+      dateOfBirth: dateOfBirth.value,
+      gender: gender.value,
+      referee: referee.value,
     });
     setLoading(false);
   }, [
@@ -135,6 +154,8 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     lastname.value,
     password.value,
     phoneNumber.value,
+    anniversary.value,
+    dateOfBirth.value,
     retypePassword.value,
     setFirstname,
     setLastname,
@@ -142,6 +163,8 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     setPassword,
     setRetypePassword,
     setPhoneNumber,
+    setAnniversary,
+    setDateOfBirth,
     signup,
   ]);
 
@@ -165,6 +188,10 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
         retypePassword,
         setRetypePassword,
         passwordCorrect,
+        anniversary,
+        dateOfBirth,
+        setAnniversary,
+        setDateOfBirth,
         handleSignUpPress,
         loading,
         setLoading,

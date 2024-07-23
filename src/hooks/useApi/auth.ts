@@ -5,13 +5,17 @@ import {setUser} from '#/store/slices/auth';
 import {useNavigation} from '@react-navigation/native';
 import {useCallback} from 'react';
 import {useAppDispatch} from '../store';
+import {addItemFromAsyncStore} from '$/src/lib/utils/helpers/async-store';
 
 export default function useAuthApi() {
   const navigation = useNavigation<NavigationProps>();
   const dispatch = useAppDispatch();
 
   const login = useCallback(
-    async ({email, password}: {email: string; password: string}) => {
+    async (
+      {email, password}: {email: string; password: string},
+      remember?: boolean,
+    ) => {
       console.log({email, password});
       try {
         const data = await fetchData<{
@@ -28,6 +32,8 @@ export default function useAuthApi() {
           }),
         );
         navigation.navigate('Home');
+
+        if (remember) addItemFromAsyncStore('auth', {email, password});
         return true;
       } catch (error) {
         if (error instanceof ApiError) {
@@ -50,12 +56,20 @@ export default function useAuthApi() {
       lastname,
       password,
       phoneNumber,
+      anniversary,
+      dateOfBirth,
+      gender,
+      referee,
     }: {
       email: string;
       password: string;
       firstname: string;
       lastname: string;
       phoneNumber: string;
+      gender: string;
+      dateOfBirth: string;
+      anniversary: string;
+      referee: string;
     }) => {
       try {
         const data = await fetchData('post', `${apiRoutes.auth.signup.route}`, {
@@ -64,6 +78,10 @@ export default function useAuthApi() {
           firstname,
           lastname,
           phoneNumber,
+          anniversary,
+          dateOfBirth,
+          gender,
+          referee,
         });
         console.log({data});
       } catch (error) {

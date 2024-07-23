@@ -5,7 +5,7 @@ import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
 import {NavigationProps} from '#/navigation/types';
 import {useNavigation} from '@react-navigation/native';
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Image, KeyboardAvoidingView, ScrollView, View} from 'react-native';
 import * as Location from 'expo-location';
 import {useAppDispatch} from '#/hooks/store';
@@ -21,21 +21,33 @@ import useApi from '#/hooks/useApi';
 import {WaterWave} from '#/assets/images';
 import {hexWithOpacity} from '#/lib/ui/helpers';
 import t from '../../../locales/translate';
+import {IS_RTL} from '$/locales';
+import {validateEmail, validatePassword} from '$/src/lib/utils/api/forms';
+import {FormField} from './Register/state';
+import {getItemFromAsyncStore} from '$/src/lib/utils/helpers/async-store';
 
 export default function Login() {
   const navigation = useNavigation<NavigationProps>();
-  const dispatch = useAppDispatch();
   const {login} = useApi();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState<FormField>({error: '', value: ''});
+  const [password, setPassword] = useState<FormField>({error: '', value: ''});
   const [error, setError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState({login: false, google: false});
 
   const handleLoginPress = useCallback(async () => {
+    const emailValidation = validateEmail(email.value);
+
+    setEmail(emailValidation);
+
+    if (emailValidation.error) return;
+
     setLoading(prev => ({...prev, login: true}));
-    const success = await login({email, password});
+    const success = await login(
+      {email: email.value, password: password.value},
+      rememberMe,
+    );
     if (!success) setError(true);
     setLoading(prev => ({...prev, login: false}));
   }, [email, password]);
@@ -52,6 +64,15 @@ export default function Login() {
     setRememberMe(prev => !prev);
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const item = await getItemFromAsyncStore('auth');
+      if (!item) return;
+      setEmail({value: item.email, error: ''});
+      setPassword({value: item.password, error: ''});
+    })();
+  }, []);
+
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -59,17 +80,13 @@ export default function Login() {
       <ScrollView style={{flexGrow: 1}} contentContainerStyle={[a.h_full]}>
         <View style={[a.flex_1, a.bg_(colors.light)]}>
           <View style={[a.h_(189), a.relative]}>
-            {/* <Image
-              source={WaterWave}
-              style={[a.w_full, a.h_full, a.absolute, a.z_10]}
-            /> */}
             <View style={[a.absolute, a.bottom_(0), a.p_(24), a.z_20]}>
               <Text
                 family="Bold"
-                style={[a.text_2xl, a.leading_snug, a.font_bold]}>
+                style={[a.text_2xl, a.text_left, a.leading_snug, a.font_bold]}>
                 {t('welcome')}
               </Text>
-              <View style={[a.flex_row, a.gap_sm, a.mt_2xs]}>
+              <Row style={[a.gap_sm, a.mt_2xs]}>
                 <Text
                   style={[a.font_normal, a.text_('16'), a.text_('#000000CC')]}>
                   {t('signupPrompt')}
@@ -85,7 +102,7 @@ export default function Login() {
                     {t('signup')}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Row>
             </View>
           </View>
           <View style={[a.bg_(colors.light), a.flex_1, a.py_md]}>
@@ -95,10 +112,11 @@ export default function Login() {
                 labelStyle={[a.text_(colors.darkgray)]}
                 containerStyle={[a.mt_2xl]}
                 inputStyle={[]}
-                value={email}
+                value={email.value}
+                errorText={email.error}
                 onChangeText={text => {
                   setError(false);
-                  setEmail(text);
+                  setEmail(prev => ({value: text, error: ''}));
                 }}
                 textContentType="emailAddress"
                 keyboardType="email-address"
@@ -109,10 +127,10 @@ export default function Login() {
                 label={t('enter_password')}
                 labelStyle={[a.text_(colors.darkgray)]}
                 containerStyle={[a.mt_2xl]}
-                value={password}
+                value={password.value}
                 onChangeText={text => {
                   setError(false);
-                  setPassword(text);
+                  setPassword(prev => ({value: text, error: ''}));
                 }}
                 textContentType="password"
                 style={[a.px_0, a.py_0, a.mt_sm, a.rounded_full]}

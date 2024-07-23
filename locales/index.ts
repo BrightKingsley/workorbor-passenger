@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
+import {reloadAsync} from 'expo-updates';
 import {I18n} from 'i18n-js';
 import {I18nManager} from 'react-native';
 
@@ -9,36 +10,42 @@ import he from './he.json';
 const i18n = new I18n();
 
 i18n.translations = {
-  'en-US': en,
-  'en-UK': en,
-  'en-IL': en,
+  en,
   he,
 };
 
 // Fallback to English if a translation isn't available in the selected language
-i18n.defaultLocale = 'en-US';
+i18n.defaultLocale = 'en';
 
 // Set initial language
 export const setLanguage = async (language: string) => {
   i18n.locale = language;
-  await AsyncStorage.setItem('appLanguage', language);
-};
+  console.log({language});
+  const isRTL = language === 'he'; // Assuming Hebrew is the only RTL language
 
-export const getStoredLanguage = async () => {
-  const storedLanguage = await AsyncStorage.getItem('appLanguage');
-  console.log({storedLanguage});
-  if (storedLanguage) {
-    i18n.locale = storedLanguage;
-  } else {
-    const [{languageTag}] = Localization.getLocales();
-    i18n.locale = languageTag;
-  }
-  const isRTL = i18n.locale === 'he';
-  console.log({isRTL});
   I18nManager.allowRTL(isRTL);
   I18nManager.forceRTL(isRTL);
+
+  // You need to reload your app for changes to take effect
+  reloadAsync();
 };
 
-export const IS_RTL = I18nManager.isRTL;
+const getIsRTL = () => {
+  const locales = Localization.getLocales();
+  console.log({locale: locales[0].languageCode}, i18n.locale);
+  if (locales && locales.length > 0) {
+    const textDirection = locales[0].textDirection;
+    console.log({textDirection});
+    return textDirection === 'rtl';
+  }
+  return false;
+};
+
+export const IS_RTL = getIsRTL();
 console.log({IS_RTL});
+
+I18nManager.allowRTL(IS_RTL);
+I18nManager.forceRTL(IS_RTL);
+
+// export const IS_RTL = I18nManager.isRTL;
 export default i18n;

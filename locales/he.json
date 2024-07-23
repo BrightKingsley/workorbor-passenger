@@ -19,5 +19,8 @@
   "anniversary_day": "יום נישואין",
   "select_gender": "בחר מגדר",
   "refer_by": "הופנה על ידי",
-  "forgot_password": "שכחת ססמה?"
+  "forgot_password": "שכחת ססמה?",
+  "M": "זכר",
+  "F": "נקבה",
+  "other": "אחר"
 }

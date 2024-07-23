@@ -5,9 +5,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {isAndroid} from '#/platform';
 
-import {BOTTOM_TAB_HEIGHT} from '../constants';
-import {a} from '../style/atoms';
-import {colors} from '../theme/palette';
+import {BOTTOM_TAB_HEIGHT} from '../lib/constants';
+import {a} from '../lib/style/atoms';
+import {colors} from '../lib/theme/palette';
 
 export default function Layout({children}: PropsWithChildren) {
   const safeAreaInsets = useSafeAreaInsets();

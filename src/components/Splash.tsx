@@ -8,8 +8,8 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
-import {a} from '../style/atoms';
-import {colors} from '../theme/palette';
+import {a} from '../lib/style/atoms';
+import {colors} from '../lib/theme/palette';
 type Props = {
   isReady: boolean;
 };

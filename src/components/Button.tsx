@@ -84,6 +84,7 @@ type ButtonProps = Pick<
     loading?: boolean;
     activityIndicator?: ActivityIndicatorIOSProps;
     style?: StyleProp<ViewStyle>;
+    buttonWrapperStyle?: StyleProp<ViewStyle>;
     ripple?: ColorValue;
     variant: ButtonVariant;
     children: NonTextElements | ((context: ButtonContext) => NonTextElements);
@@ -111,6 +112,7 @@ const Button = ({
   variant = 'solid',
   color,
   activityIndicator,
+  buttonWrapperStyle,
   disabled,
   ...otherProps
 }: PropsWithChildren<ButtonProps & ViewProps>) => {
@@ -181,10 +183,7 @@ const Button = ({
         variant={variant}
         selectedColor={selectedColor}
         disabled={disabled}
-        style={[
-          a.py_lg,
-          // animatedButtonStyle,
-        ]}
+        buttonWrapperStyle={[buttonWrapperStyle]}
         onPress={onPress}>
         <Animated.View {...otherProps}>
           <ButtonContext.Provider value={context}>
@@ -375,6 +374,7 @@ function ButtonWrapper({
   ripple,
   selectedColor,
   variant,
+  buttonWrapperStyle,
 }: PropsWithChildren<ButtonProps & {selectedColor: string}>) {
   return Platform.OS === 'android' ? (
     <Pressable
@@ -388,20 +388,14 @@ function ButtonWrapper({
         foreground: true,
       }}
       android_disableSound={false}
-      style={[
-        a.py_lg,
-        // animatedButtonStyle,
-      ]}
+      style={[a.py_lg, buttonWrapperStyle]}
       onPress={onPress}>
       {children}
     </Pressable>
   ) : (
     <TouchableOpacity
       disabled={disabled}
-      style={[
-        a.py_lg,
-        // animatedButtonStyle,
-      ]}
+      style={[a.py_lg, buttonWrapperStyle]}
       onPress={onPress as ComponentProps<typeof TouchableOpacity>['onPress']}>
       {children}
     </TouchableOpacity>
