@@ -34,7 +34,7 @@ export default function Login() {
   const [password, setPassword] = useState<FormField>({error: '', value: ''});
   const [error, setError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState({login: false, google: false});
+  const [loading, setLoading] = useState(false);
 
   const handleLoginPress = useCallback(async () => {
     const emailValidation = validateEmail(email.value);
@@ -43,13 +43,13 @@ export default function Login() {
 
     if (emailValidation.error) return;
 
-    setLoading(prev => ({...prev, login: true}));
+    setLoading(true);
     const success = await login(
       {email: email.value, password: password.value},
       rememberMe,
     );
     if (!success) setError(true);
-    setLoading(prev => ({...prev, login: false}));
+    setLoading(false);
   }, [email, password]);
 
   const handleSignUpPress = useCallback(() => {
@@ -174,7 +174,8 @@ export default function Login() {
               )}
 
               <Button
-                loading={loading.login}
+                loading={loading}
+                disabled={loading}
                 onPress={handleLoginPress}
                 variant="solid"
                 shape="round"

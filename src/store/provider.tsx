@@ -1,5 +1,6 @@
 import React from 'react';
 import {Provider} from 'react-redux';
+
 import store from '.';
 
 export function ReduxProviders({children}: {children: React.ReactNode}) {

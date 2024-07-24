@@ -17,6 +17,8 @@ export default function StepOne() {
     passwordCorrect,
     retypePassword,
     setPassword,
+    phoneNumber,
+    setPhoneNumber,
     setRetypePassword,
   } = useFormContext();
 
@@ -45,6 +47,7 @@ export default function StepOne() {
         textContentType="familyName"
         style={[a.px_0, a.py_0, a.mt_sm]}
       />
+
       <TextInput
         value={email.value}
         errorText={email.error}
@@ -57,6 +60,7 @@ export default function StepOne() {
         textContentType="emailAddress"
         style={[a.px_0, a.py_0, a.mt_sm]}
       />
+
       <TextInput
         value={password.value}
         errorText={password.error}
@@ -64,10 +68,11 @@ export default function StepOne() {
         label={t('password')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
-        placeholder={'******'}
+        placeholder="******"
         textContentType="password"
         style={[a.px_0, a.py_0, a.mt_sm]}
       />
+
       <TextInput
         value={retypePassword.value}
         errorText={retypePassword.error}
@@ -75,7 +80,7 @@ export default function StepOne() {
         label={t('password_confirmation')}
         labelStyle={[a.text_(colors.darkgray)]}
         containerStyle={[a.mt_2xl]}
-        placeholder={'******'}
+        placeholder="******"
         textContentType="password"
         style={[
           a.px_0,
@@ -84,6 +89,20 @@ export default function StepOne() {
           passwordCorrect && a.border_tint('lightgreen'),
         ]}
         inputStyle={[passwordCorrect && a.text_('lightgreen')]}
+      />
+
+      <TextInput
+        // value={phoneNumber.value}
+        value={phoneNumber}
+        // errorText={phoneNumber.error}
+        onChangeText={text => setPhoneNumber(text)}
+        label={t('phone_number')}
+        labelStyle={[a.text_(colors.darkgray)]}
+        textContentType="telephoneNumber"
+        keyboardType="number-pad"
+        placeholder="+972-52-345-6789"
+        containerStyle={[a.mt_2xl]}
+        style={[a.px_0, a.py_0, a.mt_sm]}
       />
     </>
   );

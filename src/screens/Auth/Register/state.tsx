@@ -32,11 +32,13 @@ interface FormContextProps {
   setLastname: React.Dispatch<React.SetStateAction<FormField>>;
   email: FormField;
   setEmail: React.Dispatch<React.SetStateAction<FormField>>;
-  phoneNumber: FormField;
+  // phoneNumber: FormField;
+  phoneNumber: string;
+  // setPhoneNumber: React.Dispatch<React.SetStateAction<FormField>>;
+  setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
   dateOfBirth: FormField;
   setDateOfBirth: React.Dispatch<React.SetStateAction<FormField>>;
   anniversary: FormField;
-  setPhoneNumber: React.Dispatch<React.SetStateAction<FormField>>;
   setAnniversary: React.Dispatch<React.SetStateAction<FormField>>;
   password: FormField;
   setPassword: React.Dispatch<React.SetStateAction<FormField>>;
@@ -89,10 +91,7 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     value: new Date().toString(),
     error: '',
   });
-  const [phoneNumber, setPhoneNumber] = useState<FormField>({
-    value: '',
-    error: '',
-  });
+
   const [password, setPassword] = useState<FormField>({
     value: '',
     error: '',
@@ -103,41 +102,43 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
   });
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log('EFFECT: ', {phoneNumber});
-  }, [phoneNumber]);
+  //  const [phoneNumber, setPhoneNumber] = useState<FormField>({
+  //    value: '',
+  //    error: '',
+  //  });
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const passwordCorrect =
     retypePassword.value !== '' && retypePassword.value === password.value;
 
   const handleSignUpPress = useCallback(async () => {
-    console.log({phoneNumber: phoneNumber.value});
+    console.log({phoneNumber});
     const firstNameValidation = validateName(firstname.value);
     const lastNameValidation = validateName(lastname.value);
     const emailValidation = validateEmail(email.value);
     const passwordValidation = validatePassword(password.value);
-    const phoneNumberValidation = validatePhoneNumber(phoneNumber.value);
+    // const phoneNumberValidation = validatePhoneNumber(phoneNumber.value);
+
     const retypePasswordValidation = validateRetypePassword(
       password.value,
       retypePassword.value,
     );
 
-    console.log({phoneNumberValidation});
+    // console.log({phoneNumberValidation});
 
     setFirstname(firstNameValidation);
     setLastname(lastNameValidation);
     setEmail(emailValidation);
     setPassword(passwordValidation);
     setRetypePassword(retypePasswordValidation);
-    setPhoneNumber(phoneNumberValidation);
+    // setPhoneNumber(phoneNumberValidation);
 
     if (
       firstNameValidation.error ||
       lastNameValidation.error ||
       emailValidation.error ||
       passwordValidation.error ||
-      retypePasswordValidation.error ||
-      phoneNumberValidation.error
+      retypePasswordValidation.error
     )
       return;
     setLoading(true);
@@ -146,7 +147,8 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
       password: password.value,
       firstname: firstname.value,
       lastname: lastname.value,
-      phoneNumber: phoneNumber.value,
+      // phoneNumber: phoneNumber.value
+      phoneNumber,
       anniversary: anniversary.value,
       dateOfBirth: dateOfBirth.value,
       gender: gender.value,
@@ -158,11 +160,11 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     firstname.value,
     lastname.value,
     password.value,
-    phoneNumber.value,
+    // phoneNumber.value,
+    phoneNumber,
     anniversary.value,
     dateOfBirth.value,
     retypePassword.value,
-    password,
     setFirstname,
     setLastname,
     setEmail,

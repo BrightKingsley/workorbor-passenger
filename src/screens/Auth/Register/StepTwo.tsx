@@ -8,8 +8,6 @@ import {useFormContext} from './state';
 
 export default function StepTwo() {
   const {
-    phoneNumber,
-    setPhoneNumber,
     referee,
     gender,
     setReferee,
@@ -20,21 +18,6 @@ export default function StepTwo() {
 
   return (
     <>
-      <TextInput
-        value={phoneNumber.value}
-        errorText={phoneNumber.error}
-        onChangeText={text => {
-          setPhoneNumber({value: text, error: ''});
-        }}
-        label={t('phone_number')}
-        labelStyle={[a.text_(colors.darkgray)]}
-        containerStyle={[]}
-        textContentType="telephoneNumber"
-        keyboardType="number-pad"
-        placeholder="+972-52-345-6789"
-        style={[a.px_0, a.py_0, a.mt_sm]}
-      />
-
       <DateInput
         getDate={date => setDateOfBirth({value: date.toString(), error: ''})}
         label={t('date_of_birth')}

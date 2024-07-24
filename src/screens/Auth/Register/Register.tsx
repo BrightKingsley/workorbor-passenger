@@ -133,7 +133,6 @@ function RegisterComponent() {
               a.bg_(colors.light),
               a.flex_1,
               a.pt_5xl,
-              a.pb_(100),
               a.overflow_visible,
             ]}>
             <View style={[a.w_(60)]}>
@@ -146,7 +145,7 @@ function RegisterComponent() {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               scrollEventThrottle={16}
-              scrollEnabled={false} // Disable user-initiated scrolling
+              // scrollEnabled={false} // Disable user-initiated scrolling
               onScroll={Animated.event(
                 [{nativeEvent: {contentOffset: {x: scrollX}}}],
                 {useNativeDriver: false},
