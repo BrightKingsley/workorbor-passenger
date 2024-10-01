@@ -7,25 +7,26 @@ module.exports = function (api) {
         {
           lazyImports: true,
           native: {
-            unstable_transformProfile: 'hermes-stable',
+            unstable_transformAccount: 'hermes-stable',
           },
         },
       ],
     ],
     plugins: [
-      [
-        'module:react-native-dotenv',
-        {
-          envName: 'APP_ENV',
-          moduleName: '@env',
-          path: '.env',
-          blockList: null,
-          allowList: null,
-          safe: false,
-          allowUndefined: false,
-          verbose: false,
-        },
-      ],
+      // [
+      //   'module:react-native-dotenv',
+      //   {
+      //     envName: 'APP_ENV',
+      //     moduleName: '@env',
+      //     path: '.env',
+      //     blockList: null,
+      //     allowList: null,
+      //     safe: false,
+      //     allowUndefined: false,
+      //     verbose: false,
+      //   },
+      // ],
+      'nativewind/babel',
       [
         'module-resolver',
         {

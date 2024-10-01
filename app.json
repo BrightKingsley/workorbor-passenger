@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "barbershop",
-    "slug": "barbershop",
+    "name": "Workorbor",
+    "slug": "workorbor",
+    "scheme": "workorbor",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,24 +10,59 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#E0DED7"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["workorbor"],
+        "ExpoLocalization_supportsRTL": true,
+        "UIBackgroundModes": ["location", "fetch", "remote-notification"],
+        "NSLocationWhenInUseUsageDescription": "This app requires access to your location when open.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app requires access to your location even when closed.",
+        "NSLocationAlwaysUsageDescription": "This app requires access to your location when open.",
+        "deploymentTarget": "14"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#E0DED7"
+        "backgroundColor": "#FFFFFF"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.brightkingsley.workorbor"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
-    "plugins": ["expo-localization", "expo-build-properties", "expo-font"],
+    "plugins": [
+      "expo-localization",
+      "expo-background-fetch",
+      "expo-build-properties",
+      "expo-font",
+      "expo-router",
+      "expo-secure-store",
+      ["./linking.plugin"],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(Workorbor) to use your location.",
+          "locationAlwaysPermission": "Allow $(Workorbor) to use your location.",
+          "locationWhenInUsePermission": "Allow $(Workorbor) to use your location.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ]
+    ],
     "extra": {
-      "supportsRTL": true
+      "supportsRTL": true,
+      "router": {
+        "origin": false
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

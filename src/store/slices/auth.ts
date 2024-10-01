@@ -8,18 +8,14 @@ type AuthState = {
   error?: string | null;
 };
 
-const localStorage = {
-  getItem(param: string) {
-    return '';
-  },
-  setItem(name: string, item: any) {},
-  removeItem(name: string) {},
-};
-
 let user: AuthState['user'] = null;
-const storedUser = localStorage.getItem('user');
+// const storedUser = localStorage.getItem('user');
+// if (storedUser) user = JSON.parse(storedUser);
+// const token = localStorage.getItem('token');
+
+const storedUser = '';
 if (storedUser) user = JSON.parse(storedUser);
-const token = localStorage.getItem('token');
+const token = '';
 
 console.log('STORED: ', {token, user});
 
@@ -35,20 +31,22 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<AuthState>) => {
+    setUser: (
+      state,
+      action: PayloadAction<AuthState & {callback?: () => void}>,
+    ) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.isLoading = false;
-      localStorage.setItem('user', JSON.stringify(state.user));
-      localStorage.setItem('token', state.token || '');
+      if (action.payload.callback) {
+        action.payload.callback();
+      }
     },
     clearUser: state => {
       state.user = null;
       state.isAuthenticated = false;
       state.isLoading = false;
-      localStorage.removeItem('user');
-      // localStorage.removeItem("token");
     },
   },
   extraReducers: builder => {

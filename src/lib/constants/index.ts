@@ -1,4 +1,4 @@
-import {Insets} from 'react-native';
+import {Insets, Platform} from 'react-native';
 
 // constants to manage active and logged out users
 export const DEV_MODE = false;
@@ -26,10 +26,12 @@ export const GEOCODE_URL = `https://maps.googleapis.com/maps/api/geocode/json?`;
 export let API_BASE_URL: string;
 
 if (__DEV__) {
-  API_BASE_URL = '';
-  API_BASE_URL = 'https://barbershop-api-x8ba.onrender.com';
+  if (Platform.OS !== 'ios') {
+    API_BASE_URL = 'http://192.168.122.1:8080';
+  } else API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
   console.log('__DEVELOPMENT__');
+  API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
 } else {
-  API_BASE_URL = 'https://barbershop-api-x8ba.onrender.com';
+  API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
   console.log('__PRODUCTION__');
 }

@@ -1,5 +1,14 @@
 {
   "extends": "expo/tsconfig.base",
+  "include": [
+    "./**/*.tsx",
+    "./**/*.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "metro.config.js",
+    "babel.config.js",
+    "src/components/feature/Order/PlacesAutoComplete/GoogleAutocomplete.jsx"
+  ],
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",

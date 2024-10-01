@@ -18,7 +18,7 @@ export async function getItemFromAsyncStore<K extends keyof StoreItems>(
   return storedItem ? (JSON.parse(storedItem) as StoreItems[K]) : null;
 }
 
-export async function addItemFromAsyncStore<K extends keyof StoreItems>(
+export async function addItemToAsyncStore<K extends keyof StoreItems>(
   key: K,
   value: StoreItems[K],
 ): Promise<void> {

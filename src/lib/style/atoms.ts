@@ -2,6 +2,8 @@ import {
   AnimatableNumericValue,
   DimensionValue,
   FlexStyle,
+  Image,
+  ImageStyle,
   StyleProp,
   TextStyle,
   ViewStyle,

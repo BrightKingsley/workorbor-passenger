@@ -1,2 +1,2 @@
 // @ts-nocheck
-export {default as WaterWave} from './water-wave.png';
+export {default as CarAwaiting} from './car-awaiting.png';

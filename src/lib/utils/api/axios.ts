@@ -100,7 +100,7 @@ export default async function fetchData<T>(
       {...data, ...config},
     );
     console.log({data: response.data});
-    console.log('ENDPOINT: ', response.config.url);
+    console.log('two_ENDPOINT: ', response.config.url);
 
     return response.data.data;
   } catch (error) {
