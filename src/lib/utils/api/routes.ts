@@ -82,6 +82,29 @@ const createOrderRoutes = (route: string) => {
   );
 };
 
+const createChatRoutes = (route: string) => {
+  return new Proxy(
+    {} as {
+      [key in 'get-messages' | 'send-message']: {
+        route: string;
+        route_(id: string): string;
+      };
+    },
+    {
+      get(_, key) {
+        return {
+          get route() {
+            return `${route}/${String(key)}`;
+          },
+          route_(id: string) {
+            return `${route}/${String(key)}/${id}`;
+          },
+        };
+      },
+    },
+  );
+};
+
 const apiRoutes = {
   get auth() {
     const route = baseRoutes.auth;
@@ -93,13 +116,11 @@ const apiRoutes = {
   },
   get order() {
     const route = baseRoutes.order;
-    // return {
-    //   route(id: string) {
-    //     if (!id) return route;
-    //     return `${route}/${id}`;
-    //   },
-    // };
     return createOrderRoutes(route);
+  },
+  get chat() {
+    const route = baseRoutes.order;
+    return createChatRoutes(route);
   },
 };
 

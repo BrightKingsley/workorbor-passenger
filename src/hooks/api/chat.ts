@@ -4,27 +4,30 @@ import {useCallback} from 'react';
 import {ApiError} from '#/lib/utils/api/axios';
 import apiRoutes from '#/lib/utils/api/routes';
 // import {NavigationProps} from '#/navigation/types';
-import {OrderRequest} from '#/store/slices/order/types';
 import useRequest from './useRequest';
 import {useAppDispatch, useAppSelector} from '../store';
 import {Alert} from 'react-native';
-import {updateOrderRequest} from '$/src/store/slices/order/helpers';
+import {MessageType} from '$/src/components/feature/Chat/types';
+import {addMessage, setMessages} from '$/src/store/slices/chat';
+import {useUser} from '@clerk/clerk-expo';
 
 // import {useAppDispatch} from '../store';
 
-export default function useOrderApi() {
+export default function useChatApi() {
   // const navigation = useNavigation<NavigationProps>();
   const dispatch = useAppDispatch();
-  const {orderRequest} = useAppSelector(state => state.order);
   const {fetchData} = useRequest();
+  const {user} = useUser();
+  const {chatId} = useAppSelector(state => state.chat);
 
-  const getOrders = useCallback(async () => {
+  const getMessages = useCallback(async (chatId: string) => {
     try {
-      const data = await fetchData<{orders: any[]}>(
+      const data = await fetchData<{messages: any[]}>(
         'get',
-        `${apiRoutes.order.orders.route}?user_type=passenger`,
+        `${apiRoutes.chat['get-messages'].route_(chatId)}`,
       );
       console.log({data});
+      dispatch(setMessages(data.messages));
       return data;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -38,37 +41,22 @@ export default function useOrderApi() {
     }
   }, []);
 
-  const getOrder = useCallback(async (id: string) => {
+  const sendMessage = useCallback(async (text: string) => {
+    if (!(user && chatId && text)) return;
     try {
-      const data = await fetchData<{order: any}>(
-        'get',
-        `${apiRoutes.order.orders.route_(id)}`,
-      );
-      console.log({data});
-      return data;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        console.error(
-          `API Error: ${error.message} (Status: ${error.status}, ${error.statusText})`,
-        );
-      } else {
-        console.error('Unexpected Error:', error);
-      }
-
-      return null;
-    }
-  }, []);
-
-  const createOrder = useCallback(async () => {
-    try {
-      if (!orderRequest) return Alert.alert('Invalid Order Request');
-      const data = await fetchData<{orderId: string}>(
+      const message: MessageType = {
+        id: Date.now().toString(),
+        sender: user?.id,
+        text,
+      };
+      dispatch(addMessage(message));
+      const data = await fetchData<{chat: any}>(
         'post',
-        `${apiRoutes.order.create.route}`,
-        {order: orderRequest},
+        `${apiRoutes.chat['send-message'].route}`,
+        {message, chatId},
       );
-      console.log('😭😭😭😭😭😭CREATE_ORDER: ', data, data?.orderId);
-      updateOrderRequest(dispatch, {orderId: data?.orderId});
+      console.log({data});
+      return data;
     } catch (error) {
       if (error instanceof ApiError) {
         console.error(
@@ -77,12 +65,13 @@ export default function useOrderApi() {
       } else {
         console.error('Unexpected Error:', error);
       }
+
+      return null;
     }
   }, []);
 
   return {
-    createOrder,
-    getOrder,
-    getOrders,
+    sendMessage,
+    getMessages,
   };
 }

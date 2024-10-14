@@ -22,21 +22,28 @@ import {ButtonText} from '../../global/Button';
 import ToggleButton from '../../global/ToggleButton';
 import {Text} from '../../global/Themed';
 import PlacesAutoComplete from './PlacesAutoComplete/PlacesAutoComplete';
-import KeyboardAvoidingComponent from '../../global/KeyboardAvoidingComponent';
+// import KeyboardAvoidingComponent from '../../global/KeyboardAvoidingComponent';
 import ViewHeader from '../../global/ViewHeader';
 import {Container} from '../../utils';
 import {useAnimatedKeyboard} from 'react-native-reanimated';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
+import KeyboardAvoidingComponent from '../../global/KeyboardAvoidingComponent';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {
+  GooglePlaceData,
+  GooglePlaceDetail,
+} from 'react-native-google-places-autocomplete';
 
 const {height: HEIGHT} = Dimensions.get('window');
 // NOTE: snapPoints holds the default height point for modal
 const snapPointValue = ((HEIGHT - StatusBar.currentHeight!) / HEIGHT) * 100;
 // export const snapPoints = [`${snapPointValue}%`];
 export const snapPoints = ['95%'];
-export const enablePanDownToClose = false;
+export const enablePanDownToClose = true;
 // export const snapPoints = [`80%`];
 
 let KEYBOARD_HEIGHT: number | undefined = undefined;
+
 export default function SelectDestination() {
   const [loading, setLoading] = React.useState(false);
   const [useCurrentLocation, setUseCurrentLocation] = React.useState(false);
@@ -62,6 +69,7 @@ export default function SelectDestination() {
   const barHeight = React.useMemo(() => bottomTabBarHeight, []);
 
   const createOrder = React.useCallback(() => {
+    console.log('CREATE_ORDER_CLICKED!');
     if (orderRequest?.origin && orderRequest.destination) {
       openModal('order-details', {});
     }
@@ -136,12 +144,13 @@ export default function SelectDestination() {
     // if (!(orderRequest?.origin && orderRequest.destination))
     setTimeout(() => {
       openModal('where-to', {
-        children: <></>,
         onClose() {
-          setTimeout(() => {
-            console.log('RUNNING');
-            openModal('where-to', {});
-          }, 2000);
+          orderRequest
+            ? setTimeout(() => {
+                console.log('RUNNING');
+                openModal('where-to', {});
+              }, 2000)
+            : null;
         },
       });
     }, 1000);
@@ -149,15 +158,15 @@ export default function SelectDestination() {
 
   return (
     <>
-      <Container>
-        <ViewHeader
-          canGoBack={true}
-          backPressHandler={closeModal}
-          title="Select Destination"
-        />
-      </Container>
-      <KeyboardAvoidingComponent style={[a.mt_xl]}>
+      <View style={[a.w_full, a.h_full]}>
         <>
+          <Container>
+            <ViewHeader
+              title="Select Destination"
+              canGoBack
+              backPressHandler={closeModal}
+            />
+          </Container>
           <Row
             style={[
               a.self_end,
@@ -172,32 +181,36 @@ export default function SelectDestination() {
                 accessibilityLabel={'PinButton'}
                 isActive={useCurrentLocation}
                 switchActive={() => setUseCurrentLocation(prev => !prev)}
-                style={[a.h_(32), a.w_(50), a.bg_(colors.darkgray)]}
+                style={[a.h_(32), a.w_(50), a.bg_(colors.dark_1)]}
                 circleSize={30}
               />
             </View>
           </Row>
           <Column style={[a.my_2xl, a.rounded_md, a.flex_1]}>
             <Column style={[a.mt_(-10)]}>
-              <View style={[a.px_md, a.z_30]}>
+              <View
+                style={[
+                  // a.py_xs,
+                  a.px_md,
+                  a.z_30,
+                  a.bg_(colors.light_1),
+                ]}>
                 {useCurrentLocation ? (
                   <Pressable onPress={() => setUseCurrentLocation(false)}>
                     <Row
                       style={[
                         a.align_center,
+                        // a.justify_center,
                         a.w_full,
                         a.rounded_sm,
                         a.px_lg,
                         a.h_(50),
                         a.border,
-                        a.border_tint(colors.lightgrey),
-                        a.bg_(colors.light),
+                        a.border_tint(colors.dark_1),
+                        a.bg_(colors.light_2),
                       ]}>
                       {loading ? (
-                        <Row style={[a.align_center]}>
-                          <ActivityIndicator color={colors.primarylighter} />
-                          <Text style={[a.ml_sm]}>Getting location...</Text>
-                        </Row>
+                        <ActivityIndicator color={colors.primary} />
                       ) : (
                         <>
                           <View
@@ -207,7 +220,7 @@ export default function SelectDestination() {
                               a.rounded_full,
                               a.align_center,
                               a.justify_center,
-                              a.bg_(hexWithOpacity(colors.primarydarker, 0.3)),
+                              a.bg_(hexWithOpacity(colors.teal_2, 0.3)),
                             ]}>
                             <View
                               style={[
@@ -215,8 +228,8 @@ export default function SelectDestination() {
                                 a.h_60,
                                 a.rounded_full,
                                 a.border_(2),
-                                a.border_tint(colors.lightgrey),
-                                a.bg_(colors.primarydarker),
+                                a.border_tint(colors.light_1),
+                                a.bg_(colors.teal_2),
                               ]}
                             />
                           </View>
@@ -257,9 +270,10 @@ export default function SelectDestination() {
                   a.top_(-8),
                   a.align_center,
                   a.z_20,
-                  // a.bg_(colors.lightgrey),
+                  a.bg_(colors.light_1),
                 ]}>
                 <PlacesAutoComplete
+                  iconTransitionDirection="up"
                   inputContainerStyles={[a.mx_md]}
                   listViewStyles={[a.mt_(70), {zIndex: -1}]}
                   autoFocus={true}
@@ -283,7 +297,7 @@ export default function SelectDestination() {
             </Column>
           </Column>
         </>
-      </KeyboardAvoidingComponent>
+      </View>
     </>
   );
 }

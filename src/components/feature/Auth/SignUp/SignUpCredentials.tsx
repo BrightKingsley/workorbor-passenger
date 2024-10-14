@@ -41,7 +41,7 @@ import TextInput from '$/src/components/global/TextInput';
 import {Container} from '$/src/components/utils';
 import {FontAwesome} from '@expo/vector-icons';
 import {HITSLOP_30} from '$/src/lib/constants';
-import HeaderBackButton from '$/src/components/global/HeaderBackButton';
+import BackButton from '$/src/components/global/BackButton';
 import useApi from '$/src/hooks/api/useApi';
 import {ClerkAPIError} from '@clerk/types';
 import {hexWithOpacity} from '$/src/lib/ui/helpers';
@@ -136,7 +136,7 @@ export default function SignUpCredentials() {
           },
           title: 'Sign Up',
           headerBackTitleVisible: false,
-          headerLeft: props => <HeaderBackButton {...props} />,
+          headerLeft: props => <BackButton {...props} />,
         }}
       />
       <KeyboardAvoidingView

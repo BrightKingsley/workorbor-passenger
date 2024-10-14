@@ -15,7 +15,9 @@ import {hexWithOpacity} from '#/lib/ui/helpers';
 import {useModalControls} from '$/src/components/global/modals/ModalState';
 import {Text, View} from '$/src/components/global/Themed';
 import {Column, ListTile, Row} from '$/src/components/global';
-import {CarAwaiting} from '#/assets/images';
+import {CarAwaiting, CarAwaitingGray} from '#/assets/images';
+import Skeleton from '$/src/components/global/Skeleton';
+import {MotiView} from 'moti';
 
 const imageUri =
   'https://images.unsplash.com/photo-1621569642780-4864752e847e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=668&q=80';
@@ -40,9 +42,15 @@ export default function ResponseTile({
   }, []);
 
   return (
-    <View style={[a.rounded_md, a.relative, a.shadow_sm]}>
+    <View
+      style={[
+        a.rounded_md,
+        a.relative,
+        a.border,
+        a.border_tint(hexWithOpacity(colors.lightgrey, 0.4)),
+      ]}>
       <ListTile
-        style={[a.relative, a.bg_('white')]}
+        style={[a.relative, a.bg_('white'), a.rounded_md]}
         ripple
         rippleColor={hexWithOpacity(colors.primarydarker, 0.5)}
         leading={
@@ -129,7 +137,7 @@ export default function ResponseTile({
         action={handleTilePress}
       />
 
-      <View
+      {/* <View
         style={[
           a.absolute,
           a.right_0,
@@ -166,7 +174,101 @@ export default function ResponseTile({
           ]}>
           <Ionicons name="location" size={18} color={colors.primarydarker} />
         </Pressable>
-      </View>
+      </View> */}
     </View>
+  );
+}
+
+export function ResponseTileLoader() {
+  return (
+    <MotiView
+      transition={{
+        type: 'timing',
+      }}
+      animate={{backgroundColor: '#ffffff'}}
+      style={[
+        a.rounded_md,
+        a.relative,
+        a.border,
+        a.border_tint(hexWithOpacity(colors.lightgrey, 0.4)),
+      ]}>
+      <ListTile
+        style={[a.relative, a.bg_('white'), a.rounded_md]}
+        ripple
+        rippleColor={hexWithOpacity(colors.lightgrey, 0.5)}
+        leading={
+          <Row style={[]}>
+            <Svg
+              width={90}
+              style={[a.justify_center, a.align_center]}
+              height={70}>
+              <Pattern
+                id="c"
+                height="100%"
+                width="100%"
+                patternUnits="userSpaceOnUse"
+                patternContentUnits="objectBoundingBox"
+                preserveAspectRatio="none"
+                x="0"
+                y="0">
+                <Rect width="1" height="1" fill={colors.lightgrey} />
+                <View
+                  style={[
+                    a.w_(85),
+                    a.h_(70),
+                    a.self_center,
+                    a.align_center,
+                    a.justify_center,
+                  ]}>
+                  {/* <Grayscale> */}
+                  <Image
+                    height={100}
+                    width={100}
+                    resizeMode="contain"
+                    // preserveAspectRatio="xMidYMid meet"
+                    // xlinkHref={CarAwaiting}
+                    source={CarAwaitingGray}
+                    alt="car"
+                    // href={CarAwaiting}
+                    // x="0.05"
+                    // y="0"
+                    style={[a.w_80, a.h_80, a.self_center]}
+                  />
+                  {/* </Grayscale> */}
+                </View>
+              </Pattern>
+              <Path
+                d="M0 0 L60 0 L90 90 L0 90 Z"
+                stroke="transparent"
+                strokeWidth={0}
+                fill="url(#c)"
+              />
+            </Svg>
+          </Row>
+        }
+        content={
+          <View style={[]}>
+            <Skeleton width={80} height={20} radius={'round'} />
+            <Row style={[a.mt_xs]}>
+              <Skeleton width={20} height={10} radius={'round'} />
+              <Row style={[a.align_center, a.ml_md]}>
+                <Ionicons name="person" color={colors.lightgrey} />
+                <Skeleton width={10} height={10} radius={'round'} />
+              </Row>
+            </Row>
+          </View>
+        }
+        trailing={
+          <Column
+            style={[a.align_end, a.justify_center, a.z_20, a.right_0, a.px_md]}>
+            <Skeleton width={50} height={16} radius={'round'} />
+            <View style={[a.mt_sm]}>
+              <Skeleton width={40} height={14} radius={'round'} />
+            </View>
+          </Column>
+        }
+        action={() => null}
+      />
+    </MotiView>
   );
 }

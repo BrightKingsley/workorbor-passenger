@@ -13,7 +13,7 @@ import {colors} from '$/src/lib/theme/palette';
 import {hexWithOpacity} from '$/src/lib/ui/helpers';
 import useApi from '$/src/hooks/api/useApi';
 import {Order as OrderType, formatDate} from './Orders';
-import {PingAnimation} from '$/src/components/feature/Order/CreateOrderModal/ConfirmOrder';
+import PingAnimation from '$/src/components/global/PingAnimation';
 
 export default function Order() {
   const {order: orderId} = useLocalSearchParams();

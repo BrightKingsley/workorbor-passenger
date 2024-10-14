@@ -1,5 +1,6 @@
-import {ComponentProps} from 'react';
 import {FontAwesome, Ionicons} from '@expo/vector-icons';
+import {ComponentProps} from 'react';
+
 import {OrderPhase} from './slices/order/types';
 
 // MODAL

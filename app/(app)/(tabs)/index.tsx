@@ -1,3 +1,4 @@
+import SelectDestination from '$/src/components/feature/Order/SelectDestination';
 import {ModalContainer} from '$/src/components/global/modals/Modal';
 import {ModalProvider} from '$/src/components/global/modals/ModalState';
 import {FadeScreenWrapper} from '$/src/components/utils';

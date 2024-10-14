@@ -1,3 +1,5 @@
+import {LogBox} from 'react-native';
+
 import {ClerkProvider, useAuth} from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
@@ -42,7 +44,17 @@ import {RouteTracker, SocketContainer} from '$/src/components/utils';
 import {ModalProvider} from '$/src/components/global/modals/ModalState';
 import useLocationService from '$/src/hooks/useLocationService';
 
-const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'YOUR_SENTRY_DSN', // Add your Sentry DSN here
+  enableInExpoDevelopment: true,
+  debug: true, // Set to false in production
+});
+
+const CLERK_PUBLISHABLE_KEY =
+  'pk_test_cmVuZXdpbmctd2Vhc2VsLTQ1LmNsZXJrLmFjY291bnRzLmRldiQ';
+// const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 console.log({CLERK_PUBLISHABLE_KEY});
 

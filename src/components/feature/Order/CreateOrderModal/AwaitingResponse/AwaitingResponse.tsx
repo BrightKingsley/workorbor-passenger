@@ -39,7 +39,10 @@ export default function AwaitingResponse() {
         ))}
       </BottomSheetScrollView>
       <View style={[a.my_lg]}>
-        <Button label={'confirm'} color="error" variant="outline" shape="round">
+        <Button label={'back'} color="error" variant="outline" shape="round">
+          <ButtonText></ButtonText>
+        </Button>
+        <Button label={'back'} color="error" variant="outline" shape="round">
           <ButtonText>back</ButtonText>
         </Button>
       </View>

@@ -8,7 +8,7 @@ import {colors} from '#/lib/theme/palette';
 import {hexWithOpacity} from '#/lib/ui/helpers';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useModalControls} from '../../global/modals/ModalState';
-import {Column, ListTile, Row, Separator} from '../../global';
+import {Button, Column, ListTile, Row, Separator} from '../../global';
 import {Text} from '../../global/Themed';
 import {Container} from '../../utils';
 import Orders from '$/app/(app)/(tabs)/orders';
@@ -55,7 +55,7 @@ export default function WhereTo() {
     <Container safeArea={false}>
       <View style={[a.w_full, a.h_full]}>
         <View style={[a.overflow_hidden, a.rounded_md]}>
-          <Pressable
+          <Button
             style={[
               a.rounded_md,
               a.bg_(hexWithOpacity(colors.lightgrey, 0.5)),
@@ -81,7 +81,7 @@ export default function WhereTo() {
                 Where To?
               </Text>
             </Row>
-          </Pressable>
+          </Button>
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={[a.mt_md]}>
           {Array.from({length: 4}, () => null).map((_, i) => (

@@ -6,6 +6,7 @@ import {TouchableOpacity, View} from 'react-native';
 import {HITSLOP_30} from '#/lib/constants';
 import {a} from '#/lib/style/atoms';
 
+import BackButton from './BackButton';
 import Row from './Row';
 import {Text} from './Themed';
 
@@ -26,31 +27,9 @@ export default function ViewHeader({
   description,
   backPressHandler,
 }: ViewHeaderProps) {
-  const router = useRouter();
-
-  const onPressBack = React.useCallback(() => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.navigate('/(app)/(tabs)/');
-    }
-  }, [router]);
-
   return (
     <Row style={[a.align_center]}>
-      {canGoBack ? (
-        <TouchableOpacity
-          testID="viewHeaderDrawerBtn"
-          onPress={() => backPressHandler?.() || onPressBack()}
-          hitSlop={HITSLOP_30}
-          style={[a.align_center, a.justify_center, a.rounded_full]}
-          accessible={true}
-          accessibilityRole="button"
-          accessibilityLabel="Back"
-          accessibilityHint={'Access navigation links and settings'}>
-          <FontAwesome name="angle-left" size={30} />
-        </TouchableOpacity>
-      ) : null}
+      {canGoBack ? <BackButton backPressHandler={backPressHandler} /> : null}
       {titleComponent || (
           <View style={[a.mx_auto, a.w_80]}>
             <Text

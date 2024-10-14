@@ -18,6 +18,11 @@ import {useModalControls} from '$/src/components/global/modals/ModalState';
 import {Container} from '$/src/components/utils';
 import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import ViewHeader from '$/src/components/global/ViewHeader';
+import {useAppDispatch, useAppSelector} from '$/src/hooks/store';
+import useApi from '$/src/hooks/api/useApi';
+import PingAnimation from '$/src/components/global/PingAnimation';
+import {setOrderPhase} from '$/src/store/slices/order/slice';
+import {OrderPhase} from '$/src/store/slices/order/types';
 
 export const snapPoints = [`40%`];
 
@@ -25,9 +30,13 @@ export const enablePanDownToClose = false;
 
 export default function ConfirmOrder() {
   const {closeModal, openModal} = useModalControls();
+  const {orderRequest} = useAppSelector(state => state.order);
+  const {createOrder} = useApi().order;
+  const dispatch = useAppDispatch();
 
   const handleConfirmOrder = useCallback(() => {
-    openModal('awaiting-response', {});
+    dispatch(setOrderPhase(OrderPhase.awaitingRide));
+    createOrder();
   }, []);
 
   return (
@@ -71,7 +80,6 @@ export default function ConfirmOrder() {
                   color={colors.primarylighter}
                   size={24}
                   style={[
-                    // a.absolute,
                     a.self_center,
                     a.top_(-10),
                     a.left_(-2),
@@ -82,8 +90,7 @@ export default function ConfirmOrder() {
                 />
               </View>
               <Text style={[a.ml_lg, a.text_sm]}>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Reiciendis, repellat!
+                {orderRequest?.origin.address}
               </Text>
             </Row>
             <Row style={[a.mt_5xl]}>
@@ -91,8 +98,7 @@ export default function ConfirmOrder() {
                 <PingAnimation pingSize={30} />
               </View>
               <Text style={[a.ml_lg, a.text_sm]}>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Reiciendis, repellat!
+                {orderRequest?.destination.address}
               </Text>
             </Row>
           </View>
@@ -111,64 +117,3 @@ export default function ConfirmOrder() {
     </>
   );
 }
-
-export const PingAnimation = ({
-  coreSize = 10,
-  pingSize = 20,
-  color = colors.primarylighter,
-}: {
-  pingSize?: number;
-  coreSize?: number;
-  color?: string;
-}) => {
-  const styles = StyleSheet.create({
-    container: {
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    ping: {
-      width: pingSize,
-      height: pingSize,
-      borderRadius: pingSize / 2,
-      backgroundColor: hexWithOpacity(color, 0.5),
-      position: 'absolute',
-    },
-    core: {
-      width: coreSize,
-      height: coreSize,
-      borderRadius: coreSize / 2,
-      backgroundColor: color,
-    },
-  });
-
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
-
-  React.useEffect(() => {
-    scale.value = withRepeat(
-      withTiming(2, {duration: 1000, easing: Easing.out(Easing.ease)}),
-      -1,
-      true,
-    );
-
-    opacity.value = withRepeat(
-      withTiming(0, {duration: 1000, easing: Easing.out(Easing.ease)}),
-      -1,
-      true,
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{scale: scale.value}],
-      opacity: opacity.value,
-    };
-  });
-
-  return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.ping, animatedStyle]} />
-      <View style={styles.core} />
-    </View>
-  );
-};

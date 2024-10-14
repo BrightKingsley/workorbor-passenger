@@ -1,8 +1,8 @@
 import {Ionicons} from '@expo/vector-icons';
-import React, {useCallback, useState} from 'react';
+import React, {Fragment, useCallback, useEffect, useState} from 'react';
 import {Pressable} from 'react-native';
 
-import {useAppDispatch} from '#/hooks/store';
+import {useAppDispatch, useAppSelector} from '#/hooks/store';
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
 import {clearOrderRequest} from '#/store/slices/order/slice';
@@ -11,23 +11,45 @@ import {Button, Column, Row, Separator} from '$/src/components/global';
 import {ButtonText} from '$/src/components/global/Button';
 import {useModalControls} from '$/src/components/global/modals/ModalState';
 import {Text, View} from '$/src/components/global/Themed';
-import {Container} from '$/src/components/utils';
+import {Container, FadeScreenWrapper} from '$/src/components/utils';
 import ViewHeader from '$/src/components/global/ViewHeader';
 import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import {HITSLOP_20} from '$/src/lib/constants';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import ResponseTile, {
+  ResponseTileLoader,
+} from './AwaitingResponse/ResponseTile';
+import {hexWithOpacity} from '$/src/lib/ui/helpers';
+import useApi from '$/src/hooks/api/useApi';
+import PingAnimation from '$/src/components/global/PingAnimation';
 
-export const snapPoints = [`50%`];
+export const snapPoints = [250];
 
 export const enablePanDownToClose = false;
 
 export default function OrderDetails() {
   const dispatch = useAppDispatch();
   const {closeModal, openModal} = useModalControls();
+  const {createOrder} = useApi().order;
+
+  const {orderResponse, riderInfo} = useAppSelector(state => state.order);
 
   const [vehicleType, setVehicleType] = useState<VehicleType>(VehicleType.car);
+  const [showInfo, setShowInfo] = useState(false);
+  const [rides, setRides] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleSelectRide = useCallback(() => {
-    openModal('confirm-order', {});
+    openModal('confirm-order');
   }, []);
+
+  const toggleShowInfo = useCallback(() => {
+    setShowInfo(prev => !prev);
+  }, []);
+
+  useEffect(() => {
+    if (orderResponse?.availableRiders.length) setLoading(false);
+  }, [orderResponse?.availableRiders]);
 
   return (
     <>
@@ -35,123 +57,125 @@ export default function OrderDetails() {
         <ViewHeader
           canGoBack={true}
           backPressHandler={closeModal}
+          rightComponent={
+            <Button
+              onPress={toggleShowInfo}
+              variant="ghost"
+              shape="round"
+              hitSlop={HITSLOP_20}
+              style={[a.py_0]}>
+              <Ionicons name="information-circle-outline" size={30} />
+            </Button>
+          }
           title="Select Ride"
         />
       </Container>
-      <BottomSheetScrollView style={[a.mt_xl]}>
-        <Container>
-          {/* <Row style={[a.self_center]}>
-            {vehicleTypes.map((type, index) => {
-              const selected = vehicleType === type;
-              return (
-                <React.Fragment key={index}>
-                  <Pressable
-                    onPress={() => {
-                      setVehicleType(type);
-                    }}
-                    android_ripple={{
-                      color: '#ffffff94',
-                      foreground: true,
-                    }}
-                    style={[a.flex_1]}>
-                    <Column
-                      style={[
-                        a.py_5xl,
-                        a.align_center,
-                        selected
-                          ? [
-                              a.bg_(colors.primary),
-                              a.border_(2),
-                              a.border_tint(colors.primarylighter),
-                            ]
-                          : [a.bg_(colors.lightgrey)],
-                        a.rounded_md,
-                      ]}>
-                      <View
-                        style={[
-                          a.rounded_full,
-                          a.align_center,
-                          a.justify_center,
-                          a.p_md,
-                          a.w_(60),
-                          a.h_(60),
-                          selected
-                            ? [a.border, a.border_tint(colors.primarylighter)]
-                            : a.bg_(colors.lightgrey),
-                        ]}>
-                        {type === VehicleType.car ? (
-                          selected ? (
-                            <Ionicons name="car" />
-                          ) : (
-                            <Ionicons name="bicycle" />
-                          )
-                        ) : selected ? (
-                          <Ionicons name="paper-plane" />
-                        ) : (
-                          <Ionicons name="car" />
-                        )}
-                      </View>
-                      <Text
-                        style={[
-                          a.mt_xs,
-                          selected
-                            ? a.text_(colors.primarylighter)
-                            : [a.text_('white')],
-                          a.capitalize,
-                        ]}>
-                        {type}
-                      </Text>
-                    </Column>
-                  </Pressable>
-                  {index < vehicleTypes.length - 1 && <Separator width={5} />}
-                </React.Fragment>
-              );
-            })}
-          </Row> */}
-
-          <Column style={[a.mt_2xl]}>
-            <Row style={[a.justify_between, a.align_center]}>
-              <Text style={[a.text_md, a.font_semi_bold]}>Journey Time</Text>
-              <Text style={[a.text_xl]}>5min - 10min</Text>
-            </Row>
-            <Row style={[a.mt_md, a.justify_between, a.align_center]}>
-              <Text style={[a.text_md, a.font_semi_bold]}>Capacity</Text>
-              <Text style={[a.text_xl]}>1 - 4</Text>
-            </Row>
-          </Column>
-
-          <Separator
-            height={1}
-            backgroundColor={colors.lightgrey}
-            style={[a.my_xl]}
-          />
-          <Row style={[a.align_center]}>
-            <Ionicons name="cash" color={'green'} />
-            <Text style={[a.ml_sm, a.text_md, a.font_bold]}>Pay In Cash</Text>
-          </Row>
-          <Button
-            label={'Clear Order Request'}
-            variant="solid"
-            shape="round"
-            color="primary"
-            style={[a.mt_2xl, a.w_full]}
-            onPress={handleSelectRide}>
-            <ButtonText>Select ride</ButtonText>
-          </Button>
-          <Button
-            label={'Clear Order Request'}
-            variant="outline"
-            shape="round"
-            color="error"
-            style={[a.mt_2xl, a.w_full]}
-            onPress={() => {
-              dispatch(clearOrderRequest());
-              closeModal();
-            }}>
-            <ButtonText>Cancel Order</ButtonText>
-          </Button>
-        </Container>
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        style={[a.mt_xl]}>
+        {showInfo ? (
+          <RideInfo />
+        ) : (
+          <Animated.View entering={FadeIn} exiting={FadeOut}>
+            {/* <Container>
+              {loading || !riderInfo ? (
+                <Fragment>
+                  <ResponseTileLoader />
+                  <Separator height={10} />
+                </Fragment>
+              ) : (
+                )}
+                </Container> */}
+            <Fragment>
+              <ResponseTile />
+              <Separator height={10} />
+            </Fragment>
+            <Separator
+              height={1}
+              backgroundColor={hexWithOpacity(colors.lightgrey, 0.3)}
+              style={[a.mb_lg]}
+            />
+            <Container>
+              <Row style={[a.align_center, a.mb_xs]}>
+                <Ionicons name="cash" color={'green'} />
+                <Text style={[a.ml_sm, a.text_md, a.font_bold]}>
+                  Pay In Cash
+                </Text>
+              </Row>
+              <Button
+                label={'Clear Order Request'}
+                variant="solid"
+                shape="round"
+                color="primary"
+                style={[a.w_full]}
+                onPress={handleSelectRide}>
+                <ButtonText>Select ride</ButtonText>
+              </Button>
+            </Container>
+          </Animated.View>
+        )}
       </BottomSheetScrollView>
     </>
+  );
+}
+
+function RideInfo() {
+  const {orderRequest} = useAppSelector(state => state.order);
+
+  return (
+    <Animated.View
+      entering={FadeIn}
+      exiting={FadeOut}
+      style={[a.mt_2xl, a.top_0, a.pb_(20)]}>
+      <View
+        style={[
+          a.absolute,
+          a.h_65,
+          a.left_(4),
+          a.border_l,
+          a.mt_2xl,
+          a.border_l_tint(colors.primarylighter),
+          {borderStyle: 'dashed'},
+        ]}
+      />
+      <Row style={[]}>
+        <View
+          style={[
+            a.relative,
+            a.w_(10),
+            a.h_(10),
+            a.mt_2xl,
+            a.rounded_full,
+            a.align_center,
+            a.justify_center,
+            // a.bg_(colors.primarylighter),
+            a.overflow_visible,
+          ]}>
+          <Ionicons
+            name="location"
+            color={colors.primarylighter}
+            size={24}
+            style={[
+              // a.absolute,
+              a.self_center,
+              a.top_(-10),
+              a.left_(-2),
+              a.z_20,
+              a.w_(20),
+              a.h_(30),
+            ]}
+          />
+        </View>
+        <Text style={[a.ml_lg, a.text_sm]}>{orderRequest?.origin.address}</Text>
+      </Row>
+      <Row style={[a.mt_5xl]}>
+        <View style={[a.mt_2xl]}>
+          <PingAnimation pingSize={30} />
+        </View>
+        <Text style={[a.ml_lg, a.text_sm]}>
+          {orderRequest?.destination.address}
+        </Text>
+      </Row>
+    </Animated.View>
   );
 }

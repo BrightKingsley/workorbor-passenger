@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {ViewStyle} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 
 import {a} from '#/lib/style/atoms';
 
@@ -43,7 +44,10 @@ export default function ListTile({
   pointerEvents,
 }: ListTileType) {
   return (
-    <View pointerEvents={pointerEvents}>
+    <Animated.View
+      entering={FadeIn}
+      exiting={FadeOut}
+      pointerEvents={pointerEvents}>
       <ListTileWrapper
         ripple={ripple}
         rippleColor={rippleColor}
@@ -62,7 +66,7 @@ export default function ListTile({
           <View>{trailing}</View>
         </Row>
       </ListTileWrapper>
-    </View>
+    </Animated.View>
   );
 }
 

@@ -1,6 +1,8 @@
+import * as Haptics from 'expo-haptics';
 import * as React from 'react';
 import {
   DimensionValue,
+  GestureResponderEvent,
   Insets,
   Pressable,
   StyleProp,
@@ -60,6 +62,11 @@ function AnimatedCircle({
   circleSize?: DimensionValue | number;
   style?: StyleProp<ViewStyle>;
 }) {
+  const onSwitchPress = React.useCallback((_: GestureResponderEvent) => {
+    switchActive?.();
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
+
   // Translate switch to X depending on switchValue state
   const switchStyle = useAnimatedStyle(() => {
     const translateX = isActive
@@ -72,12 +79,12 @@ function AnimatedCircle({
   });
 
   return (
-    <TouchableOpacity
+    <Pressable
       testID="toggleBtn"
       accessibilityHint="Tap to toggle active state"
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      onPress={switchActive}
+      onPress={onSwitchPress}
       hitSlop={hitslop}
       style={[
         styles.switchContainer,
@@ -99,7 +106,7 @@ function AnimatedCircle({
           a.w_(circleSize as DimensionValue),
         ]}
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

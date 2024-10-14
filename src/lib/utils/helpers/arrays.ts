@@ -7,7 +7,5 @@ export function moveStringToEnd<T>(arr: T[], str: T): T[] {
   }
 
   // Add the string to the end of the array
-  arr.push(str);
-
-  return arr;
+  return [...arr, str];
 }

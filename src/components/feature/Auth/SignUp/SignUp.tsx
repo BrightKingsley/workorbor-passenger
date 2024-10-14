@@ -45,7 +45,7 @@ import {
   MarketIconOutline,
 } from '$/src/assets/icons';
 import {Container} from '$/src/components/utils';
-import HeaderBackButton from '$/src/components/global/HeaderBackButton';
+import BackButton from '$/src/components/global/BackButton';
 
 const DATA = [StepOne, StepTwo];
 
@@ -166,7 +166,7 @@ export default function SignUp() {
           headerShown: true,
           headerTransparent: true,
           title: '',
-          headerLeft: props => <HeaderBackButton {...props} />,
+          headerLeft: props => <BackButton {...props} />,
         }}
       />
       <KeyboardAvoidingView

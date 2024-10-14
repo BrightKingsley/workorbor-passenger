@@ -320,6 +320,9 @@ export const a = {
   gap_5xl: {
     gap: tokens.space._5xl,
   },
+  display_none: {
+    display: 'none',
+  },
   flex: {
     display: 'flex',
   },
@@ -1210,6 +1213,12 @@ export const a = {
   },
   left_0: {
     left: 0,
+  },
+  top_0: {
+    top: 0,
+  },
+  bottom_0: {
+    bottom: 0,
   },
 
   input_opacity_sm: {backgroundColor: 'rgba(225,225,225, 0.5)'},

@@ -5,8 +5,7 @@ import {
   View as DefaultView,
 } from 'react-native';
 import {StyleProp, TextStyle} from 'react-native';
-import Animated from 'react-native-reanimated';
-import {UITextView} from 'react-native-uitextview';
+import Animated, {AnimatedProps} from 'react-native-reanimated';
 
 import useLoadedFonts from '#/hooks/useLoadedFonts';
 import {a} from '#/lib/style/atoms';
@@ -83,11 +82,23 @@ export function Text({
   );
 }
 
-export function AnimatedText({children, selectable, ...props}: TextProps) {
+export function AnimatedText({
+  children,
+  selectable,
+  family = 'Regular',
+  ...props
+}: AnimatedProps<TextProps>) {
   const {style, lightColor, darkColor, ...otherProps} = props;
-  const color = useThemeColor({light: lightColor, dark: darkColor}, 'text');
+  const color = useThemeColor(
+    {light: lightColor as string, dark: darkColor as string},
+    'text',
+  );
   const t = useTheme();
-  const nts = normalizeTextStyles([a.text_sm, t.atoms.text, flatten(style)]);
+  const nts = normalizeTextStyles([
+    a.text_sm,
+    t.atoms.text,
+    flatten(style as TextStyle),
+  ]);
 
   const {error, loaded} = useLoadedFonts();
 
@@ -103,7 +114,7 @@ export function AnimatedText({children, selectable, ...props}: TextProps) {
   return (
     <Animated.Text
       selectable={selectable}
-      style={[{color}, nts]}
+      style={[{color, fontFamily: getFontFamily(family as any)}, nts]}
       {...otherProps}>
       {children}
     </Animated.Text>

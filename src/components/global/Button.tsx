@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import React, {Children, ComponentProps, forwardRef} from 'react';
+import React, {Children, ComponentProps, forwardRef, useCallback} from 'react';
 import {PropsWithChildren} from 'react';
 import {
   AccessibilityProps,
@@ -31,6 +31,7 @@ import {android} from '#/platform';
 
 import {normalizeTextStyles, Text, TextProps} from './Themed';
 import {View} from './Themed';
+import * as Haptics from 'expo-haptics';
 
 export type ButtonVariant =
   | 'solid'
@@ -85,7 +86,7 @@ type ButtonProps = Pick<
     style?: StyleProp<ViewStyle>;
     buttonWrapperStyle?: StyleProp<ViewStyle>;
     ripple?: ColorValue;
-    variant: ButtonVariant;
+    variant?: ButtonVariant;
     children: NonTextElements | ((context: ButtonContext) => NonTextElements);
     animatedStyle?: StyleProp<ViewStyle>;
   };
@@ -377,6 +378,11 @@ function ButtonWrapper({
   shape,
   style,
 }: PropsWithChildren<ButtonProps & {selectedColor: string}>) {
+  const onButtonPress = useCallback((e: GestureResponderEvent) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress?.(e);
+  }, []);
+
   return Platform.OS === 'android' ? (
     <AnimatedPressable
       disabled={disabled}
@@ -402,7 +408,7 @@ function ButtonWrapper({
         variant === 'solid' && a.bg_(selectedColor),
         style,
       ]}
-      onPress={onPress}>
+      onPress={onButtonPress}>
       {children}
     </AnimatedPressable>
   ) : (
@@ -421,7 +427,9 @@ function ButtonWrapper({
         variant === 'solid' && a.bg_(selectedColor),
         style,
       ]}
-      onPress={onPress as ComponentProps<typeof TouchableOpacity>['onPress']}>
+      onPress={
+        onButtonPress as ComponentProps<typeof TouchableOpacity>['onPress']
+      }>
       {children}
     </AnimatedTouchableOpacity>
   );

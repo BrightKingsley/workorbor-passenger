@@ -5,6 +5,10 @@ export default function Layout() {
     <>
       <Stack>
         <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+        <Stack.Screen
+          name="chats"
+          options={{headerShown: false, presentation: 'modal'}}
+        />
       </Stack>
     </>
   );

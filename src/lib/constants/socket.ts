@@ -8,6 +8,7 @@ const sk = {
     update_rider_socket: 'update_rider_socket',
     update_passenger_socket: 'update_passenger_socket',
     update_rider_location: 'update_rider_location',
+    available_rides: 'available_rides',
   },
 } as const;
 

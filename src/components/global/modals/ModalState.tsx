@@ -1,6 +1,6 @@
 import {BottomSheetProps} from '@gorhom/bottom-sheet';
 import {BottomSheetMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 
 import {useNonReactiveCallback} from '$/src/hooks/useNonReactiveCallbacks';
 import {moveStringToEnd} from '$/src/lib/utils/helpers/arrays';
@@ -99,7 +99,7 @@ const ModalContext = React.createContext<{
 });
 
 const ModalControlContext = React.createContext<{
-  openModal: (modal: Modal, props: Partial<BottomSheetProps>) => void;
+  openModal: (modal: Modal, props?: Partial<BottomSheetProps>) => void;
   closeModal: () => boolean;
   closeAllModals: () => void;
   setupModal: (modalRef: React.RefObject<BottomSheetMethods>) => void;
@@ -141,24 +141,23 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     setModalRef(ref);
   });
 
-  const openModal = useNonReactiveCallback(
-    (modal: Modal, props: Partial<BottomSheetProps>) => {
+  const openModal = useCallback(
+    (modal: Modal, props?: Partial<BottomSheetProps>) => {
       setActiveModals(modals => {
-        const sortedModals = moveStringToEnd<Modal>([...modals, modal], modal);
+        const sortedModals = moveStringToEnd<Modal>(modals, modal); // Using spread operator to create a new array
         console.log({
           modals,
           modal,
           sortedModals,
           unSorted: [...modals, modal],
         });
-        // return [...modals, modal];
         return sortedModals;
       });
 
-      setModalProps(props);
+      setModalProps(props || {});
     },
+    [],
   );
-
   // const closeModal = useNonReactiveCallback(() => {
   //   let wasActive = activeModals.length > 0;
   //   setActiveModals(modals => {
@@ -166,7 +165,7 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
   //   });
   //   return wasActive;
   // });
-  const closeModal = useNonReactiveCallback(() => {
+  const closeModal = useCallback(() => {
     modalRef?.current?.close();
     let wasActive = true;
     setTimeout(() => {
@@ -179,7 +178,7 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     }, 200);
 
     return wasActive;
-  });
+  }, []);
 
   const closeAllModals = useNonReactiveCallback(() => {
     setActiveModals([]);
@@ -188,13 +187,15 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
   unstable_openModal = openModal;
   unstable_closeModal = closeModal;
 
-  const state = React.useMemo(
-    () => ({
-      isModalActive: activeModals.length > 0,
-      activeModals,
-    }),
-    [activeModals],
-  );
+  // const state = React.useMemo(
+  //   () => ({
+  //     isModalActive: activeModals.length > 0,
+  //     activeModals,
+  //   }),
+  //   [activeModals.length],
+  // );
+
+  const state = {activeModals, isModalActive: activeModals.length > 0};
 
   const methods = React.useMemo(
     () => ({

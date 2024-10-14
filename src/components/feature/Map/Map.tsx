@@ -25,6 +25,8 @@ import MapViewDirections, {
 } from 'react-native-maps-directions';
 import {
   ActivityIndicator,
+  Image,
+  ImageStyle,
   Platform,
   Pressable,
   useWindowDimensions,
@@ -35,9 +37,11 @@ import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
 import MarkerYellow from '#/assets/animation/marker-aqua.json';
 import {useAppSelector} from '#/hooks/store';
 import {customMapStyle} from './style';
-import {MapProps, MarkerProps} from './types';
+import {DirectionsProps, MapProps, MarkerProps} from './types';
 import {Text, View} from '../../global/Themed';
 import {Column} from '../../global';
+import BalloonMarker from './Markers/Marker';
+import {useUser} from '@clerk/clerk-expo';
 
 const DELTAS = {
   latitudeDelta: 1,
@@ -48,32 +52,103 @@ export default function Map({
   minZoomLevel = 10,
   onMapReady,
   initialRegion,
-  markers = [],
-  directions,
   style = {},
   children,
   ...mapProps
 }: MapProps) {
   const mapRef = useRef<MapView>();
 
+  const {user} = useUser();
+
   const {currentPosition, lastPosition} = useAppSelector(
     state => state.location,
   );
+  const {orderRequest} = useAppSelector(state => state.order);
+
+  const [directions, setDirections] = useState<DirectionsProps | null>(null);
+
+  const markers: MarkerProps[] = [
+    {
+      coords: {
+        latitude: orderRequest?.origin?.latitude!,
+        longitude: orderRequest?.origin?.longitude!,
+      },
+      description: 'pick up',
+      identifier: 'origin',
+    },
+    {
+      coords: {
+        latitude: orderRequest?.destination?.latitude!,
+        longitude: orderRequest?.destination?.longitude!,
+      },
+      description: 'destination',
+      identifier: 'destination',
+    },
+  ];
 
   const originLocation = markers.find(
     marker =>
       marker.identifier === 'origin' && marker.coords.latitude !== undefined,
   );
 
+  useEffect(() => {
+    console.info('ORIGIN: ', orderRequest?.origin);
+    console.info('DESTINATION: ', orderRequest?.destination);
+
+    if (orderRequest?.origin && orderRequest?.destination) {
+      console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
+      setDirections({
+        origin: {
+          latitude: orderRequest?.origin?.latitude!,
+          longitude: orderRequest?.origin?.longitude!,
+        },
+        // origin: {latitude: 10.3121757, longitude: 10.3121757},
+        destination: {
+          latitude: orderRequest?.destination?.latitude!,
+          longitude: orderRequest?.destination?.longitude!,
+        },
+        // destination: {latitude: 10.2650001, longitude: 10.2650001},
+        strokeWidth: 5,
+        strokeColor: colors.primary,
+        onReady: result => {
+          console.log('Directions ready:', result);
+        },
+      });
+    }
+  }, [orderRequest]);
+
   const _markers: (MarkerProps | undefined)[] = [
-    // !originLocation
-    //   ? {
-    //       coords: currentPosition?.coords!,
-    //       description: 'your are here',
-    //       identifier: 'current',
-    //     }
-    //   : undefined,
-    ...markers,
+    !originLocation
+      ? {
+          coords: currentPosition?.coords!,
+          description: 'your are here',
+          identifier: 'current',
+          alt: (
+            <Image
+              source={{uri: user?.imageUrl}}
+              style={[a.w_full, a.h_full] as ImageStyle}
+            />
+          ),
+        }
+      : undefined,
+    orderRequest?.origin
+      ? {
+          coords: {
+            latitude: orderRequest?.origin?.latitude || 0,
+            longitude: orderRequest?.origin?.longitude || 0,
+          },
+          identifier: 'origin',
+        }
+      : undefined,
+    orderRequest?.destination
+      ? {
+          coords: {
+            latitude: orderRequest?.destination?.latitude || 0,
+            longitude: orderRequest?.destination?.longitude || 0,
+          },
+          identifier: 'destination',
+        }
+      : undefined,
   ];
 
   const initRegion: Region = {
@@ -96,7 +171,7 @@ export default function Map({
     mapRef?.current?.animateToRegion(initRegion);
     mapRef?.current?.animateCamera({
       center: {latitude: initRegion.latitude, longitude: initRegion.longitude},
-      zoom: 14,
+      zoom: 18,
     });
   };
 
@@ -169,23 +244,24 @@ const CustomMarker = ({
   return (
     <Marker
       tracksInfoWindowChanges
-      style={[a.h_(150)]}
+      style={[a.h_(150), a.w_(50)]}
       onPress={() => {
         setShowLabel(prev => !prev);
       }}
       {...markerProps}>
-      {markerProps.children || (
+      {/* {markerProps.children || (
         <View style={[a.relative, a.align_center, a.justify_center]}>
           {showLabel && label && <Popup label={label} />}
-          {/* <LottieView
+          <LottieView
             source={MarkerYellow}
             style={[a.w_(100), a.h_(100)]}
             autoPlay
             duration={2000 + (index + 2) * 50}
             loop={true}
-          /> */}
+          />
         </View>
-      )}
+      )} */}
+      <BalloonMarker>{markerProps.children}</BalloonMarker>
     </Marker>
   );
 };

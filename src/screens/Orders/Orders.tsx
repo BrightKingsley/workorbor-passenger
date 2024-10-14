@@ -21,269 +21,272 @@ import {Text, View} from '$/src/components/global/Themed';
 import {Container, FadeScreenWrapper} from '$/src/components/utils';
 import {a} from '$/src/lib/style/atoms';
 import {colors} from '$/src/lib/theme/palette';
-import {
+import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import {RefreshControl} from 'react-native-gesture-handler';
 import useApi from '$/src/hooks/api/useApi';
+import OrdersLoader, {OrderLoading, OrdersHeaderLoading} from './OrdersLoader';
+import {MotiView} from 'moti';
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
-// const ORDER_DATA = [
-//   {
-//     title: 'Aug, 2024',
-//     data: [
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//     ],
-//   },
-//   {
-//     title: 'September, 2024',
-//     data: [
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//       {
-//         id: Math.random(),
-//         destination: 'Saje Foods and Pastries',
-//         bookingTime: '20:22',
-//         arrivalTime: '21:22',
-//         origin: 'My House',
-//         date: '25th Aug, 2024',
-//         fee: 2000,
-//       },
-//     ],
-//   },
-// ];
+const ORDER_DATA = [
+  {
+    title: 'Aug, 2024',
+    data: [
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+    ],
+  },
+  {
+    title: 'September, 2024',
+    data: [
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+      {
+        id: Math.random(),
+        destination: 'Saje Foods and Pastries',
+        bookingTime: '20:22',
+        arrivalTime: '21:22',
+        origin: 'My House',
+        date: '25th Aug, 2024',
+        fee: 2000,
+      },
+    ],
+  },
+];
 
 export interface Order {
   _id: string;
@@ -391,6 +394,17 @@ function transformOrders(orders: Order[]): TransformedOrder[] {
   return Object.values(groupedOrders);
 }
 
+const DEFAULT_ORDERS = Array.from({length: 20}, (_, i) => ({
+  _id: i.toString(),
+  dropOffLocation: {address: '', latitude: 0, longitude: 0},
+  fare: 0,
+  isPaid: false,
+  orderTime: new Date(2024, Math.floor(i / 5) + 1, 15).toString(), // Month increments every 5 items
+  passengerId: '',
+  pickupLocation: {address: '', latitude: 0, longitude: 0},
+  status: '',
+}));
+
 export default function Orders() {
   const {getOrders} = useApi().order;
   const headerHeight = useSharedValue(0);
@@ -400,21 +414,31 @@ export default function Orders() {
   const headHeight = useHeaderHeight();
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
   const animatedContainerStyle = useAnimatedStyle(() => ({
     paddingTop: headerHeight.value,
   }));
 
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const responseData = await getOrders();
+      console.log('ORDERS: ', responseData);
+      if (!responseData) return;
+      setOrders(responseData.orders);
+    } catch (error) {
+      console.error('GET_ORDERS: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       console.log('FOCUS!');
-      (async () => {
-        const responseData = await getOrders();
-        console.log('ORDERS: ', responseData);
-        if (!responseData) return;
-        setOrders(responseData.orders);
-      })();
+      fetchOrders();
       return () => {
         headerHeight.value = 0;
         setH_Height(0);
@@ -445,10 +469,7 @@ export default function Orders() {
   };
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
+    fetchOrders();
   }, []);
 
   return (
@@ -461,90 +482,133 @@ export default function Orders() {
         }}
       />
       <>
-        <Container
-          style={[
-            a.bg_(colors.light),
-            a.flex_1,
-            // Platform.OS === 'ios' && [a.pt_(h_height)],
-            Platform.OS === 'ios' && animatedContainerStyle,
-            // a.flex_1,
-          ]}
-          safeArea={false}>
-          <SectionList
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            onScroll={handleScroll}
-            showsVerticalScrollIndicator={false}
-            contentInsetAdjustmentBehavior="automatic"
-            stickySectionHeadersEnabled={true}
-            style={[a.pt_xl]}
-            sections={transformOrders(orders)}
-            keyExtractor={(item, index) => (item._id + index).toString()}
-            ItemSeparatorComponent={() => (
-              <Separator height={1} backgroundColor={colors.lightgrey} />
-            )}
-            SectionSeparatorComponent={() => <Separator height={15} />}
-            renderSectionHeader={({section: {title}}) => (
-              <View
-                style={[
-                  {
-                    shadowColor: colors.darkgray,
-                    shadowOffset: {height: 10, width: 0},
-                    shadowRadius: 10,
-                    shadowOpacity: 0,
-                    // elevation: 10,
-                  },
-                  a.bg_(colors.light),
-                  a.w_(150),
-                  a.rounded_xl,
-                  a.px_sm,
-                  a.py_xs,
-                ]}>
-                <Text>{title}</Text>
-              </View>
-            )}
-            renderItem={({item}) => (
-              <ListTile
-                action={() => router.push(`/(tabs)/orders/${item._id}`)}
-                ripple
-                style={[a.py_md]}
-                leading={
-                  <View
-                    style={[a.p_md, a.rounded_full, a.bg_(colors.lightgrey)]}>
-                    <MaterialCommunityIcons name="car-outline" size={24} />
-                  </View>
-                }
-                content={
-                  <Column style={[a.ml_xl]}>
-                    <Text numberOfLines={1} family="Bold" style={[a.text_md]}>
-                      {item.dropOffLocation.address}
+        <MotiView
+          style={[a.flex_1]}
+          transition={{
+            type: 'timing',
+          }}
+          animate={{backgroundColor: '#ffffff'}}>
+          <Container
+            style={[
+              a.bg_(colors.light),
+              a.flex_1,
+              // Platform.OS === 'ios' && [a.pt_(h_height)],
+              Platform.OS === 'ios' && animatedContainerStyle,
+              // a.flex_1,
+            ]}
+            safeArea={false}>
+            <SectionList
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              ListHeaderComponent={
+                !orders.length && !loading ? (
+                  <Column style={[a.align_center]}>
+                    <Text style={[a.text_center]}>
+                      You have no orders available
                     </Text>
-                    <Row>
-                      <Text>{item.date} - </Text>
-                      <Text>N{item.fare}</Text>
-                    </Row>
+                    <Button
+                      variant="ghost"
+                      shape="round"
+                      style={[a.py_xs, a.px_md, a.mt_sm]}
+                      color="primary"
+                      onPress={fetchOrders}>
+                      <ButtonText style={[a.text_md]}>Refresh</ButtonText>
+                    </Button>
                   </Column>
-                }
-                trailing={
-                  <Button
-                    style={[a.bg_(colors.lightgrey), a.px_lg, a.py_md]}
-                    variant="solid"
-                    shape="round">
-                    <Row style={[a.align_center]}>
-                      <Feather name="rotate-ccw" size={18} />
-                      <ButtonText
-                        family="Medium"
-                        style={[a.text_(colors.dark)]}>
-                        Rebook
-                      </ButtonText>
-                    </Row>
-                  </Button>
-                }
-              />
-            )}
-          />
-        </Container>
+                ) : undefined
+              }
+              onScroll={handleScroll}
+              showsVerticalScrollIndicator={false}
+              contentInsetAdjustmentBehavior="automatic"
+              stickySectionHeadersEnabled={true}
+              style={[a.pt_xl]}
+              sections={
+                loading
+                  ? transformOrders(DEFAULT_ORDERS)
+                  : transformOrders(orders)
+              }
+              keyExtractor={(item, index) => (item._id + index).toString()}
+              ItemSeparatorComponent={() => (
+                <Separator height={1} backgroundColor={colors.lightgrey} />
+              )}
+              SectionSeparatorComponent={() => <Separator height={15} />}
+              renderSectionHeader={({section: {title}}) =>
+                loading ? (
+                  <OrdersHeaderLoading />
+                ) : (
+                  <View
+                    style={[
+                      {
+                        shadowColor: colors.darkgray,
+                        shadowOffset: {height: 10, width: 0},
+                        shadowRadius: 10,
+                        shadowOpacity: 0,
+                        // elevation: 10,
+                      },
+                      a.bg_(colors.light),
+                      a.w_(150),
+                      a.rounded_xl,
+                      a.px_sm,
+                      a.py_xs,
+                    ]}>
+                    <Text>{title}</Text>
+                  </View>
+                )
+              }
+              renderItem={({item}) =>
+                loading ? (
+                  <OrderLoading />
+                ) : (
+                  <ListTile
+                    action={() => router.push(`/(tabs)/orders/${item._id}`)}
+                    ripple
+                    style={[a.py_md]}
+                    leading={
+                      <View
+                        style={[
+                          a.p_md,
+                          a.rounded_full,
+                          a.bg_(colors.lightgrey),
+                        ]}>
+                        <MaterialCommunityIcons name="car-outline" size={24} />
+                      </View>
+                    }
+                    content={
+                      <Column style={[a.ml_xl]}>
+                        <Text
+                          numberOfLines={1}
+                          family="Bold"
+                          style={[a.text_md]}>
+                          {item.dropOffLocation.address}
+                        </Text>
+                        <Row>
+                          <Text>{item.date} - </Text>
+                          <Text>N{item.fare}</Text>
+                        </Row>
+                      </Column>
+                    }
+                    trailing={
+                      <Button
+                        style={[a.bg_(colors.lightgrey), a.px_lg, a.py_md]}
+                        variant="solid"
+                        shape="round">
+                        <Row style={[a.align_center]}>
+                          <Feather name="rotate-ccw" size={18} />
+                          <ButtonText
+                            family="Medium"
+                            style={[a.text_(colors.dark)]}>
+                            Rebook
+                          </ButtonText>
+                        </Row>
+                      </Button>
+                    }
+                  />
+                )
+              }
+            />
+          </Container>
+        </MotiView>
       </>
     </>
   );

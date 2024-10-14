@@ -10,9 +10,12 @@ export type Vehicle = {
 };
 
 export type Rider = {
-  name: string;
+  riderId: string;
   location: {coords: {latitude: number; longitude: number}; address: string};
   vehicle: Vehicle;
+  photo: string;
+  lastName: string;
+  firstName: string;
 };
 
 export enum OrderPhase {
@@ -25,6 +28,7 @@ export enum OrderPhase {
 }
 
 export interface RideOrderRequest {
+  orderId: string;
   origin: {
     latitude?: number;
     longitude?: number;
@@ -50,4 +54,5 @@ export type OrderState = {
   orderRequest: OrderRequest | null;
   orderResponse: OrderResponse | null;
   orderPhase: OrderPhase;
+  riderInfo: Rider | null;
 };

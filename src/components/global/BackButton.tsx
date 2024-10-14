@@ -1,18 +1,35 @@
 import {FontAwesome} from '@expo/vector-icons';
 import type {HeaderBackButtonProps} from '@react-navigation/native-stack/src/types';
+import * as Haptics from 'expo-haptics';
 import {useRouter} from 'expo-router';
+import {useCallback} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {HITSLOP_30} from '$/src/lib/constants';
 import {a} from '$/src/lib/style/atoms';
 
-export default function HeaderBackButton({canGoBack}: HeaderBackButtonProps) {
+export default function BackButton({
+  backPressHandler,
+  canGoBack,
+}: Partial<HeaderBackButtonProps> & {backPressHandler?(): void}) {
   const router = useRouter();
 
+  const onPressBack = useCallback(() => {
+    if (backPressHandler) {
+      backPressHandler();
+    } else {
+      if (router.canGoBack() || canGoBack) {
+        router.back();
+      } else {
+        router.navigate('/(app)/(tabs)/');
+      }
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [router]);
   return (
     <TouchableOpacity
       testID="viewHeaderDrawerBtn"
-      onPress={() => (canGoBack ? router.back() : null)}
+      onPress={onPressBack}
       hitSlop={HITSLOP_30}
       style={[a.align_center, a.justify_center, a.rounded_full]}
       accessible={true}

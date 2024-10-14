@@ -1,64 +1,45 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {Tabs} from 'expo-router';
+import {GestureResponderEvent, Pressable} from 'react-native';
 
 import {HomeIcon, HomeIconOutline} from '$/src/assets/icons';
-import {Text} from '$/src/components/global/Themed';
-import {a} from '$/src/lib/style/atoms';
 import {colors} from '$/src/lib/theme/palette';
+import {useCallback} from 'react';
+import * as Haptics from 'expo-haptics';
+import {useModals} from '$/src/components/global/modals/ModalState';
 
 export default function TabLayout() {
+  const {isModalActive} = useModals();
+  console.log('IS_MODAL_ACTIVE: ', isModalActive);
   return (
     <>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: colors.primary,
           headerShown: false,
-          // tabBarLabel: ({children, color}) => (
-          //   <Text style={[a.text_(color), a.text_xs]}>{children}</Text>
-          // ),
+          tabBarStyle: {
+            display: isModalActive ? 'none' : 'flex',
+          },
           tabBarLabelStyle: {
             fontFamily: 'DMSans_400Regular',
           },
           // tabBarShowLabel: false,
-          // tabBarButton({children, ...props}) {
-          //   const [active, setActive] = useState(false);
-          //   const animatedValue = useSharedValue(0);
-
-          //   const animatedStyle = useAnimatedStyle(() => ({
-          //     backgroundColor: withTiming(
-          //       active ? '#6944D880' : 'transparent',
-          //       {duration: 300}, // adjust the duration for smoothness
-          //     ),
-          //   }));
-          //   return (
-          //     <Pressable
-          //       android_ripple={{
-          //         color: hexWithOpacity(colors.primary, 0.1),
-          //       }}
-          //       {...props}
-          //       onPressIn={() => {
-          //         setActive(true);
-          //         animatedValue.value = 1;
-          //       }}
-          //       onPressOut={() => {
-          //         setActive(false);
-          //         animatedValue.value = 0;
-          //       }}
-          //       style={[
-          //         props.style,
-          //         // [active && a.bg_(hexWithOpacity(colors.primary, 0.1))],
-          //       ]}>
-          //       <Animated.View
-          //         style={[
-          //           Platform.OS === 'ios' && animatedStyle,
-          //           a.w_full,
-          //           a.h_full,
-          //         ]}>
-          //         {children}
-          //       </Animated.View>
-          //     </Pressable>
-          //   );
-          // },
+          tabBarButton({children, onPressIn, ...props}) {
+            const onTabButtonPressIn = useCallback(
+              (e: GestureResponderEvent) => {
+                onPressIn?.(e);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
+              },
+              [],
+            );
+            return (
+              <Pressable onPressIn={onTabButtonPressIn} {...props}>
+                {children}
+              </Pressable>
+            );
+          },
         }}>
         <Tabs.Screen
           name="index"

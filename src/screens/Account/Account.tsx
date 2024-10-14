@@ -1,8 +1,9 @@
 import {useAuth, useUser} from '@clerk/clerk-expo';
 import {useHeaderHeight} from '@react-navigation/elements';
-import {Link, Stack, router, useLocalSearchParams} from 'expo-router';
-import Head from 'expo-router/head';
-import {Image, ImageStyle, Platform, Pressable, View} from 'react-native';
+import {Stack, useLocalSearchParams} from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import {Image, ImageStyle, View} from 'react-native';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 
 import {a} from '$/src/lib/style/atoms';
@@ -10,15 +11,17 @@ import {colors} from '$/src/lib/theme/palette';
 
 import {Row} from '../../components/global';
 import Button, {ButtonText} from '../../components/global/Button';
-import {Text} from '../../components/global/Themed';
-import ViewHeader from '../../components/global/ViewHeader';
-// import {Feed} from '@/components/feed';
+import {AnimatedText, Text} from '../../components/global/Themed';
 import {Container} from '../../components/utils';
 import {useCallback} from 'react';
-import {useModalControls} from '../../components/global/modals/ModalState';
-import {ModalContainer} from '../../components/global/modals/Modal';
-import Animated, {FadeIn} from 'react-native-reanimated';
+import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
 import {createCustomBackdrop} from '$/src/components/global/modals/ModalBackdrop';
+import {
+  useModalControls,
+  useModals,
+} from '$/src/components/global/modals/ModalState';
+import {socket} from '$/src/lib/utils/socket';
+const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
 // Run in Node.js environments at build time to generate a list of
 // pages that should be statically generated.
@@ -34,35 +37,64 @@ export default function Account() {
 
 export function AccountScreen({account}: {account: string}) {
   const {user} = useUser();
-  const headerHeight = useHeaderHeight();
-  const {signOut, isSignedIn} = useAuth();
+  const {signOut} = useAuth();
   const {openModal, closeModal} = useModalControls();
+  const {activeModals} = useModals();
+
+  const isModalActive = activeModals.includes('edit');
 
   const handleEditPress = useCallback(() => {
-    openModal('where-to', {
-      enablePanDownToClose: true,
-      backdropComponent: createCustomBackdrop(closeModal),
-    });
-  }, []);
+    isModalActive
+      ? closeModal()
+      : openModal('edit', {
+          enablePanDownToClose: true,
+          backdropComponent: createCustomBackdrop(closeModal),
+        });
+  }, [isModalActive]);
 
   return (
     <>
       <Stack.Screen
         options={{
           title: 'Account',
-          headerStyle: {backgroundColor: colors.light},
           headerShown: true,
           headerShadowVisible: false,
           headerTitleAlign: 'center',
           headerRight: () => (
-            <TouchableOpacity onPress={handleEditPress} style={[]}>
-              <Text style={[a.text_(colors.primary)]}>Edit</Text>
+            <TouchableOpacity
+              onPress={handleEditPress}
+              style={[
+                a.relative,
+                a.w_(30),
+                a.h_(30),
+                a.align_center,
+                a.justify_center,
+              ]}>
+              {isModalActive ? (
+                <AnimatedIcon
+                  entering={ZoomIn}
+                  exiting={ZoomOut}
+                  name="close-outline"
+                  size={34}
+                  color={colors.primary}
+                  style={[a.absolute]}
+                />
+              ) : (
+                <AnimatedText
+                  entering={ZoomIn}
+                  exiting={ZoomOut}
+                  style={[a.text_(colors.primary), a.absolute]}>
+                  Edit
+                </AnimatedText>
+              )}
             </TouchableOpacity>
           ),
         }}
       />
       <Container style={[a.flex_1, a.bg_(colors.light)]}>
-        <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentInsetAdjustmentBehavior="automatic">
           <Image
             source={{uri: user?.imageUrl}}
             alt="user"
@@ -100,12 +132,17 @@ export function AccountScreen({account}: {account: string}) {
                 {user?.firstName} {user?.lastName}
               </Text>
             </View>
-
             <Row
               style={[a.mb_(40), a.align_center, a.justify_between, a.w_full]}>
               <Text>{'Email Address'}</Text>
 
               <Text>{user?.emailAddresses[0].emailAddress}</Text>
+            </Row>
+            <Row
+              style={[a.mb_(40), a.align_center, a.justify_between, a.w_full]}>
+              <Text>{'Socket Id'}</Text>
+
+              <Text>{socket.id}</Text>
             </Row>
 
             {user?.phoneNumbers[0] && (
@@ -121,14 +158,6 @@ export function AccountScreen({account}: {account: string}) {
                 <Text>{user?.phoneNumbers[0]?.phoneNumber}</Text>
               </Row>
             )}
-
-            <Row
-              style={[a.mb_(40), a.align_center, a.justify_between, a.w_full]}>
-              <Text>{'User ID'}</Text>
-
-              <Text>{user?.id}</Text>
-            </Row>
-
             <Button
               onPress={signOut}
               variant="ghost"

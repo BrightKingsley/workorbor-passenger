@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {FontAwesome, Ionicons, Octicons} from '@expo/vector-icons';
 import React, {ComponentProps, PropsWithChildren, useState} from 'react';
 import {
@@ -12,7 +13,13 @@ import {
   GooglePlaceData,
   GooglePlaceDetail,
 } from 'react-native-google-places-autocomplete';
-import {useAnimatedKeyboard} from 'react-native-reanimated';
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  FadeOut,
+  ZoomIn,
+  ZoomOut,
+} from 'react-native-reanimated';
 
 import {GOOGLE_MAPS_API_KEY} from '#/lib/constants';
 import {a} from '#/lib/style/atoms';
@@ -33,6 +40,7 @@ export default function PlacesAutoComplete({
   containerStyles,
   listViewStyles,
   inputContainerStyles,
+  iconTransitionDirection,
   ...inputProps
 }: TextInputProps & {
   getDetails(data: GooglePlaceData, details: GooglePlaceDetail | null): void;
@@ -40,6 +48,7 @@ export default function PlacesAutoComplete({
   containerStyles?: StyleProp<ViewStyle>;
   inputContainerStyles?: StyleProp<ViewStyle>;
   listViewStyles?: StyleProp<ViewStyle>;
+  iconTransitionDirection?: 'up' | 'down';
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputText, setInputText] = useState('');
@@ -92,7 +101,7 @@ export default function PlacesAutoComplete({
       query={{
         key: GOOGLE_MAPS_API_KEY,
         language: 'en',
-        components: 'country:NG',
+        components: 'country:LR',
       }}
       renderRow={(data: GooglePlaceData) => (
         <React.Fragment>
@@ -107,9 +116,15 @@ export default function PlacesAutoComplete({
       )}
       renderLeftButton={() => (
         <View style={[a.align_center, a.justify_center]}>
-          {selectedPlaceDetails ? (
-            <View style={[a.opacity_(0.4)]}>
-              <Image
+          {
+            selectedPlaceDetails ? (
+              // <Animated.View
+              //   entering={ZoomIn}
+              //   entering={ZoomOut}
+              //   style={[a.opacity_(0.4),  a.w_(20), a.h_(20)]}>
+              <Animated.Image
+                entering={ZoomIn}
+                exiting={ZoomOut}
                 width={20}
                 height={20}
                 style={[]}
@@ -118,14 +133,28 @@ export default function PlacesAutoComplete({
                     (selectedPlaceDetails as any).icon_mask_base_uri + '.png',
                 }}
               />
-            </View>
-          ) : (
-            <FontAwesome
-              name={isFocused ? 'search' : 'circle-o'}
-              size={20}
-              color={isFocused ? colors.dark : colors.primarylighter}
-            />
-          )}
+            ) : // </Animated.View>
+            // <Animated.View
+            //   style={[ a.w_(20), a.h_(20)]}
+            //   entering={ZoomIn}
+            //   entering={ZoomOut}>
+            isFocused ? (
+              <Animated.View
+                entering={
+                  iconTransitionDirection === 'up' ? FadeInUp : FadeInDown
+                }
+                exiting={iconTransitionDirection === 'up' ? FadeOut : FadeOut}>
+                <FontAwesome name={'search'} size={20} color={colors.dark} />
+              </Animated.View>
+            ) : (
+              <FontAwesome
+                name={'circle-o'}
+                size={20}
+                color={colors.primarylighter}
+              />
+            )
+            // </Animated.View>
+          }
         </View>
       )}
       renderRightButton={
@@ -179,6 +208,8 @@ export default function PlacesAutoComplete({
           a.w_full,
           listViewStyles,
           a.z_50,
+          a.bg_(colors.light),
+          {minHeight: 80},
         ],
       }}
       showsVerticalScrollIndicator={false}

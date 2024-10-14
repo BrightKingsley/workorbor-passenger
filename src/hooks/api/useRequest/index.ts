@@ -15,8 +15,6 @@ const api = axios.create({
 api.interceptors.request.use(
   config => {
     // const token = localStorage.getItem('token');
-    const token = 'okayyyyy';
-    console.log('AUTHORIZATION: ', config.headers);
 
     // if (token) {
     //   config.headers.Authorization = `Bearer ${token}`;
@@ -71,8 +69,6 @@ export default function useRequest() {
       ) => Promise<AxiosResponse<ApiResponse<T>>>;
 
       const token = await getToken();
-
-      console.log('TOKEN: ', token);
 
       // Build the headers with the Authorization token
       const headers = {

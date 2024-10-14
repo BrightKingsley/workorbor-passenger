@@ -11,24 +11,25 @@ import {colors} from '#/lib/theme/palette';
 import {CarAwaiting} from '$/src/assets/images';
 import useApi from '$/src/hooks/api/useApi';
 
-import {Button, Column, Row, Separator} from '../../global';
-import {ButtonText} from '../../global/Button';
+import {Column, Row, Separator} from '../../global';
 import {useModalControls} from '../../global/modals/ModalState';
 import {Text} from '../../global/Themed';
 import ViewHeader from '../../global/ViewHeader';
 
-// NOTE: snapPoints holds the default height point for modal
 export const snapPoints = ['70%'];
 
 export const enablePanDownToClose = true;
 
 export default function RideInfo() {
   const {closeModal} = useModalControls();
-  const {orderRequest} = useAppSelector(state => state.order);
 
   return (
     <View style={[a.px_md]}>
-      <ViewHeader canGoBack backPressHandler={closeModal} />
+      <ViewHeader
+        title="Rider Details"
+        canGoBack
+        backPressHandler={closeModal}
+      />
       <ScrollView showsVerticalScrollIndicator={false} style={[]}>
         <View style={[]}>
           <Image
@@ -40,16 +41,10 @@ export default function RideInfo() {
             source={CarAwaiting}
           />
           <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_2xl]}>
-            Workorbor
+            {'Rider Name'}
           </Text>
         </View>
-        <Column style={[{gap: 10}]}>
-          <InfoRow label="Fare" value="₦1300" />
-          <InfoRow label="Wait Time" value="₦10/Min" />
-          <InfoRow label="Booking Fee" value="2%" />
-          <InfoRow label="Discount" value="15%" />
-          <InfoRow label="Seats" value="4" />
-        </Column>
+
         <View style={[a.mt_2xl]}>
           <Text style={[a.text_(colors.primarylighter)]}>
             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vel,
@@ -57,6 +52,14 @@ export default function RideInfo() {
             tempore atque tempora?
           </Text>
         </View>
+
+        <Column style={[{gap: 10}]}>
+          <InfoRow label="Fare" value="₦1300" />
+          <InfoRow label="Wait Time" value="₦10/Min" />
+          <InfoRow label="Booking Fee" value="2%" />
+          <InfoRow label="Discount" value="15%" />
+          <InfoRow label="Seats" value="4" />
+        </Column>
       </ScrollView>
     </View>
   );
