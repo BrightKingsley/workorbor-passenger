@@ -47,16 +47,20 @@ import useLocationService from '$/src/hooks/useLocationService';
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
-  dsn: 'YOUR_SENTRY_DSN', // Add your Sentry DSN here
-  enableInExpoDevelopment: true,
-  debug: true, // Set to false in production
+  dsn: 'https://7fe76dab3ab51dbdec9b6b3d48bd456b@o4508120609783808.ingest.us.sentry.io/4508120612012032',
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+  _experiments: {
+    // profilesSampleRate is relative to tracesSampleRate.
+    // Here, we'll capture profiles for 100% of transactions.
+    profilesSampleRate: 1.0,
+  },
 });
 
 const CLERK_PUBLISHABLE_KEY =
   'pk_test_cmVuZXdpbmctd2Vhc2VsLTQ1LmNsZXJrLmFjY291bnRzLmRldiQ';
 // const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-
-console.log({CLERK_PUBLISHABLE_KEY});
 
 const tokenCache = {
   async getToken(key: string) {
@@ -85,12 +89,13 @@ function RootLayoutInner() {
   const router = useRouter();
 
   useEffect(() => {
+    // Sentry.nativeCrash();
     const timeout = setTimeout(() => {
       setIsReady(true);
     }, 6000);
 
     return () => clearTimeout(timeout);
-  });
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -118,7 +123,7 @@ function RootLayoutInner() {
   return <Slot />;
 }
 
-export default function RootLayout() {
+const RootLayout = () => {
   // return (
   //   <SafeAreaProvider style={[a.flex_1, a.w_full]}>
   //     {/* <Splash isReady={isReady}> */}
@@ -132,6 +137,8 @@ export default function RootLayout() {
   //     {/* </Splash> */}
   //   </SafeAreaProvider>
   // );
+
+  Sentry.nativeCrash();
 
   return (
     <ReduxProviders>
@@ -151,4 +158,6 @@ export default function RootLayout() {
       </ClerkProvider>
     </ReduxProviders>
   );
-}
+};
+
+export default Sentry.wrap(RootLayout);

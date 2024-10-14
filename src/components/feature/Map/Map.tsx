@@ -96,7 +96,6 @@ export default function Map({
     console.info('DESTINATION: ', orderRequest?.destination);
 
     if (orderRequest?.origin && orderRequest?.destination) {
-      console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥');
       setDirections({
         origin: {
           latitude: orderRequest?.origin?.latitude!,
