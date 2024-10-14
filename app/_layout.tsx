@@ -89,7 +89,6 @@ function RootLayoutInner() {
   const router = useRouter();
 
   useEffect(() => {
-    // Sentry.nativeCrash();
     const timeout = setTimeout(() => {
       setIsReady(true);
     }, 6000);
@@ -137,8 +136,6 @@ const RootLayout = () => {
   //     {/* </Splash> */}
   //   </SafeAreaProvider>
   // );
-
-  Sentry.nativeCrash();
 
   return (
     <ReduxProviders>
