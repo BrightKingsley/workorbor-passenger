@@ -27,7 +27,6 @@ export default function useLocationService() {
     let {status: foregroundPermissionStatus} =
       await Location.requestForegroundPermissionsAsync();
     if (foregroundPermissionStatus !== 'granted') {
-      console.log('Foreground location permission denied');
       return;
     }
 
@@ -35,7 +34,6 @@ export default function useLocationService() {
       await Location.requestBackgroundPermissionsAsync();
 
     if (backgroundPermissionStatus !== 'granted') {
-      console.log('Background location permission denied');
     }
     // Start background location tracking
     await Location.startLocationUpdatesAsync('background-location-task', {
@@ -61,8 +59,6 @@ export default function useLocationService() {
     const position = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });
-
-    console.log('POSITION!');
     // if (!position) {
     //   return setTimeout(() => {
     //     return getCurrentPosition();
@@ -133,12 +129,7 @@ export default function useLocationService() {
 
       const _address = result[0];
 
-      console.log({
-        _address,
-      });
-
       _address.address_components.map(component => {
-        console.log({component});
         return component;
       });
 

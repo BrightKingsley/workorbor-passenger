@@ -44,8 +44,8 @@ export default function RideInfo() {
           </Text>
         </View>
         <Column style={[{gap: 10}]}>
-          <InfoRow label="Fare" value="₦1300" />
-          <InfoRow label="Wait Time" value="₦10/Min" />
+          <InfoRow label="Fare" value="$1300" />
+          <InfoRow label="Wait Time" value="$10/Min" />
           <InfoRow label="Booking Fee" value="2%" />
           <InfoRow label="Discount" value="15%" />
           <InfoRow label="Seats" value="4" />
@@ -64,7 +64,7 @@ export default function RideInfo() {
 
 function InfoRow({
   label = 'Fare',
-  value = '₦1300',
+  value = '$1300',
 }: {
   label: string;
   value: string;

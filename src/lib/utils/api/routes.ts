@@ -3,6 +3,7 @@ const baseRoutes = {
   user: '/user',
   users: '/users',
   order: '/order',
+  chat: '/chat',
 };
 
 const createAuthRoutes = (route: string) => {
@@ -62,7 +63,7 @@ const createUsersRoutes = (route: string) => {
 const createOrderRoutes = (route: string) => {
   return new Proxy(
     {} as {
-      [key in 'create' | 'orders']: {
+      [key in 'create' | 'orders' | 'cancel-request' | 'cancel-ride']: {
         route: string;
         route_(id: string): string;
       };
@@ -114,13 +115,13 @@ const apiRoutes = {
     const route = baseRoutes.users;
     return createUsersRoutes(route);
   },
+  get chat() {
+    const route = baseRoutes.chat;
+    return createChatRoutes(route);
+  },
   get order() {
     const route = baseRoutes.order;
     return createOrderRoutes(route);
-  },
-  get chat() {
-    const route = baseRoutes.order;
-    return createChatRoutes(route);
   },
 };
 

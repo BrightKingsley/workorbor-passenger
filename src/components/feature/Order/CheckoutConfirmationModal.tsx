@@ -25,7 +25,6 @@ export function Component() {
   const {closeModal} = useModalControls();
 
   const handleProceed = () => {
-    console.log('PROCEED');
   };
 
   return (

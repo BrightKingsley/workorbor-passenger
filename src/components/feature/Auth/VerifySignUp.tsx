@@ -19,24 +19,20 @@ export default function VerifySignUp() {
 
   const handleNumberPress = (val: string) => {
     setError(false);
-    console.log('OTP_INPUT_VALUE', val);
     setCode(val);
   };
 
   useEffect(() => {
-    console.log({input: code});
   }, [code]);
 
   const handleCompleteOtp = async (code: string) => {
     setLoading(prev => ({...prev, login: true}));
-    console.log('CODE: ', code);
     await handleVerify(code);
     setLoading(prev => ({...prev, login: false}));
     setError(true);
   };
 
   const handleVerify = async (code: string) => {
-    console.log({code});
     signup.verifyUser(code);
   };
 

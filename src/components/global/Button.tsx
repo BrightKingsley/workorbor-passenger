@@ -31,7 +31,7 @@ import {android} from '#/platform';
 
 import {normalizeTextStyles, Text, TextProps} from './Themed';
 import {View} from './Themed';
-import * as Haptics from 'expo-haptics';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 export type ButtonVariant =
   | 'solid'
@@ -379,7 +379,7 @@ function ButtonWrapper({
   style,
 }: PropsWithChildren<ButtonProps & {selectedColor: string}>) {
   const onButtonPress = useCallback((e: GestureResponderEvent) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Haptics.medium();
     onPress?.(e);
   }, []);
 

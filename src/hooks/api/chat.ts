@@ -26,7 +26,6 @@ export default function useChatApi() {
         'get',
         `${apiRoutes.chat['get-messages'].route_(chatId)}`,
       );
-      console.log({data});
       dispatch(setMessages(data.messages));
       return data;
     } catch (error) {
@@ -42,20 +41,21 @@ export default function useChatApi() {
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
+    console.log({text});
     if (!(user && chatId && text)) return;
     try {
       const message: MessageType = {
         id: Date.now().toString(),
         sender: user?.id,
-        text,
+        content: text,
       };
       dispatch(addMessage(message));
       const data = await fetchData<{chat: any}>(
         'post',
         `${apiRoutes.chat['send-message'].route}`,
-        {message, chatId},
+        {content: message.content, chatId},
       );
-      console.log({data});
+      console.log('SEND_MESSAGE: ', data);
       return data;
     } catch (error) {
       if (error instanceof ApiError) {

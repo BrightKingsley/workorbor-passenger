@@ -715,7 +715,6 @@ export const GooglePlacesAutocomplete = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    console.log('IS_INPUT_FOCUSED: ', isInputFocused);
   }, [isInputFocused]);
 
   const _renderRow = (rowData = {}, index) => {

@@ -1,4 +1,5 @@
 import {useUser} from '@clerk/clerk-expo';
+import {memo} from 'react';
 import Animated, {ZoomInEasyDown} from 'react-native-reanimated';
 
 import {a} from '$/src/lib/style/atoms';
@@ -9,7 +10,7 @@ import {Row} from '../../global';
 import {Text} from '../../global/Themed';
 import {MessageType} from './types';
 
-export default function Message({sender, text}: MessageType) {
+const Message = memo(({sender, content}: MessageType) => {
   const {user} = useUser();
 
   return (
@@ -59,9 +60,11 @@ export default function Message({sender, text}: MessageType) {
             //   : [a.rounded_b_lg, a.rounded_t_sm],
             a.rounded_(25),
           ]}>
-          <Text style={[a.text_md]}>{text}</Text>
+          <Text style={[a.text_md]}>{content}</Text>
         </Animated.View>
       </Row>
     </Animated.View>
   );
-}
+});
+
+export default Message;

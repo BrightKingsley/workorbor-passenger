@@ -26,7 +26,6 @@ export default function useAuthApi() {
       handleErrors: (errors: ClerkAPIError[]) => void,
       remember?: boolean,
     ) => {
-      console.log({email, password});
       try {
         const signInAttempt = await signIn?.create({
           identifier: email,
@@ -111,7 +110,6 @@ export default function useAuthApi() {
       handleErrors: (errors: ClerkAPIError[]) => void,
     ) => {
       try {
-        console.log({firstname, lastname, email, phoneNumber, password});
         const signUpAttempt = await signUp?.create({
           // firstName: firstname,
           // lastName: lastname,
@@ -171,7 +169,6 @@ export default function useAuthApi() {
         `${apiRoutes.auth['forgot-password'].route}`,
         {email},
       );
-      console.log({data});
       return true;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -186,15 +183,12 @@ export default function useAuthApi() {
   }, []);
 
   const verifyResetOtp = async ({email, otp}: {otp: string; email: string}) => {
-    console.log({otp, email});
     try {
-      console.log('ROUTE: ', apiRoutes.auth['verify-reset-otp'].route);
       const data = await fetchData(
         'post',
         `${apiRoutes.auth['verify-reset-otp'].route}`,
         {otp, email},
       );
-      console.log({data});
       return true;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -216,7 +210,6 @@ export default function useAuthApi() {
           `${apiRoutes.auth['reset-password'].route}`,
           {password, email},
         );
-        console.log({data});
         return true;
       } catch (error) {
         if (error instanceof ApiError) {

@@ -1,12 +1,12 @@
 import {FontAwesome} from '@expo/vector-icons';
 import type {HeaderBackButtonProps} from '@react-navigation/native-stack/src/types';
-import * as Haptics from 'expo-haptics';
 import {useRouter} from 'expo-router';
 import {useCallback} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {HITSLOP_30} from '$/src/lib/constants';
 import {a} from '$/src/lib/style/atoms';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 export default function BackButton({
   backPressHandler,
@@ -24,7 +24,7 @@ export default function BackButton({
         router.navigate('/(app)/(tabs)/');
       }
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.success();
   }, [router]);
   return (
     <TouchableOpacity

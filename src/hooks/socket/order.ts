@@ -19,8 +19,6 @@ export function useOrderSocket() {
   useEffect(() => {
     if (!user) return;
 
-    console.log('ORDER_SOCKET');
-
     if (!socket.id) return;
     socket.emit<EventName>('update_rider_socket', {
       riderId: user?.id,
@@ -35,19 +33,16 @@ export function useOrderSocket() {
   }, [socket.id, user?.id, user]);
 
   useEffect(() => {
-    console.log({user});
     if (!user) return;
     const interval = setInterval(() => {
       (async () => {
         try {
-          console.log('EMIT_ASYNC', user?.id);
           const currentPosition = (await getCurrentPosition()) || {
             coords: {latitude: 10, longitude: 10},
           };
           const currentAddress = await getCurrentAddress();
 
           if (!currentPosition) {
-            console.log('😭😭😭');
             return;
           }
           socket.emit<EventName>('update_rider_location', {
@@ -68,7 +63,6 @@ export function useOrderSocket() {
 
   useEffect(() => {
     socket.on('order_request', () => {
-      console.log('PING_RECEIVED😭😭😭😭😭😭');
       (async () => {
         const audioFile = AlertSound;
         const sound = await playAudio(audioFile);

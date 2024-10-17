@@ -1,21 +1,19 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import Constants from 'expo-constants';
-import {useEffect, useRef} from 'react';
+import {memo, useEffect, useRef} from 'react';
 import React from 'react';
 import {Platform, StyleSheet} from 'react-native';
 
 import {a} from '$/src/lib/style/atoms';
 import {colors} from '$/src/lib/theme/palette';
 
-// import {createCustomBackdrop} from './ModalBackdrop';
 import modalContent from './ModalContent';
 import {useModalControls, useModals} from './ModalState';
-import {Text} from '../Themed';
 
 const DEFAULT_SNAP_POINTS = ['90%'];
 const HANDLE_HEIGHT = 24;
 
-export function ModalContainer() {
+function Modal() {
   const {isModalActive, activeModals} = useModals();
   const {closeModal, setupModal, modalProps} = useModalControls();
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -33,7 +31,8 @@ export function ModalContainer() {
 
   React.useEffect(() => {
     bottomSheetRef.current && setupModal(bottomSheetRef);
-  });
+    console.log({bottomSheetRef});
+  }, [bottomSheetRef]);
 
   React.useEffect(() => {
     if (isModalActive) {
@@ -45,16 +44,7 @@ export function ModalContainer() {
 
   let snapPoints: (string | number)[] = DEFAULT_SNAP_POINTS;
 
-  useEffect(() => {
-    // console.log('ACTIVE_MODAL: ', modalContent[activeModal]);
-    // console.log('SNAP_POINTS: ', modalContent[activeModal]?.snapPoints);
-    console.log(
-      'ACTIVE_MODALS: ',
-      activeModals,
-      activeModal,
-      modalContent[activeModal],
-    );
-  }, [activeModals]);
+  useEffect(() => {}, [activeModals]);
 
   // if (snapPoints[0] === 'fullscreen') {
   //   return (
@@ -73,8 +63,6 @@ export function ModalContainer() {
     contentSnapPoints = snapPoints;
     contentProps = content;
   }
-
-  console.log({isModalActive}, activeModals.length);
 
   if (!isModalActive || !activeModals.length) return null;
   return (
@@ -118,3 +106,5 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
+
+export const ModalContainer = memo(Modal);

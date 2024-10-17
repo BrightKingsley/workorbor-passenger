@@ -21,6 +21,7 @@ import {
   useModals,
 } from '$/src/components/global/modals/ModalState';
 import {socket} from '$/src/lib/utils/socket';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
 // Run in Node.js environments at build time to generate a list of
@@ -40,6 +41,7 @@ export function AccountScreen({account}: {account: string}) {
   const {signOut} = useAuth();
   const {openModal, closeModal} = useModalControls();
   const {activeModals} = useModals();
+  const safeInsets = useSafeAreaInsets();
 
   const isModalActive = activeModals.includes('edit');
 
@@ -60,34 +62,48 @@ export function AccountScreen({account}: {account: string}) {
           headerShown: true,
           headerShadowVisible: false,
           headerTitleAlign: 'center',
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={handleEditPress}
+          header: ({navigation, options, route, back}) => (
+            <Container
               style={[
-                a.relative,
-                a.w_(30),
-                a.h_(30),
-                a.align_center,
-                a.justify_center,
+                a.h_(120),
+                a.justify_end,
+                a.bg_(colors.light),
+                a.py_md,
+                a.pt_(safeInsets.top),
               ]}>
-              {isModalActive ? (
-                <AnimatedIcon
-                  entering={ZoomIn}
-                  exiting={ZoomOut}
-                  name="close-outline"
-                  size={34}
-                  color={colors.primary}
-                  style={[a.absolute]}
-                />
-              ) : (
-                <AnimatedText
-                  entering={ZoomIn}
-                  exiting={ZoomOut}
-                  style={[a.text_(colors.primary), a.absolute]}>
-                  Edit
-                </AnimatedText>
-              )}
-            </TouchableOpacity>
+              <Row style={[a.justify_between]}>
+                <Text family="Bold" style={[a.text_4xl]}>
+                  Account
+                </Text>
+                <TouchableOpacity
+                  onPress={handleEditPress}
+                  style={[
+                    a.relative,
+                    a.w_(30),
+                    a.h_(30),
+                    a.align_center,
+                    a.justify_center,
+                  ]}>
+                  {isModalActive ? (
+                    <AnimatedIcon
+                      entering={ZoomIn}
+                      exiting={ZoomOut}
+                      name="close-outline"
+                      size={34}
+                      color={colors.primary}
+                      style={[a.absolute]}
+                    />
+                  ) : (
+                    <AnimatedText
+                      entering={ZoomIn}
+                      exiting={ZoomOut}
+                      style={[a.text_(colors.primary), a.absolute]}>
+                      Edit
+                    </AnimatedText>
+                  )}
+                </TouchableOpacity>
+              </Row>
+            </Container>
           ),
         }}
       />
@@ -100,10 +116,11 @@ export function AccountScreen({account}: {account: string}) {
             alt="user"
             style={
               [
-                a.w_(80),
-                a.h_(80),
+                a.w_(100),
+                a.h_(100),
                 a.rounded_full,
-                a.mx_auto,
+                // a.mx_auto,
+                // a.ml_3xl,
                 a.mt_4xl,
               ] as ImageStyle
             }
@@ -138,12 +155,6 @@ export function AccountScreen({account}: {account: string}) {
 
               <Text>{user?.emailAddresses[0].emailAddress}</Text>
             </Row>
-            <Row
-              style={[a.mb_(40), a.align_center, a.justify_between, a.w_full]}>
-              <Text>{'Socket Id'}</Text>
-
-              <Text>{socket.id}</Text>
-            </Row>
 
             {user?.phoneNumbers[0] && (
               <Row
@@ -157,6 +168,34 @@ export function AccountScreen({account}: {account: string}) {
 
                 <Text>{user?.phoneNumbers[0]?.phoneNumber}</Text>
               </Row>
+            )}
+
+            {__DEV__ && (
+              <>
+                <Row
+                  style={[
+                    a.mb_(40),
+                    a.align_center,
+                    a.justify_between,
+                    a.w_full,
+                  ]}>
+                  <Text>{'User ID'}</Text>
+
+                  <Text>{user?.id}</Text>
+                </Row>
+
+                <Row
+                  style={[
+                    a.mb_(40),
+                    a.align_center,
+                    a.justify_between,
+                    a.w_full,
+                  ]}>
+                  <Text>{'Socket ID'}</Text>
+
+                  <Text>{socket?.id}</Text>
+                </Row>
+              </>
             )}
             <Button
               onPress={signOut}

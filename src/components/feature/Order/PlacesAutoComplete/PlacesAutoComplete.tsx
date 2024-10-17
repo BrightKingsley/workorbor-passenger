@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {FontAwesome, Ionicons, Octicons} from '@expo/vector-icons';
 import React, {ComponentProps, PropsWithChildren, useState} from 'react';
 import {
@@ -51,7 +50,7 @@ export default function PlacesAutoComplete({
   iconTransitionDirection?: 'up' | 'down';
 }) {
   const [isFocused, setIsFocused] = useState(false);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState(inputProps.value);
   const [selectedPlaceDetails, setSelectedDetails] =
     useState<GooglePlaceDetail | null>(null);
 
@@ -101,11 +100,12 @@ export default function PlacesAutoComplete({
       query={{
         key: GOOGLE_MAPS_API_KEY,
         language: 'en',
-        components: 'country:LR',
+        // components: 'country:LR',
+        components: `country:${__DEV__ ? 'NG' : 'LR'}`,
       }}
       renderRow={(data: GooglePlaceData) => (
         <React.Fragment>
-          <PlaceRow data={data} inputText={inputText} />
+          <PlaceRow data={data} inputText={inputText!} />
           <Separator
             height={1.8}
             width={'95%'}

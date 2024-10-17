@@ -5,7 +5,10 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Map from '$/src/components/feature/Map';
 import {Button} from '$/src/components/global';
 import {ButtonText} from '$/src/components/global/Button';
-import {useModalControls} from '$/src/components/global/modals/ModalState';
+import {
+  useModalControls,
+  useModals,
+} from '$/src/components/global/modals/ModalState';
 import {Text, View} from '$/src/components/global/Themed';
 import useApi from '$/src/hooks/api/useApi';
 import {a} from '$/src/lib/style/atoms';
@@ -18,24 +21,26 @@ import {OrderPhase} from '$/src/store/slices/order/types';
 
 export default function Home() {
   const {openModal} = useModalControls();
+  const {activeModals} = useModals();
+
   const {createOrder} = useApi().order;
+
   const {riderInfo, orderPhase, orderRequest} = useAppSelector(
     state => state.order,
   );
   const {user} = useUser();
 
-  const toggleModal = () => {
-    openModal('where-to');
-  };
+  const toggleModal = useCallback(() => {
+    openModal(activeModals[activeModals.length - 1] || 'where-to');
+  }, [activeModals]);
 
   useFocusEffect(
     useCallback(() => {
-      console.log('FOOOOOCUS', orderRequest);
+      // if (true) {
       if (!orderRequest) {
-        console.log('NOIOOOOT');
         toggleModal();
       }
-    }, []),
+    }, [orderRequest]),
   );
 
   useEffect(() => {
@@ -46,6 +51,7 @@ export default function Home() {
 
   return (
     <>
+      <Map />
       {orderPhase === OrderPhase.awaitingRide && (
         <View
           style={[
@@ -54,6 +60,7 @@ export default function Home() {
             a.h_full,
             a.align_center,
             a.justify_center,
+            a.z_50,
           ]}>
           <PingAnimation pingSize={200}>
             <Image
@@ -71,7 +78,6 @@ export default function Home() {
           <Text style={[a.mx_auto, a.mt_2xl]}>Finding Available Riders...</Text>
         </View>
       )}
-      <Map />
     </>
   );
 }

@@ -29,7 +29,6 @@ import {FormField, FormProvider, useFormContext} from './state';
 import t from '$/locales/translate';
 
 import {IS_RTL} from '$/locales';
-import {LinearGradient} from 'expo-linear-gradient';
 import {StatusBar} from 'expo-status-bar';
 import {Stack, useRouter} from 'expo-router';
 import {useOAuth, useSignIn, useSignUp} from '@clerk/clerk-expo';
@@ -115,44 +114,22 @@ export default function SignUp() {
     try {
       const {createdSessionId, setActive, signUp, signIn} =
         await startGoogleOAuthFlow();
-
-      console.log({createdSessionId, setActive});
       if (createdSessionId) {
         setActive!({session: createdSessionId});
-        console.log(
-          'firstName: ',
-          signUp?.firstName,
-          signUp?.id,
-          signUp?.emailAddress,
-        );
       } else {
-        console.log('failed to sign in or sign up');
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   }, []);
 
   const onPressApple = useCallback(async () => {
     try {
       const {createdSessionId, setActive, signUp, signIn, authSessionResult} =
         await startAppleOAuthFlow();
-
-      console.log({createdSessionId, setActive});
       if (createdSessionId) {
         setActive!({session: createdSessionId});
-        console.log(
-          'firstName: ',
-          signUp?.firstName,
-          signUp?.id,
-          signUp?.emailAddress,
-        );
       } else {
-        console.log('failed to sign in or sign up');
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   }, []);
 
   const handleLoginPress = useCallback(() => {

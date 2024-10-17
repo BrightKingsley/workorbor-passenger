@@ -7,10 +7,7 @@ export default function PopScreenOnBlur({children}: PropsWithChildren) {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Screen is focused
-      console.log('FOCUSED:', {segments});
       return () => {
-        console.log('UNFOCUSED:', {segments});
 
         // Screen is unfocused
         // Remove this screen from the stack

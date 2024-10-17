@@ -6,7 +6,6 @@ export async function playAudio(file: any) {
     await sound.playAsync();
     return sound;
   } catch (error) {
-    console.log('Error playing audio:', error);
     return null;
   }
 }
@@ -18,6 +17,5 @@ export async function stopAudio(sound: Audio.Sound) {
       await sound.unloadAsync();
     }
   } catch (error) {
-    console.log('Error stopping audio:', error);
   }
 }

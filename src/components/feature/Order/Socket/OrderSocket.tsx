@@ -1,36 +1,38 @@
-import {useEffect} from 'react';
-
+import {useEffect, useCallback} from 'react';
 import {socket} from '$/src/lib/utils/socket';
 import {EventName} from '$/src/lib/utils/socket/socket';
 import {useUser} from '@clerk/clerk-expo';
-import useLocationService from '$/src/hooks/useLocationService';
-import {AlertSound} from '$/src/assets/audio';
-import {playAudio, stopAudio} from '$/src/lib/utils/audio';
-import {updateOrderResponse} from '$/src/store/slices/order/helpers';
+import {Alert} from 'react-native';
 import {useAppDispatch, useAppSelector} from '$/src/hooks/store';
-import {setOrderPhase, setRider} from '$/src/store/slices/order/slice';
-import {OrderPhase, Vehicle, VehicleType} from '$/src/store/slices/order/types';
-import {setChatId} from '$/src/store/slices/chat';
+import {useModalControls} from '$/src/components/global/modals/ModalState';
+import {
+  clearOrderRequest,
+  clearOrderResponse,
+  setOrderPhase,
+  setRider,
+} from '$/src/store/slices/order/slice';
+import {clearChatId, setChatId} from '$/src/store/slices/chat';
+import {OrderPhase, VehicleType} from '$/src/store/slices/order/types';
 
 export default function OrderSocket() {
   const {user} = useUser();
   const dispatch = useAppDispatch();
   const {orderRequest} = useAppSelector(state => state.order);
+  const {closeAllModals} = useModalControls();
 
+  // Emit passenger socket update only when socket ID or user ID changes
   useEffect(() => {
-    if (!user) return;
+    if (user?.id && socket.id) {
+      socket.emit<EventName>('update_passenger_socket', {
+        passengerId: user.id,
+        socketId: socket.id,
+      });
+    }
+  }, [user?.id, socket.id]);
 
-    if (!socket.id) return;
-    console.log({passengerId: user?.id, socketId: socket?.id});
-
-    socket.emit<EventName>('update_passenger_socket', {
-      passengerId: user?.id,
-      socketId: socket?.id,
-    });
-  }, [socket.id, user?.id, user]);
-
-  useEffect(() => {
-    socket.on<EventName>('available_rides', (data: any) => {
+  // Handler for 'available_rides' event
+  const handleAvailableRides = useCallback(
+    (data: any) => {
       console.log('AVAILABLE_RIDERS: ', data);
       dispatch(setOrderPhase(OrderPhase.enroute));
       dispatch(
@@ -50,10 +52,43 @@ export default function OrderSocket() {
         }),
       );
       dispatch(setChatId(data.chatId));
-      console.log('HANDSHAKE: ', orderRequest, orderRequest?.orderId);
       socket.emit('handshake', orderRequest?.orderId);
-    });
-  }, [socket.id, orderRequest]);
+    },
+    [dispatch, orderRequest?.orderId],
+  );
+
+  // Handler for 'ride_completed' event
+  const handleRideCompleted = useCallback(() => {
+    console.log('✅✅✅✅RIDE_COMPLETED✅✅✅✅');
+    dispatch(clearChatId());
+    dispatch(clearOrderRequest());
+    dispatch(clearOrderResponse());
+    Alert.alert('Ride completed');
+    closeAllModals();
+  }, [dispatch, closeAllModals]);
+
+  // Handler for 'ride_cancelled' event
+  const handleRideCancelled = useCallback(() => {
+    console.log('❌❌❌❌RIDE_CANCELLED❌❌❌❌');
+    dispatch(clearChatId());
+    dispatch(clearOrderResponse());
+    closeAllModals();
+    Alert.alert('Ride cancelled');
+  }, [dispatch, closeAllModals]);
+
+  // Socket event listeners
+  useEffect(() => {
+    socket.on<EventName>('available_rides', handleAvailableRides);
+    socket.on<EventName>('ride_completed', handleRideCompleted);
+    socket.on<EventName>('ride_cancelled', handleRideCancelled);
+
+    // Cleanup listeners on unmount or re-render to avoid memory leaks
+    return () => {
+      socket.off<EventName>('available_rides', handleAvailableRides);
+      socket.off<EventName>('ride_completed', handleRideCompleted);
+      socket.off<EventName>('ride_cancelled', handleRideCancelled);
+    };
+  }, [handleAvailableRides, handleRideCompleted, handleRideCancelled]);
 
   return null;
 }

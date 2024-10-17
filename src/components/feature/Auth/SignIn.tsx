@@ -77,7 +77,6 @@ export default function SignIn() {
     try {
       await login.google();
     } catch (err) {
-      console.log(err);
     }
   }, []);
 
@@ -85,7 +84,6 @@ export default function SignIn() {
     try {
       await login.google();
     } catch (err) {
-      console.log(err);
     }
   }, []);
 

@@ -1,4 +1,7 @@
+<script src="http://192.168.0.197:8097"></script>;
 import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs(); //
 
 import {ClerkProvider, useAuth} from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -109,8 +112,6 @@ function RootLayoutInner() {
       segments,
     });
 
-    console.log({isSignedIn, inTabsGroup, MENTS: segments});
-
     if (!isSignedIn) {
       router.replace('/(auth)/sign-in');
       return;
@@ -146,9 +147,11 @@ const RootLayout = () => {
           <SafeAreaProvider style={[a.flex_1, a.w_full]}>
             <StatusBar animated={true} translucent={true} />
             <GestureHandlerRootView style={a.h_full}>
-              <RootLayoutInner />
-              <RouteTracker />
-              <SocketContainer />
+              <ModalProvider>
+                <RootLayoutInner />
+                <RouteTracker />
+                <SocketContainer />
+              </ModalProvider>
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </LocalizationProvider>

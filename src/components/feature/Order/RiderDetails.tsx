@@ -1,20 +1,21 @@
 // import {useModalControls} from '#/state/modals';
 // import {NigeriaIcon, UnitedKingdomIcon} from '#/lib/icons';
+import {useUser} from '@clerk/clerk-expo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import * as React from 'react';
-import {Alert, Image, ScrollView, View} from 'react-native';
+import {Image, ImageStyle, View} from 'react-native';
 
-import {useAppSelector} from '#/hooks/store';
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
 import {CarAwaiting} from '$/src/assets/images';
-import useApi from '$/src/hooks/api/useApi';
+import {useAppSelector} from '$/src/hooks/store';
 
-import {Column, Row, Separator} from '../../global';
+import {Row, Separator} from '../../global';
 import {useModalControls} from '../../global/modals/ModalState';
 import {Text} from '../../global/Themed';
 import ViewHeader from '../../global/ViewHeader';
+import {Container} from '../../utils';
 
 export const snapPoints = ['70%'];
 
@@ -22,52 +23,72 @@ export const enablePanDownToClose = true;
 
 export default function RideInfo() {
   const {closeModal} = useModalControls();
+  const {riderInfo} = useAppSelector(state => state.order);
 
   return (
-    <View style={[a.px_md]}>
+    <Container style={[a.flex_1]}>
       <ViewHeader
         title="Rider Details"
         canGoBack
         backPressHandler={closeModal}
       />
-      <ScrollView showsVerticalScrollIndicator={false} style={[]}>
-        <View style={[]}>
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[a.py_3xl]}
+        style={[a.flex_1]}>
+        <View style={[a.bg_(colors.lightgrey), a.relative, a.align_center]}>
           <Image
             style={
-              [a.w_(150), a.h_(80), a.mx_auto] as React.ComponentProps<
+              [a.w_('100%'), a.h_(200), a.mx_auto] as React.ComponentProps<
                 typeof Image
               >['style']
             }
             source={CarAwaiting}
           />
-          <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_2xl]}>
-            {'Rider Name'}
-          </Text>
+          <View
+            style={[
+              a.absolute,
+              a.bottom_(-90),
+              a.z_50,
+              a.align_center,
+              a.justify_center,
+            ]}>
+            <Image
+              style={[a.w_(80), a.h_(80), a.rounded_full] as ImageStyle}
+              source={{uri: riderInfo?.photo}}
+            />
+            <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_md]}>
+              {riderInfo?.firstName} {riderInfo?.lastName}
+            </Text>
+            <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_xs]}>
+              {'08021248576'}
+            </Text>
+          </View>
         </View>
 
-        <View style={[a.mt_2xl]}>
-          <Text style={[a.text_(colors.primarylighter)]}>
+        <View style={[a.mt_(110)]}>
+          <Text style={[a.text_(colors.darkgray), a.text_center]}>
             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vel,
             provident quo impedit possimus accusantium id. Sequi quisquam
             tempore atque tempora?
           </Text>
         </View>
 
-        <Column style={[{gap: 10}]}>
-          <InfoRow label="Fare" value="₦1300" />
-          <InfoRow label="Wait Time" value="₦10/Min" />
+        {/* <Column style={[{gap: 10}, a.mt_2xl]}>
+          <InfoRow label="Fare" value="$1300" />
+          <InfoRow label="Wait Time" value="$10/Min" />
           <InfoRow label="Booking Fee" value="2%" />
           <InfoRow label="Discount" value="15%" />
           <InfoRow label="Seats" value="4" />
-        </Column>
-      </ScrollView>
-    </View>
+        </Column> */}
+      </BottomSheetScrollView>
+    </Container>
   );
 }
 
 function InfoRow({
   label = 'Fare',
-  value = '₦1300',
+  value = '$1300',
 }: {
   label: string;
   value: string;

@@ -24,12 +24,12 @@ export default function useAuthApi() {
   const {signUp, setActive: setActiveUp} = useSignUp();
   const {startOAuthFlow: startGoogleOAuthFlow} = useOAuth({
     strategy: 'oauth_google',
-    redirectUrl: Linking.createURL('/account'),
+    redirectUrl: Linking.createURL('/(app)/(tabs)/'),
   });
 
   const {startOAuthFlow: startAppleOAuthFlow} = useOAuth({
     strategy: 'oauth_apple',
-    redirectUrl: Linking.createURL('/account'),
+    redirectUrl: Linking.createURL('/(app)/(tabs)/'),
   });
 
   const dispatch = useAppDispatch();
@@ -41,16 +41,8 @@ export default function useAuthApi() {
     try {
       const {createdSessionId, setActive, signUp, signIn} =
         await startGoogleOAuthFlow();
-
-      console.log({createdSessionId, setActive});
       if (createdSessionId) {
         setActive!({session: createdSessionId});
-        console.log(
-          'firstName: ',
-          signUp?.firstName,
-          signUp?.id,
-          signUp?.emailAddress,
-        );
         createUser({
           email: signUp?.emailAddress || '',
           firstName: signUp?.firstName || '',
@@ -58,10 +50,8 @@ export default function useAuthApi() {
           uid: signUp?.createdUserId || '',
         });
       } else {
-        console.log('failed to sign in or sign up');
       }
     } catch (err) {
-      console.log(err);
     }
   }, []);
 
@@ -69,16 +59,8 @@ export default function useAuthApi() {
     try {
       const {createdSessionId, setActive, signUp, signIn} =
         await startAppleOAuthFlow();
-
-      console.log({createdSessionId, setActive});
       if (createdSessionId) {
         setActive!({session: createdSessionId});
-        console.log(
-          'firstName: ',
-          signUp?.firstName,
-          signUp?.id,
-          signUp?.emailAddress,
-        );
         createUser({
           email: signUp?.emailAddress || '',
           firstName: signUp?.firstName || '',
@@ -86,10 +68,8 @@ export default function useAuthApi() {
           uid: signUp?.createdUserId || '',
         });
       } else {
-        console.log('failed to sign in or sign up');
       }
     } catch (err) {
-      console.log(err);
     }
   }, []);
 
@@ -105,7 +85,6 @@ export default function useAuthApi() {
 
       // Start the sign-up process using the info the user provided
       try {
-        console.log({emailAddress: email, password: password});
         const signInAttempt = await signIn.create({
           identifier: email,
           password,
@@ -212,13 +191,11 @@ export default function useAuthApi() {
       },
       handleErrors: (errors: Partial<ClerkAPIError>[]) => void,
     ) => {
-      console.log('Credentials');
       if (!isLoaded) {
         return false;
       }
 
       const userWithEmailExists = await doesUserWithEmailExist(email);
-      console.log({userWithEmailExists});
       if (userWithEmailExists) {
         handleErrors([
           {
@@ -235,7 +212,6 @@ export default function useAuthApi() {
 
       // Start the sign-up process using the info the user provided
       try {
-        console.log({emailAddress: email, password: password});
         await signUp?.create({
           firstName,
           lastName,
@@ -264,7 +240,6 @@ export default function useAuthApi() {
   );
 
   const verifyUser = async (code: string) => {
-    console.log({code});
     if (!isLoaded || code.length < 6) {
       return;
     }
@@ -302,7 +277,6 @@ export default function useAuthApi() {
         message: string;
         emailExists: boolean;
       }>('post', `${apiRoutes.auth['check-email-exist'].route}`, {email});
-      console.log({data});
       return data?.emailExists;
     } catch (error) {
       console.error('doesUserWithEmailExist: ', error);
@@ -322,12 +296,6 @@ export default function useAuthApi() {
       email: string;
       uid: string;
     }) => {
-      console.log('init-CREATE_USER: ', {
-        email,
-        firstName,
-        lastName,
-        uid,
-      });
       try {
         if (!(firstName && lastName && uid)) return;
         const data = await fetchData<{
@@ -338,7 +306,6 @@ export default function useAuthApi() {
           lastName,
           uid,
         });
-        console.log('CREATE_USER:', data);
       } catch (error) {
         console.error('CREATE_USER:', error);
       }
@@ -372,7 +339,6 @@ export default function useAuthApi() {
       handleErrors: (errors: ClerkAPIError[]) => void,
     ) => {
       try {
-        console.log({firstname, lastname, email, phoneNumber, password});
         const signUpAttempt = await signUp?.create({
           // firstName: firstname,
           // lastName: lastname,
@@ -432,7 +398,6 @@ export default function useAuthApi() {
         `${apiRoutes.auth['forgot-password'].route}`,
         {email},
       );
-      console.log({data});
       return true;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -447,15 +412,12 @@ export default function useAuthApi() {
   }, []);
 
   const verifyResetOtp = async ({email, otp}: {otp: string; email: string}) => {
-    console.log({otp, email});
     try {
-      console.log('ROUTE: ', apiRoutes.auth['verify-reset-otp'].route);
       const data = await fetchData(
         'post',
         `${apiRoutes.auth['verify-reset-otp'].route}`,
         {otp, email},
       );
-      console.log({data});
       return true;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -477,7 +439,6 @@ export default function useAuthApi() {
           `${apiRoutes.auth['reset-password'].route}`,
           {password, email},
         );
-        console.log({data});
         return true;
       } catch (error) {
         if (error instanceof ApiError) {

@@ -88,7 +88,6 @@ export default async function fetchData<T>(
   data?: {[key: string]: any},
   config: AxiosRequestConfig = {},
 ): Promise<T> {
-  console.log({endpoint});
   try {
     const callableMethod = api[method] as unknown as (
       url: string,
@@ -99,8 +98,6 @@ export default async function fetchData<T>(
       endpoint,
       {...data, ...config},
     );
-    console.log({data: response.data});
-    console.log('two_ENDPOINT: ', response.config.url);
 
     return response.data.data;
   } catch (error) {
@@ -113,7 +110,6 @@ export default async function fetchData<T>(
         statusText,
       );
     } else {
-      console.log(error);
       throw new Error('An unexpected error occurred');
     }
   }

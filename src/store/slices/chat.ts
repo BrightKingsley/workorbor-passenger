@@ -21,10 +21,10 @@ const chatSlice = createSlice({
   name: 'chat',
   initialState: initialChatState,
   reducers: {
-    setChatId(state, action: PayloadAction<{chatId: string}>) {
+    setChatId(state, action: PayloadAction<string>) {
       return {
         ...state,
-        chatId: action.payload.chatId,
+        chatId: action.payload,
       };
     },
     clearChatId(state) {

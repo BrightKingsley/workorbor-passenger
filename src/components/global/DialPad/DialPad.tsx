@@ -135,7 +135,6 @@ function DialpadKeypad({
   useEffect(() => {
     if (code.length >= pinLength) {
       const _code = code.join('');
-      console.log({_code, code});
       handleCompleteOtp?.(_code);
     }
   }, [code, pinLength]);

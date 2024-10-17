@@ -5,20 +5,11 @@ import {
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
 import React, {useState} from 'react';
-import {
-  Image,
-  ImageStyle,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-} from 'react-native';
-import {TouchableNativeFeedback} from 'react-native-gesture-handler';
+import {Image, ImageStyle} from 'react-native';
 
-import {CarAwaiting} from '$/src/assets/images';
 import {FormField} from '$/src/components/feature/Auth/SignUp/state';
-import {Button, Column} from '$/src/components/global';
+import {Button} from '$/src/components/global';
 import TextInput from '$/src/components/global/TextInput';
-import {View} from '$/src/components/global/Themed';
 import {Container} from '$/src/components/utils';
 import {a} from '$/src/lib/style/atoms';
 import {colors} from '$/src/lib/theme/palette';
@@ -26,7 +17,7 @@ import {hexWithOpacity} from '$/src/lib/ui/helpers';
 
 type Fields = 'firstName' | 'lastName' | 'phoneNumber';
 
-export const snapPoints = ['50%'];
+export const snapPoints = ['50%', '90%'];
 export const enablePanDownToClose = false;
 
 export default function Edit() {
@@ -43,7 +34,6 @@ export default function Edit() {
       <Container style={[a.py_3xl]}>
         <Button
           variant="ghost"
-          onPress={_ => console.log('TOUCHED')}
           style={[a.self_center, a.rounded_md, a.py_0, a.bg_(colors.primary)]}>
           <>
             {user?.imageUrl ? (

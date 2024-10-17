@@ -20,7 +20,6 @@ i18n.defaultLocale = 'en';
 // Set initial language
 export const setLanguage = async (language: string) => {
   i18n.locale = language;
-  console.log({language});
   const isRTL = language === 'he'; // Assuming Hebrew is the only RTL language
 
   I18nManager.allowRTL(isRTL);
@@ -32,17 +31,14 @@ export const setLanguage = async (language: string) => {
 
 const getIsRTL = () => {
   const locales = Localization.getLocales();
-  console.log({locale: locales[0].languageCode}, i18n.locale);
   if (locales && locales.length > 0) {
     const textDirection = locales[0].textDirection;
-    console.log({textDirection});
     return textDirection === 'rtl';
   }
   return false;
 };
 
 export const IS_RTL = getIsRTL();
-console.log({IS_RTL});
 
 I18nManager.allowRTL(IS_RTL);
 I18nManager.forceRTL(IS_RTL);

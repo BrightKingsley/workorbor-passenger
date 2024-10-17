@@ -58,7 +58,6 @@ export default function MyPager() {
   const {orderRequest} = useAppSelector(state => state.order);
 
   React.useEffect(() => {
-    console.log({orderRequest});
     if (orderRequest?.tabIndex !== undefined) {
       pagerRef?.current?.setPage(orderRequest.tabIndex);
     }
@@ -83,7 +82,6 @@ export default function MyPager() {
   const handler = usePagerScrollHandler({
     onPageScroll: (e: any) => {
       'worklet';
-      console.log('PAGERVIEW: ', e.offset, e.position);
     },
   });
 

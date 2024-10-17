@@ -144,13 +144,7 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
   const openModal = useCallback(
     (modal: Modal, props?: Partial<BottomSheetProps>) => {
       setActiveModals(modals => {
-        const sortedModals = moveStringToEnd<Modal>(modals, modal); // Using spread operator to create a new array
-        console.log({
-          modals,
-          modal,
-          sortedModals,
-          unSorted: [...modals, modal],
-        });
+        const sortedModals = moveStringToEnd<Modal>(modals, modal);
         return sortedModals;
       });
 
@@ -169,7 +163,6 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     modalRef?.current?.close();
     let wasActive = true;
     setTimeout(() => {
-      console.log('RESOLVING!');
       let active = activeModals.length > 0;
       setActiveModals(modals => {
         return modals.slice(0, -1);
@@ -207,9 +200,7 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     [openModal, closeModal, closeAllModals, setupModal],
   );
 
-  useEffect(() => {
-    console.log({activeModals});
-  }, [activeModals, activeModals.length]);
+  useEffect(() => {}, [activeModals, activeModals.length]);
 
   return (
     <ModalContext.Provider value={state}>

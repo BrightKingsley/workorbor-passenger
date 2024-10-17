@@ -86,10 +86,12 @@ export default function OrderDetails() {
               ) : (
                 )}
                 </Container> */}
-            <Fragment>
-              <ResponseTile />
-              <Separator height={10} />
-            </Fragment>
+            <Container>
+              <Fragment>
+                <ResponseTile />
+                <Separator height={10} />
+              </Fragment>
+            </Container>
             <Separator
               height={1}
               backgroundColor={hexWithOpacity(colors.lightgrey, 0.3)}
@@ -127,55 +129,59 @@ function RideInfo() {
       entering={FadeIn}
       exiting={FadeOut}
       style={[a.mt_2xl, a.top_0, a.pb_(20)]}>
-      <View
-        style={[
-          a.absolute,
-          a.h_65,
-          a.left_(4),
-          a.border_l,
-          a.mt_2xl,
-          a.border_l_tint(colors.primarylighter),
-          {borderStyle: 'dashed'},
-        ]}
-      />
-      <Row style={[]}>
+      <Container>
         <View
           style={[
-            a.relative,
-            a.w_(10),
-            a.h_(10),
+            a.absolute,
+            a.h_65,
+            a.left_(4),
+            a.border_l,
             a.mt_2xl,
-            a.rounded_full,
-            a.align_center,
-            a.justify_center,
-            // a.bg_(colors.primarylighter),
-            a.overflow_visible,
-          ]}>
-          <Ionicons
-            name="location"
-            color={colors.primarylighter}
-            size={24}
+            a.border_l_tint(colors.primarylighter),
+            {borderStyle: 'dashed'},
+          ]}
+        />
+        <Row style={[]}>
+          <View
             style={[
-              // a.absolute,
-              a.self_center,
-              a.top_(-10),
-              a.left_(-2),
-              a.z_20,
-              a.w_(20),
-              a.h_(30),
-            ]}
-          />
-        </View>
-        <Text style={[a.ml_lg, a.text_sm]}>{orderRequest?.origin.address}</Text>
-      </Row>
-      <Row style={[a.mt_5xl]}>
-        <View style={[a.mt_2xl]}>
-          <PingAnimation pingSize={30} />
-        </View>
-        <Text style={[a.ml_lg, a.text_sm]}>
-          {orderRequest?.destination.address}
-        </Text>
-      </Row>
+              a.relative,
+              a.w_(10),
+              a.h_(10),
+              a.mt_2xl,
+              a.rounded_full,
+              a.align_center,
+              a.justify_center,
+              // a.bg_(colors.primarylighter),
+              a.overflow_visible,
+            ]}>
+            <Ionicons
+              name="location"
+              color={colors.primarylighter}
+              size={24}
+              style={[
+                // a.absolute,
+                a.self_center,
+                a.top_(-10),
+                a.left_(-2),
+                a.z_20,
+                a.w_(20),
+                a.h_(30),
+              ]}
+            />
+          </View>
+          <Text style={[a.ml_lg, a.text_sm]}>
+            {orderRequest?.origin.address}
+          </Text>
+        </Row>
+        <Row style={[a.mt_5xl]}>
+          <View style={[a.mt_2xl]}>
+            <PingAnimation pingSize={30} />
+          </View>
+          <Text style={[a.ml_lg, a.text_sm]}>
+            {orderRequest?.destination.address}
+          </Text>
+        </Row>
+      </Container>
     </Animated.View>
   );
 }

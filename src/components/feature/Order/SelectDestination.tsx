@@ -1,303 +1,264 @@
-import * as React from 'react';
-import {
-  View,
-  Dimensions,
-  StatusBar,
-  TextInputProps,
-  ActivityIndicator,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import {a} from '#/lib/style/atoms';
-import useLocationService from '#/hooks/useLocationService';
-import {useAppDispatch, useAppSelector} from '#/hooks/store';
-import {colors} from '#/lib/theme/palette';
-import {BOTTOM_TAB_HEIGHT, GOOGLE_MAPS_API_KEY} from '#/lib/constants';
-import {updateOrderRequest} from '#/store/slices/order/helpers';
-import {hexWithOpacity} from '#/lib/ui/helpers';
-import {useModalControls} from '../../global/modals/ModalState';
-import {Button, Column, Row, Separator} from '../../global';
-import {ButtonText} from '../../global/Button';
-import ToggleButton from '../../global/ToggleButton';
-import {Text} from '../../global/Themed';
-import PlacesAutoComplete from './PlacesAutoComplete/PlacesAutoComplete';
-// import KeyboardAvoidingComponent from '../../global/KeyboardAvoidingComponent';
-import ViewHeader from '../../global/ViewHeader';
-import {Container} from '../../utils';
-import {useAnimatedKeyboard} from 'react-native-reanimated';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-import KeyboardAvoidingComponent from '../../global/KeyboardAvoidingComponent';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Pressable,
+  StatusBar,
+  View,
+} from 'react-native';
 import {
   GooglePlaceData,
   GooglePlaceDetail,
 } from 'react-native-google-places-autocomplete';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-const {height: HEIGHT} = Dimensions.get('window');
-// NOTE: snapPoints holds the default height point for modal
-const snapPointValue = ((HEIGHT - StatusBar.currentHeight!) / HEIGHT) * 100;
-// export const snapPoints = [`${snapPointValue}%`];
+import {useAppDispatch, useAppSelector} from '#/hooks/store';
+import useLocationService from '#/hooks/useLocationService';
+import {a} from '#/lib/style/atoms';
+import {colors} from '#/lib/theme/palette';
+import {hexWithOpacity} from '#/lib/ui/helpers';
+import {updateOrderRequest} from '$/src/store/slices/order/helpers';
+
+import {Button, Column, Row, Separator} from '../../global';
+import {ButtonText} from '../../global/Button';
+import {useModalControls} from '../../global/modals/ModalState';
+import {Text} from '../../global/Themed';
+import ToggleButton from '../../global/ToggleButton';
+import ViewHeader from '../../global/ViewHeader';
+import {Container} from '../../utils';
+import PlacesAutoComplete from './PlacesAutoComplete/PlacesAutoComplete';
+
 export const snapPoints = ['95%'];
 export const enablePanDownToClose = true;
-// export const snapPoints = [`80%`];
-
-let KEYBOARD_HEIGHT: number | undefined = undefined;
 
 export default function SelectDestination() {
-  const [loading, setLoading] = React.useState(false);
-  const [useCurrentLocation, setUseCurrentLocation] = React.useState(false);
   const {currentAddress, currentPosition} = useAppSelector(
     state => state.location,
   );
-  const [originInput, setOriginInput] = React.useState('');
-  const [destinationInput, setDestinationInput] = React.useState('');
   const {orderRequest} = useAppSelector(state => state.order);
-
   const {getCurrentAddress} = useLocationService();
-  const dispatch = useAppDispatch();
   const {closeModal, openModal} = useModalControls();
 
-  const keyboard = useAnimatedKeyboard();
-
-  if (!KEYBOARD_HEIGHT) {
-    KEYBOARD_HEIGHT = keyboard.height.value;
-  }
-
-  const bottomTabBarHeight = useBottomTabBarHeight();
-
-  const barHeight = React.useMemo(() => bottomTabBarHeight, []);
-
-  const createOrder = React.useCallback(() => {
-    console.log('CREATE_ORDER_CLICKED!');
-    if (orderRequest?.origin && orderRequest.destination) {
-      openModal('order-details', {});
-    }
+  const [currentLocationUsed, setCurrentLocationUsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [originInput, setOriginInput] = useState('');
+  const [destinationInput, setDestinationInput] = useState(
+    orderRequest?.destination ? orderRequest.destination?.address : '',
+  );
+  useEffect(() => {
+    if (orderRequest) setDestinationInput(orderRequest.destination?.address);
   }, [orderRequest]);
 
-  const handleGetOriginDetails = React.useCallback(
-    (data: any, details: any | null) => {
-      // (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
-      updateOrderRequest(dispatch, {
-        origin: {
-          address: details?.formatted_address,
-          latitude: details?.geometry.location.lat,
-          longitude: details?.geometry.location.lng,
-        },
-      });
-      // createOrder();
-    },
+  const dispatch = useAppDispatch();
 
-    [],
-  );
-
-  const handleGetDestinationDetails = React.useCallback(
-    (data: any, details: any | null) => {
-      // (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
-      if (useCurrentLocation) {
+  // Handle origin location updates
+  const handleGetOriginDetails = useCallback(
+    (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
+      if (details) {
         updateOrderRequest(dispatch, {
           origin: {
-            address: currentAddress?.formattedAddress!,
-            latitude: currentPosition?.coords.latitude,
-            longitude: currentPosition?.coords.longitude,
+            address: details?.formatted_address,
+            latitude: details?.geometry.location.lat,
+            longitude: details?.geometry.location.lng,
           },
         });
       }
-      updateOrderRequest(dispatch, {
-        destination: {
-          address: details?.formatted_address,
-          latitude: details?.geometry.location.lat,
-          longitude: details?.geometry.location.lng,
-        },
-      });
-      // createOrder();
     },
-
-    [],
+    [dispatch],
   );
 
-  React.useEffect(() => {
-    (async () => {
-      if (currentAddress) return;
-      setLoading(true);
-      const ADDRESS = await getCurrentAddress();
-      setLoading(false);
-    })();
-  }, []);
+  // Handle destination location updates
+  const handleGetDestinationDetails = useCallback(
+    (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
+      if (currentLocationUsed && currentAddress && currentPosition) {
+        updateOrderRequest(dispatch, {
+          origin: {
+            address: currentAddress.formattedAddress!,
+            latitude: currentPosition.coords.latitude,
+            longitude: currentPosition.coords.longitude,
+          },
+        });
+      }
+      if (details) {
+        updateOrderRequest(dispatch, {
+          destination: {
+            address: details?.formatted_address,
+            latitude: details?.geometry.location.lat,
+            longitude: details?.geometry.location.lng,
+          },
+        });
+      }
+    },
+    [currentLocationUsed, currentAddress, currentPosition, dispatch],
+  );
 
-  // React.useEffect(() => {
-  //   if (orderRequest?.origin && orderRequest.destination) {
-  //     closeModal();
-  //     setTimeout(() => {
-  //       openModal({
-  //         name: 'create-order',
-  //       });
-  //     }, 200);
-  //   }
-  // }, [orderRequest, openModal, closeModal]);
+  // Fetch current address if not already present
+  useEffect(() => {
+    const fetchAddress = async () => {
+      if (!currentAddress) {
+        setLoading(true);
+        await getCurrentAddress();
+        setLoading(false);
+      }
+    };
+    fetchAddress();
+  }, [currentAddress, getCurrentAddress]);
 
-  const onCloseModal = React.useCallback(async () => {
-    await new Promise(resolve => {
-      resolve(closeModal());
-    });
+  const createOrder = useCallback(() => {
+    if (orderRequest?.origin && orderRequest?.destination) {
+      openModal('order-details');
+    }
+  }, [orderRequest, openModal]);
 
-    // if (!(orderRequest?.origin && orderRequest.destination))
-    setTimeout(() => {
-      openModal('where-to', {
-        onClose() {
-          orderRequest
-            ? setTimeout(() => {
-                console.log('RUNNING');
-                openModal('where-to', {});
-              }, 2000)
-            : null;
-        },
-      });
-    }, 1000);
-  }, [orderRequest]);
+  // const onCloseModal = useCallback(async () => {
+  //   await closeModal();
+  //   setTimeout(() => {
+  //     openModal('where-to', {});
+  //   }, 1000);
+  // }, [closeModal, openModal]);
 
-  return (
-    <>
-      <View style={[a.w_full, a.h_full]}>
-        <>
-          <Container>
-            <ViewHeader
-              title="Select Destination"
-              canGoBack
-              backPressHandler={closeModal}
-            />
-          </Container>
+  // Memoize elements to avoid unnecessary renders
+  const originComponent = useMemo(
+    () =>
+      currentLocationUsed ? (
+        <Pressable onPress={() => setCurrentLocationUsed(false)}>
           <Row
             style={[
-              a.self_end,
-              a.px_xl,
-              a.w_full,
-              a.justify_between,
               a.align_center,
+              a.w_full,
+              a.rounded_sm,
+              a.px_lg,
+              a.h_(50),
+              a.border,
+              a.border_tint(colors.lightgrey),
+              a.bg_(colors.lightgrey),
             ]}>
-            <Text style={[a.text_md]}>Use Current Location?</Text>
-            <View style={[a.ml_(4)]}>
-              <ToggleButton
-                accessibilityLabel={'PinButton'}
-                isActive={useCurrentLocation}
-                switchActive={() => setUseCurrentLocation(prev => !prev)}
-                style={[a.h_(32), a.w_(50), a.bg_(colors.dark_1)]}
-                circleSize={30}
-              />
-            </View>
-          </Row>
-          <Column style={[a.my_2xl, a.rounded_md, a.flex_1]}>
-            <Column style={[a.mt_(-10)]}>
-              <View
-                style={[
-                  // a.py_xs,
-                  a.px_md,
-                  a.z_30,
-                  a.bg_(colors.light_1),
-                ]}>
-                {useCurrentLocation ? (
-                  <Pressable onPress={() => setUseCurrentLocation(false)}>
-                    <Row
-                      style={[
-                        a.align_center,
-                        // a.justify_center,
-                        a.w_full,
-                        a.rounded_sm,
-                        a.px_lg,
-                        a.h_(50),
-                        a.border,
-                        a.border_tint(colors.dark_1),
-                        a.bg_(colors.light_2),
-                      ]}>
-                      {loading ? (
-                        <ActivityIndicator color={colors.primary} />
-                      ) : (
-                        <>
-                          <View
-                            style={[
-                              a.w_(25),
-                              a.h_(25),
-                              a.rounded_full,
-                              a.align_center,
-                              a.justify_center,
-                              a.bg_(hexWithOpacity(colors.teal_2, 0.3)),
-                            ]}>
-                            <View
-                              style={[
-                                a.w_60,
-                                a.h_60,
-                                a.rounded_full,
-                                a.border_(2),
-                                a.border_tint(colors.light_1),
-                                a.bg_(colors.teal_2),
-                              ]}
-                            />
-                          </View>
-                          <View style={[a.flex_1, a.ml_lg]}>
-                            <Text style={[a.text_md]}>
-                              {currentAddress?.formattedAddress}
-                            </Text>
-                          </View>
-                        </>
-                      )}
-                    </Row>
-                  </Pressable>
-                ) : (
-                  <PlacesAutoComplete
-                    placeholder="Pick-up"
-                    autoFocus={!useCurrentLocation}
-                    listViewStyles={[a.top_(120)]}
-                    getDetails={handleGetOriginDetails}
-                    value={originInput}
-                    onChangeText={text => setOriginInput(text)}
+            {loading ? (
+              <ActivityIndicator color={colors.primary} />
+            ) : (
+              <>
+                <View
+                  style={[
+                    a.w_(25),
+                    a.h_(25),
+                    a.rounded_full,
+                    a.align_center,
+                    a.justify_center,
+                    a.bg_(hexWithOpacity(colors.darkgray, 0.3)),
+                  ]}>
+                  <View
+                    style={[
+                      a.w_60,
+                      a.h_60,
+                      a.rounded_full,
+                      a.border_(2),
+                      a.border_tint(colors.light),
+                      a.bg_(colors.darkgray),
+                    ]}
                   />
-                )}
-              </View>
-              <Separator height={2} />
-              <Row
-                style={[
-                  {
-                    shadowColor: '#000000',
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.16,
-                    shadowRadius: 1.51,
-                    elevation: 2,
-                  },
-                  a.h_(70),
-                  a.top_(-8),
-                  a.align_center,
-                  a.z_20,
-                  a.bg_(colors.light_1),
-                ]}>
-                <PlacesAutoComplete
-                  iconTransitionDirection="up"
-                  inputContainerStyles={[a.mx_md]}
-                  listViewStyles={[a.mt_(70), {zIndex: -1}]}
-                  autoFocus={true}
-                  placeholder="Destination"
-                  getDetails={handleGetDestinationDetails}
-                  value={destinationInput}
-                  onChangeText={text => setDestinationInput(text)}
-                />
-              </Row>
-              {orderRequest?.origin && orderRequest.destination && (
-                <View style={[a.mx_md, a.mt_xl]}>
-                  <Button
-                    variant="solid"
-                    color="primary"
-                    shape="round"
-                    onPress={createOrder}>
-                    <ButtonText>Continue</ButtonText>
-                  </Button>
                 </View>
-              )}
-            </Column>
-          </Column>
-        </>
-      </View>
-    </>
+                <View style={[a.flex_1, a.ml_lg]}>
+                  <Text style={[a.text_md]}>
+                    {currentAddress?.formattedAddress}
+                  </Text>
+                </View>
+              </>
+            )}
+          </Row>
+        </Pressable>
+      ) : (
+        <PlacesAutoComplete
+          placeholder="Pick-up"
+          autoFocus={!currentLocationUsed}
+          listViewStyles={[a.top_(120)]}
+          getDetails={handleGetOriginDetails}
+          value={originInput}
+          onChangeText={text => setOriginInput(text)}
+        />
+      ),
+    [
+      currentLocationUsed,
+      loading,
+      currentAddress,
+      originInput,
+      handleGetOriginDetails,
+    ],
+  );
+
+  return (
+    <View style={[a.w_full, a.h_full]}>
+      <Container>
+        <ViewHeader
+          title="Select Destination"
+          canGoBack
+          backPressHandler={closeModal}
+        />
+      </Container>
+      <Row
+        style={[
+          a.self_end,
+          a.px_xl,
+          a.w_full,
+          a.justify_between,
+          a.align_center,
+        ]}>
+        <Text style={[a.text_md]}>Use Current Location?</Text>
+        <ToggleButton
+          accessibilityLabel="PinButton"
+          isActive={currentLocationUsed}
+          switchActive={() => setCurrentLocationUsed(prev => !prev)}
+          style={[a.h_(32), a.w_(50), a.bg_(colors.lightgrey)]}
+          circleSize={30}
+        />
+      </Row>
+      <Column style={[a.my_2xl, a.rounded_md, a.flex_1]}>
+        <Column style={[a.mt_(-10)]}>
+          <View style={[a.px_md, a.z_30, a.bg_(colors.light)]}>
+            {originComponent}
+          </View>
+          <Separator height={2} />
+          <Row
+            style={[
+              {
+                shadowColor: '#000000',
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.16,
+                shadowRadius: 1.51,
+                elevation: 2,
+              },
+              a.h_(70),
+              a.top_(-8),
+              a.align_center,
+              a.z_20,
+              a.px_md,
+              a.bg_(colors.light),
+            ]}>
+            <PlacesAutoComplete
+              placeholder="Destination"
+              listViewStyles={[a.mt_(70), {zIndex: -1}]}
+              getDetails={handleGetDestinationDetails}
+              value={destinationInput}
+              onChangeText={text => text && setDestinationInput(text)}
+              iconTransitionDirection="up"
+            />
+          </Row>
+          {orderRequest?.origin && orderRequest?.destination && (
+            <View style={[a.mx_md, a.mt_xl]}>
+              <Button
+                variant="solid"
+                color="primary"
+                shape="round"
+                onPress={createOrder}>
+                <ButtonText>Continue</ButtonText>
+              </Button>
+            </View>
+          )}
+        </Column>
+      </Column>
+    </View>
   );
 }

@@ -1,8 +1,9 @@
 import {Feather, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useHeaderHeight} from '@react-navigation/elements';
-import {Stack, useFocusEffect, useRouter} from 'expo-router';
+import {useFocusEffect, useRouter} from 'expo-router';
 import {useCallback, useEffect, useState} from 'react';
 import {
+  InteractionManager,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Platform,
@@ -30,6 +31,8 @@ import {RefreshControl} from 'react-native-gesture-handler';
 import useApi from '$/src/hooks/api/useApi';
 import OrdersLoader, {OrderLoading, OrdersHeaderLoading} from './OrdersLoader';
 import {MotiView} from 'moti';
+import {useScrollProps} from '@bacons/expo-router-top-tabs';
+
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
 const ORDER_DATA = [
@@ -370,14 +373,14 @@ function transformOrders(orders: Order[]): TransformedOrder[] {
     groupedOrders[longMonthYear].data.push({
       _id: order._id,
       dropOffLocation: {
-        address: order.dropOffLocation.address,
-        latitude: order.dropOffLocation.latitude,
-        longitude: order.dropOffLocation.longitude,
+        address: order.dropOffLocation?.address,
+        latitude: order.dropOffLocation?.latitude,
+        longitude: order.dropOffLocation?.longitude,
       },
       pickupLocation: {
-        address: order.pickupLocation.address,
-        latitude: order.pickupLocation.latitude,
-        longitude: order.pickupLocation.longitude,
+        address: order.pickupLocation?.address,
+        latitude: order.pickupLocation?.latitude,
+        longitude: order.pickupLocation?.longitude,
       },
       orderTime: formatTime(order.orderTime),
       arrivalTime: formatTime(
@@ -405,7 +408,7 @@ const DEFAULT_ORDERS = Array.from({length: 20}, (_, i) => ({
   status: '',
 }));
 
-export default function Orders() {
+export default function Orders({status}: {status: 'pending' | 'completed'}) {
   const {getOrders} = useApi().order;
   const headerHeight = useSharedValue(0);
 
@@ -417,15 +420,11 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
 
   const router = useRouter();
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    paddingTop: headerHeight.value,
-  }));
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const responseData = await getOrders();
-      console.log('ORDERS: ', responseData);
+      const responseData = await getOrders(status);
       if (!responseData) return;
       setOrders(responseData.orders);
     } catch (error) {
@@ -435,38 +434,23 @@ export default function Orders() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log('FOCUS!');
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchOrders();
+  //     return () => {
+  //       headerHeight.value = 0;
+  //       setH_Height(0);
+  //     };
+  //   }, []),
+  // );
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
       fetchOrders();
-      return () => {
-        headerHeight.value = 0;
-        setH_Height(0);
-      };
-    }, []),
-  );
-
-  useEffect(() => {}, []);
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollOffsetY = event.nativeEvent.contentOffset.y;
-
-    // Set the threshold for when the large title collapses (typically around 100-120px)
-    const collapseThreshold = -headHeight;
-
-    // Check if header is collapsed
-    if (
-      scrollOffsetY >= collapseThreshold &&
-      headerHeight.value === 0 &&
-      h_height === 0
-    ) {
-      setH_Height(headHeight);
-      headerHeight.value = withTiming(headHeight, {duration: 300});
-    }
-    // else if (scrollOffsetY < collapseThreshold && isHeaderCollapsed) {
-    //   setHeaderCollapsed(false);
-    // }
-  };
+      setTimeout(() => {});
+    });
+    return () => task.cancel();
+  }, []);
 
   const onRefresh = useCallback(() => {
     fetchOrders();
@@ -474,13 +458,6 @@ export default function Orders() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Orders',
-          headerShown: true,
-          headerLargeTitle: true,
-        }}
-      />
       <>
         <MotiView
           style={[a.flex_1]}
@@ -488,15 +465,7 @@ export default function Orders() {
             type: 'timing',
           }}
           animate={{backgroundColor: '#ffffff'}}>
-          <Container
-            style={[
-              a.bg_(colors.light),
-              a.flex_1,
-              // Platform.OS === 'ios' && [a.pt_(h_height)],
-              Platform.OS === 'ios' && animatedContainerStyle,
-              // a.flex_1,
-            ]}
-            safeArea={false}>
+          <Container style={[a.bg_(colors.light), a.flex_1]} safeArea={false}>
             <SectionList
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -518,7 +487,6 @@ export default function Orders() {
                   </Column>
                 ) : undefined
               }
-              onScroll={handleScroll}
               showsVerticalScrollIndicator={false}
               contentInsetAdjustmentBehavior="automatic"
               stickySectionHeadersEnabled={true}
@@ -528,7 +496,7 @@ export default function Orders() {
                   ? transformOrders(DEFAULT_ORDERS)
                   : transformOrders(orders)
               }
-              keyExtractor={(item, index) => (item._id + index).toString()}
+              keyExtractor={(item, index) => (item?._id + index).toString()}
               ItemSeparatorComponent={() => (
                 <Separator height={1} backgroundColor={colors.lightgrey} />
               )}
@@ -561,7 +529,7 @@ export default function Orders() {
                   <OrderLoading />
                 ) : (
                   <ListTile
-                    action={() => router.push(`/(tabs)/orders/${item._id}`)}
+                    action={() => router.push(`/(tabs)/orders/${item?._id}`)}
                     ripple
                     style={[a.py_md]}
                     leading={
@@ -580,11 +548,11 @@ export default function Orders() {
                           numberOfLines={1}
                           family="Bold"
                           style={[a.text_md]}>
-                          {item.dropOffLocation.address}
+                          {item?.dropOffLocation?.address}
                         </Text>
                         <Row>
-                          <Text>{item.date} - </Text>
-                          <Text>N{item.fare}</Text>
+                          <Text>{item?.date} - </Text>
+                          <Text>${item?.fare}</Text>
                         </Row>
                       </Column>
                     }

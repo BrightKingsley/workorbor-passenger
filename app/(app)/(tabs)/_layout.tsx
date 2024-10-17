@@ -5,12 +5,11 @@ import {GestureResponderEvent, Pressable} from 'react-native';
 import {HomeIcon, HomeIconOutline} from '$/src/assets/icons';
 import {colors} from '$/src/lib/theme/palette';
 import {useCallback} from 'react';
-import * as Haptics from 'expo-haptics';
 import {useModals} from '$/src/components/global/modals/ModalState';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 export default function TabLayout() {
   const {isModalActive} = useModals();
-  console.log('IS_MODAL_ACTIVE: ', isModalActive);
   return (
     <>
       <Tabs
@@ -28,9 +27,7 @@ export default function TabLayout() {
             const onTabButtonPressIn = useCallback(
               (e: GestureResponderEvent) => {
                 onPressIn?.(e);
-                Haptics.notificationAsync(
-                  Haptics.NotificationFeedbackType.Success,
-                );
+                Haptics.success();
               },
               [],
             );
@@ -53,6 +50,7 @@ export default function TabLayout() {
           name="orders"
           options={{
             title: 'orders',
+            headerShown: false,
             tabBarIcon: ({color, focused}) => (
               <MaterialCommunityIcons
                 name={focused ? 'calendar-blank' : 'calendar-blank-outline'}

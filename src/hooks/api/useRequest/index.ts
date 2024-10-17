@@ -60,7 +60,6 @@ export default function useRequest() {
     data?: {[key: string]: any},
     config: AxiosRequestConfig = {},
   ): Promise<T> {
-    console.log({endpoint});
     try {
       const callableMethod = api[method] as unknown as (
         url: string,
@@ -74,6 +73,7 @@ export default function useRequest() {
       const headers = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
+        'User-Type': 'passenger',
       };
 
       // Handle GET and non-GET requests differently
@@ -89,8 +89,6 @@ export default function useRequest() {
               headers, // For POST/PUT, pass data in body and headers in config
             });
 
-      console.log('My_ENDPOINT: ', response.config.url);
-
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -102,7 +100,6 @@ export default function useRequest() {
           statusText,
         );
       } else {
-        console.log(error);
         throw new Error('An unexpected error occurred');
       }
     }

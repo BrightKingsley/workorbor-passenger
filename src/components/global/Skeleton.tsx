@@ -7,7 +7,7 @@ export default function Skeleton({
   ...props
 }: PropsWithChildren<Partial<MotiSkeletonProps>>) {
   return (
-    <DefaultSkeleton colorMode="light" {...props}>
+    <DefaultSkeleton colorMode="light" radius={'round'} {...props}>
       {children}
     </DefaultSkeleton>
   );

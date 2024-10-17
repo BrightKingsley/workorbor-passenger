@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import * as React from 'react';
 import {
   DimensionValue,
@@ -15,6 +14,7 @@ import Animated, {useAnimatedStyle, withSpring} from 'react-native-reanimated';
 
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 type ToggleButtonProp = {
   accessibilityLabel: string;
@@ -64,7 +64,7 @@ function AnimatedCircle({
 }) {
   const onSwitchPress = React.useCallback((_: GestureResponderEvent) => {
     switchActive?.();
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.success();
   }, []);
 
   // Translate switch to X depending on switchValue state

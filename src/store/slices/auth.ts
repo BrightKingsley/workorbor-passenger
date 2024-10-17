@@ -17,8 +17,6 @@ const storedUser = '';
 if (storedUser) user = JSON.parse(storedUser);
 const token = '';
 
-console.log('STORED: ', {token, user});
-
 const initialState: AuthState = {
   user,
   isAuthenticated: user ? true : false,

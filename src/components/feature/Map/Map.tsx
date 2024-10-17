@@ -42,6 +42,7 @@ import {Text, View} from '../../global/Themed';
 import {Column} from '../../global';
 import BalloonMarker from './Markers/Marker';
 import {useUser} from '@clerk/clerk-expo';
+import PingAnimation from '../../global/PingAnimation';
 
 const DELTAS = {
   latitudeDelta: 1,
@@ -92,9 +93,6 @@ export default function Map({
   );
 
   useEffect(() => {
-    console.info('ORIGIN: ', orderRequest?.origin);
-    console.info('DESTINATION: ', orderRequest?.destination);
-
     if (orderRequest?.origin && orderRequest?.destination) {
       setDirections({
         origin: {
@@ -107,13 +105,11 @@ export default function Map({
           longitude: orderRequest?.destination?.longitude!,
         },
         // destination: {latitude: 10.2650001, longitude: 10.2650001},
-        strokeWidth: 5,
+        strokeWidth: 2,
         strokeColor: colors.primary,
-        onReady: result => {
-          console.log('Directions ready:', result);
-        },
+        onReady: result => {},
       });
-    }
+    } else setDirections(null);
   }, [orderRequest]);
 
   const _markers: (MarkerProps | undefined)[] = [
@@ -170,7 +166,7 @@ export default function Map({
     mapRef?.current?.animateToRegion(initRegion);
     mapRef?.current?.animateCamera({
       center: {latitude: initRegion.latitude, longitude: initRegion.longitude},
-      zoom: 18,
+      zoom: 16,
     });
   };
 
@@ -198,7 +194,6 @@ export default function Map({
         ...DELTAS,
       }}
       onMapLoaded={() => {
-        console.log('[[[[MAP_LOADED]]]]');
         initializeMapItems();
       }}
       provider={PROVIDER_GOOGLE}
@@ -238,12 +233,11 @@ const CustomMarker = ({
 }: ComponentProps<typeof Marker> & {index: number}) => {
   const [showLabel, setShowLabel] = useState(true);
   const label = markerProps.description;
-  console.log({index: index + 1, label});
 
   return (
     <Marker
       tracksInfoWindowChanges
-      style={[a.h_(150), a.w_(50)]}
+      style={[a.overflow_visible, a.w_(100), a.h_(100)]}
       onPress={() => {
         setShowLabel(prev => !prev);
       }}
@@ -260,7 +254,12 @@ const CustomMarker = ({
           />
         </View>
       )} */}
-      <BalloonMarker>{markerProps.children}</BalloonMarker>
+      {/* <BalloonMarker>{markerProps.children}</BalloonMarker> */}
+      {/* {markerProps.identifier === 'current' && (
+        // <View style={[a.w_(300), a.h_(300)]}>
+        <PingAnimation coreSize={30} color={colors.primary} pingSize={300} />
+        // </View>
+      )} */}
     </Marker>
   );
 };

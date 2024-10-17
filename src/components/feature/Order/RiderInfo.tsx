@@ -1,4 +1,4 @@
-import {View, Image, Platform, Linking} from 'react-native';
+import {View, ScrollView, Image, Alert, Platform} from 'react-native';
 // import {useModalControls} from '#/state/modals';
 // import {NigeriaIcon, UnitedKingdomIcon} from '#/lib/icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -27,91 +27,60 @@ import Animated, {
 
 const AnimatedIonIcon = Animated.createAnimatedComponent(Ionicons);
 
-let SNAP_POINTS = '35%';
+let SNAP_POINTS = '90%';
 
 export const snapPoints = [SNAP_POINTS];
 
 export const enablePanDownToClose = false;
 
-export default function EnRoute() {
-  const {openModal, closeAllModals} = useModalControls();
+export default function RiderInfo() {
+  const {openModal} = useModalControls();
   const {riderInfo} = useAppSelector(state => state.order);
-
-  const {cancelRide} = useApi().order;
+  const {createOrder} = useApi().order;
   const router = useRouter();
-  const {user} = useUser();
   const [loading, setLoading] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
-  const handleCallPress = () => {
-    const phoneNumber = `tel:${'08021248576'}`;
-
-    console.log({phoneNumber});
-
-    Linking.openURL(phoneNumber).catch(err =>
-      console.error('An error occurred while opening the phone app:', err),
-    );
-  };
-
   const handleProfilePress = useCallback(() => {
-    openModal('rider-details');
+    SNAP_POINTS = '90%';
+    setShowProfile(prev => !prev);
   }, []);
 
-  const handleChatPress = useCallback(() => {
+  const handlePressChat = useCallback(() => {
     Platform.OS === 'android'
       ? openModal('chat')
       : router.push('/(app)/chats/4');
   }, []);
 
-  const handleCancelPress = useCallback(() => {
-    cancelRide();
-    closeAllModals();
-  }, []);
-
   return (
     <View style={[a.px_md, a.flex_1]}>
       <BottomSheetScrollView showsVerticalScrollIndicator={false} style={[]}>
-        <Button
-          onPress={handleProfilePress}
-          variant="ghost"
-          style={[a.mt_sm, a.w_(130), a.mx_auto, a.px_2xl, a.relative]}>
-          <View style={[a.relative]}>
-            <Image
-              style={
-                [
-                  a.w_(80),
-                  a.h_(80),
-                  a.mx_auto,
-                  a.rounded_full,
-                  a.bg_(colors.primary),
-                ] as ComponentProps<typeof Image>['style']
-              }
-              source={{uri: riderInfo?.photo || user?.imageUrl}}
-            />
-            <View
-              style={[
-                a.absolute,
-                a.bottom_0,
-                a.right_0,
-                a.bg_(colors.light),
+        <View style={[a.mt_5xl]}>
+          <Image
+            style={
+              [
+                a.w_(100),
+                a.h_(100),
+                a.mx_auto,
                 a.rounded_full,
-              ]}>
-              <AnimatedIonIcon name={'information-circle-outline'} size={30} />
-            </View>
-          </View>
-          <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_sm]}>
-            {riderInfo?.firstName || 'John'}
+                a.bg_(colors.primary),
+              ] as ComponentProps<typeof Image>['style']
+            }
+            source={{uri: riderInfo?.photo}}
+          />
+          <Text style={[a.font_bold, a.text_md, a.text_center, a.mt_2xl]}>
+            {riderInfo?.firstName}
             {'  '}
-            {riderInfo?.lastName || 'Doe'}
+            {riderInfo?.lastName}
           </Text>
-        </Button>
+        </View>
 
-        <Row style={[a.justify_around, a.mt_lg]}>
+        <Row style={[a.justify_around, a.mt_2xl]}>
           <Column style={[a.align_center]}>
             <Button
               shape="round"
               variant="outline"
-              onPress={handleCallPress}
+              onPress={handleProfilePress}
               style={[
                 a.w_(50),
                 a.h_(50),
@@ -123,13 +92,14 @@ export default function EnRoute() {
               ]}>
               <AnimatedIonIcon
                 entering={ZoomIn}
+                exiting={ZoomOut}
                 color={colors.darkgray}
-                name="call-outline"
+                name="person-outline"
                 size={30}
               />
             </Button>
             <Text style={[a.text_xs, a.text_(colors.darkgray), a.mt_xs]}>
-              Call Rider
+              Rider Details
             </Text>
           </Column>
 
@@ -137,7 +107,7 @@ export default function EnRoute() {
             <Button
               shape="round"
               variant="outline"
-              onPress={handleChatPress}
+              onPress={handlePressChat}
               style={[
                 a.w_(50),
                 a.h_(50),
@@ -149,6 +119,7 @@ export default function EnRoute() {
               ]}>
               <AnimatedIonIcon
                 entering={ZoomIn}
+                exiting={ZoomOut}
                 color={colors.darkgray}
                 name="chatbox-outline"
                 size={30}
@@ -161,7 +132,6 @@ export default function EnRoute() {
 
           <Column style={[a.align_center]}>
             <Button
-              onPress={() => handleCancelPress()}
               shape="round"
               variant="outline"
               style={[
@@ -175,6 +145,7 @@ export default function EnRoute() {
               ]}>
               <AnimatedIonIcon
                 entering={ZoomIn}
+                exiting={ZoomOut}
                 color={colors.darkgray}
                 name="close-outline"
                 size={30}

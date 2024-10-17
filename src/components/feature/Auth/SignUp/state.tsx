@@ -112,7 +112,6 @@ export const FormProvider = ({children}: {children: ReactNode}) => {
     retypePassword.value !== '' && retypePassword.value === password.value;
 
   const handleSignUpPress = useCallback(async () => {
-    console.log({phoneNumber});
     const firstNameValidation = validateName(firstname.value);
     const lastNameValidation = validateName(lastname.value);
     const emailValidation = validateEmail(email.value);

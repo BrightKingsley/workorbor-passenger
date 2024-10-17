@@ -23,16 +23,13 @@ export default function VerifyOtp() {
 
   const handleNumberPress = (val: string) => {
     setError(false);
-    console.log('OTP_INPUT_VALUE', val);
     setInput(val);
   };
 
   useEffect(() => {
-    console.log({input});
   }, [input]);
 
   const handleCompleteOtp = () => {
-    console.log('RUNNNN');
     setTimeout(async () => {
       setLoading(prev => ({...prev, login: true}));
       const success = await verifyResetOtp({

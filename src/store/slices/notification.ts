@@ -24,8 +24,6 @@ const notificationSlice = createSlice({
         // children,
       } = action.payload;
 
-      console.log("TRIGGER_MODAL: ", action.payload);
-
       return {
         ...state,
         show: show !== undefined ? show : !state.show,

@@ -89,7 +89,6 @@ function ListTileWrapper({
           : null
       }
       onPress={e => {
-        console.log('THis PRESSED');
         action?.(e);
       }}>
       {children}
@@ -98,7 +97,6 @@ function ListTileWrapper({
     <TouchableOpacity
       style={[a.rounded_sm, a.overflow_hidden, style]}
       onPress={() => {
-        console.log('THis PRESSED');
         action?.();
       }}>
       {children}

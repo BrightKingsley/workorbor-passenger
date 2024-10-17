@@ -29,9 +29,7 @@ if (__DEV__) {
   if (Platform.OS !== 'ios') {
     API_BASE_URL = 'http://192.168.122.1:8080';
   } else API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
-  console.log('__DEVELOPMENT__');
   API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
 } else {
   API_BASE_URL = 'https://workorbor-api-givk.onrender.com';
-  console.log('__PRODUCTION__');
 }

@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
-import * as Haptics from 'expo-haptics';
 import {useCallback, useState} from 'react';
 import {Platform, Pressable, ViewStyle} from 'react-native';
 import Animated, {Easing, RollInRight} from 'react-native-reanimated';
@@ -12,16 +11,16 @@ import {hexWithOpacity} from '#/lib/ui/helpers';
 import {Row} from '../../global';
 import TextInput from '../../global/TextInput';
 import useApi from '$/src/hooks/api/useApi';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 export default function ChatInput() {
   const {sendMessage} = useApi().chat;
 
   const [text, setText] = useState('');
   const handleSubmit = useCallback(async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.success();
     try {
       const result = await sendMessage(text);
-      console.log('CHAT_RESULT: ', result);
     } catch (error) {
       console.error('CHAT_INPUT: ', error);
     }

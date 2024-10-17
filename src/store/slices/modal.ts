@@ -26,8 +26,6 @@ const modalSlice = createSlice({
         children,
       } = action.payload;
 
-      console.log('TRIGGER_MODAL: ', action.payload);
-
       return {
         ...state,
         showModal: show !== undefined ? show : !state.showModal,

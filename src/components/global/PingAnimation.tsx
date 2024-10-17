@@ -38,6 +38,10 @@ export default function PingAnimation({
       height: coreSize,
       borderRadius: coreSize / 2,
       backgroundColor: color,
+      position: 'relative',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'visible',
     },
   });
 
@@ -66,9 +70,14 @@ export default function PingAnimation({
   });
 
   return (
-    <View style={styles.container}>
+    // <View style={styles.container}>
+    //   <Animated.View style={[styles.ping, animatedStyle]} />
+    //   {children || <View style={styles.core} />}
+    // </View>
+
+    <View style={styles.core}>
       <Animated.View style={[styles.ping, animatedStyle]} />
-      {children || <View style={styles.core} />}
+      {/* {children || <View style={styles.core} />} */}
     </View>
   );
 }

@@ -72,7 +72,6 @@ async function registerForPushNotificationsAsync() {
           projectId,
         })
       ).data;
-      console.log(pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {
       handleRegistrationError(`${e}`);
@@ -102,7 +101,6 @@ export default function App() {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
       });
 
     return () => {
@@ -116,7 +114,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.log({expoPushToken});
   }, [expoPushToken]);
 
   return (

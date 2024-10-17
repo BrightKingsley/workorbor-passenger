@@ -29,7 +29,6 @@ import {FormField, FormProvider, useFormContext} from './state';
 import t from '$/locales/translate';
 
 import {IS_RTL} from '$/locales';
-import {LinearGradient} from 'expo-linear-gradient';
 import {StatusBar} from 'expo-status-bar';
 import {Stack, useRouter} from 'expo-router';
 import {useOAuth, useSignIn, useSignUp} from '@clerk/clerk-expo';
@@ -89,7 +88,6 @@ export default function SignUpCredentials() {
       },
       handleErrors,
     );
-    console.log({success});
 
     if (!success) setError(true);
     setLoading(false);

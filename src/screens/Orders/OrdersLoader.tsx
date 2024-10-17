@@ -1,7 +1,6 @@
 import {MotiView} from 'moti';
 import React from 'react';
-import {SectionList, SectionListData} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import {SectionList} from 'react-native';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 
 import {

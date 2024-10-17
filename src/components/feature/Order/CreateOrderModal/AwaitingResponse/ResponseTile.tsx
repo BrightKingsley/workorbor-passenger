@@ -118,7 +118,7 @@ export default function ResponseTile({
         trailing={
           <Column
             style={[a.align_end, a.justify_center, a.z_20, a.right_0, a.px_md]}>
-            <Text style={[a.text_lg, a.font_bold]}>#{'2000'}</Text>
+            <Text style={[a.text_lg, a.font_bold]}>${'2000'}</Text>
             <Text
               style={[
                 a.text_sm,
@@ -130,7 +130,7 @@ export default function ResponseTile({
                   textDecorationLine: 'line-through',
                 },
               ]}>
-              #{'2000'}
+              ${'2000'}
             </Text>
           </Column>
         }
