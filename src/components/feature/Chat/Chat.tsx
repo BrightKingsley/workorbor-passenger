@@ -70,7 +70,6 @@ export default function Chat() {
 
   const fetchMessages = useCallback(async () => {
     setLoading(true);
-    console.log({chatId});
     await getMessages(chatId!);
     setLoading(false);
   }, [chatId]);

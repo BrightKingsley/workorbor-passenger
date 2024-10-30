@@ -33,7 +33,6 @@ export default function OrderSocket() {
   // Handler for 'available_rides' event
   const handleAvailableRides = useCallback(
     (data: any) => {
-      console.log('AVAILABLE_RIDERS: ', data);
       dispatch(setOrderPhase(OrderPhase.enroute));
       dispatch(
         setRider({
@@ -59,7 +58,6 @@ export default function OrderSocket() {
 
   // Handler for 'ride_completed' event
   const handleRideCompleted = useCallback(() => {
-    console.log('✅✅✅✅RIDE_COMPLETED✅✅✅✅');
     dispatch(clearChatId());
     dispatch(clearOrderRequest());
     dispatch(clearOrderResponse());
@@ -69,7 +67,6 @@ export default function OrderSocket() {
 
   // Handler for 'ride_cancelled' event
   const handleRideCancelled = useCallback(() => {
-    console.log('❌❌❌❌RIDE_CANCELLED❌❌❌❌');
     dispatch(clearChatId());
     dispatch(clearOrderResponse());
     closeAllModals();

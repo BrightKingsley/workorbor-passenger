@@ -9,6 +9,7 @@ import {colors} from '$/src/lib/theme/palette';
 
 import modalContent from './ModalContent';
 import {useModalControls, useModals} from './ModalState';
+import {Haptics} from '$/src/lib/utils/haptics';
 
 const DEFAULT_SNAP_POINTS = ['90%'];
 const HANDLE_HEIGHT = 24;
@@ -20,6 +21,7 @@ function Modal() {
   const activeModal = activeModals[activeModals.length - 1];
 
   const onBottomSheetChange = async (snapPoint: number) => {
+    Haptics.medium();
     if (snapPoint === -1) {
       closeModal();
     }
@@ -31,7 +33,6 @@ function Modal() {
 
   React.useEffect(() => {
     bottomSheetRef.current && setupModal(bottomSheetRef);
-    console.log({bottomSheetRef});
   }, [bottomSheetRef]);
 
   React.useEffect(() => {

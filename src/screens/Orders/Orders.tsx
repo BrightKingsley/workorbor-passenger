@@ -298,8 +298,10 @@ export interface Order {
   orderTime: string;
   passengerId: string;
   pickupLocation: {address: string; latitude: number; longitude: number};
-  status: string;
+  status: 'pending' | 'completed' | 'cancelled' | 'accepted';
   fare: number;
+  passenger?: User;
+  rider?: User;
 }
 
 interface TransformedOrder {

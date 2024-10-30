@@ -14,7 +14,7 @@
     "jsx": "react-jsx",
     "module": "esnext",
     "types": [
-      "node"
+      "node",
     ],
     "paths": {
       "$/*": [

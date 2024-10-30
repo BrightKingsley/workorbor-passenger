@@ -9,6 +9,10 @@ export default function Layout() {
           name="chats"
           options={{headerShown: false, presentation: 'modal'}}
         />
+        <Stack.Screen
+          name="wallet"
+          options={{headerShown: false, presentation: 'modal'}}
+        />
       </Stack>
     </>
   );

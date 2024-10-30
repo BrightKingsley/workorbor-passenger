@@ -93,9 +93,11 @@ export type Modal = keyof typeof modalContent;
 const ModalContext = React.createContext<{
   isModalActive: boolean;
   activeModals: Modal[];
+  modalRef: React.RefObject<BottomSheetMethods> | null;
 }>({
   isModalActive: false,
   activeModals: [],
+  modalRef: null,
 });
 
 const ModalControlContext = React.createContext<{
@@ -168,7 +170,7 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
         return modals.slice(0, -1);
       });
       wasActive = active;
-    }, 200);
+    }, 300);
 
     return wasActive;
   }, []);
@@ -188,7 +190,11 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
   //   [activeModals.length],
   // );
 
-  const state = {activeModals, isModalActive: activeModals.length > 0};
+  const state = {
+    activeModals,
+    isModalActive: activeModals.length > 0,
+    modalRef,
+  };
 
   const methods = React.useMemo(
     () => ({

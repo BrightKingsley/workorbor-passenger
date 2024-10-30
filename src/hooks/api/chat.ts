@@ -41,7 +41,6 @@ export default function useChatApi() {
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
-    console.log({text});
     if (!(user && chatId && text)) return;
     try {
       const message: MessageType = {
@@ -55,7 +54,6 @@ export default function useChatApi() {
         `${apiRoutes.chat['send-message'].route}`,
         {content: message.content, chatId},
       );
-      console.log('SEND_MESSAGE: ', data);
       return data;
     } catch (error) {
       if (error instanceof ApiError) {

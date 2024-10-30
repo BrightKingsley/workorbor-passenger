@@ -8,6 +8,9 @@ import * as RideInfoImports from '../../feature/Order/RideInfo';
 import * as RiderDetailsImports from '../../feature/Order/RiderDetails';
 import * as SelectDestinationImports from '../../feature/Order/SelectDestination';
 import * as WhereToImports from '../../feature/Order/WhereTo';
+import * as TopUpImports from '../../feature/Wallet/TopUp';
+import * as WalletImports from '../../feature/Wallet/Wallet';
+import {FadeScreenWrapper} from '../../utils';
 
 const {default: WhereToComponent, ...whereToOptions} = WhereToImports;
 const {default: SelectDestinationComponent, ...selectDestinationOptions} =
@@ -24,6 +27,8 @@ const {default: EditComponent, ...editOptions} = EditImports;
 const {default: EnrouteComponent, ...enrouteOptions} = EnrouteImports;
 const {default: RiderDetailsComponent, ...riderDetailsOptions} =
   RiderDetailsImports;
+const {default: TopUpComponent, ...topUpOptions} = TopUpImports;
+const {default: WalletComponent, ...walletOptions} = WalletImports;
 
 // Define the modalContent object with proper typing for each bottom sheet
 const modalContent = {
@@ -70,6 +75,18 @@ const modalContent = {
   edit: {
     children: <EditComponent />,
     ...editOptions,
+  },
+  'top-up': {
+    children: (
+      <FadeScreenWrapper>
+        <TopUpComponent />
+      </FadeScreenWrapper>
+    ),
+    ...topUpOptions,
+  },
+  wallet: {
+    children: <WalletComponent />,
+    ...walletOptions,
   },
 };
 export default modalContent;

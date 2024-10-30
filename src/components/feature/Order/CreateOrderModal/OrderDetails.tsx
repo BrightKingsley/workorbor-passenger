@@ -1,6 +1,6 @@
 import {Ionicons} from '@expo/vector-icons';
 import React, {Fragment, useCallback, useEffect, useState} from 'react';
-import {Pressable} from 'react-native';
+import {Platform, Pressable, ViewStyle} from 'react-native';
 
 import {useAppDispatch, useAppSelector} from '#/hooks/store';
 import {a} from '#/lib/style/atoms';
@@ -9,11 +9,18 @@ import {clearOrderRequest} from '#/store/slices/order/slice';
 import {VehicleType} from '#/store/slices/order/types';
 import {Button, Column, Row, Separator} from '$/src/components/global';
 import {ButtonText} from '$/src/components/global/Button';
-import {useModalControls} from '$/src/components/global/modals/ModalState';
+import {
+  useModalControls,
+  useModals,
+} from '$/src/components/global/modals/ModalState';
 import {Text, View} from '$/src/components/global/Themed';
 import {Container, FadeScreenWrapper} from '$/src/components/utils';
 import ViewHeader from '$/src/components/global/ViewHeader';
-import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import {
+  BottomSheetFooter,
+  BottomSheetFooterProps,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import {HITSLOP_20} from '$/src/lib/constants';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import ResponseTile, {
@@ -22,21 +29,79 @@ import ResponseTile, {
 import {hexWithOpacity} from '$/src/lib/ui/helpers';
 import useApi from '$/src/hooks/api/useApi';
 import PingAnimation from '$/src/components/global/PingAnimation';
+import {useRouter} from 'expo-router';
+import {
+  calculateDistance,
+  calculateRideFare,
+  rideFareConfig,
+} from '$/src/lib/utils/api/getRidePrice';
 
-export const snapPoints = [250];
+export const snapPoints = [280, '50%'];
 
 export const enablePanDownToClose = false;
+
+export const footerComponent = (props: BottomSheetFooterProps) => {
+  const {openModal} = useModalControls();
+  const router = useRouter();
+
+  const handlePaymentOption = useCallback(() => {
+    Platform.OS === 'android'
+      ? openModal('wallet')
+      : router.push('/(app)/wallet');
+  }, []);
+
+  const handleSelectRide = useCallback(() => {
+    openModal('confirm-order');
+  }, []);
+
+  return (
+    <BottomSheetFooter
+      {...props}
+      style={
+        [
+          a.bg_(colors.light),
+          a.border_t_tint(hexWithOpacity(colors.lightgrey, 0.3)),
+          a.border_t,
+        ] as ViewStyle
+      }
+      bottomInset={24}>
+      <Container>
+        <Button onPress={handlePaymentOption} variant="ghost">
+          <Row style={[a.align_center, a.mb_xs]}>
+            <Ionicons name="cash" color={'green'} />
+            <Text style={[a.ml_sm, a.text_md, a.font_bold]}>Pay In Cash</Text>
+          </Row>
+        </Button>
+        <Button
+          label={'Clear Order Request'}
+          variant="solid"
+          shape="round"
+          color="primary"
+          style={[a.w_full]}
+          onPress={handleSelectRide}>
+          <ButtonText>Select ride</ButtonText>
+        </Button>
+      </Container>
+    </BottomSheetFooter>
+  );
+};
 
 export default function OrderDetails() {
   const dispatch = useAppDispatch();
   const {closeModal, openModal} = useModalControls();
+  const {modalRef} = useModals();
   const {createOrder} = useApi().order;
 
-  const {orderResponse, riderInfo} = useAppSelector(state => state.order);
+  const router = useRouter();
+
+  const {orderResponse, orderRequest, riderInfo} = useAppSelector(
+    state => state.order,
+  );
 
   const [vehicleType, setVehicleType] = useState<VehicleType>(VehicleType.car);
   const [showInfo, setShowInfo] = useState(false);
   const [rides, setRides] = useState([]);
+  const [ridePrice, setRidePrice] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const handleSelectRide = useCallback(() => {
@@ -44,12 +109,56 @@ export default function OrderDetails() {
   }, []);
 
   const toggleShowInfo = useCallback(() => {
-    setShowInfo(prev => !prev);
-  }, []);
+    setShowInfo(prev => {
+      prev ? modalRef?.current?.collapse() : modalRef?.current?.expand();
+      return !prev;
+    });
+  }, [openModal]);
 
   useEffect(() => {
     if (orderResponse?.availableRiders.length) setLoading(false);
   }, [orderResponse?.availableRiders]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        if (!(orderRequest && orderRequest.destination && orderRequest.origin))
+          return;
+        const data = await calculateDistance({
+          // destination: {
+          //   latitude: orderRequest?.destination.latitude,
+          //   longitude: orderRequest?.destination.longitude,
+          // },
+          // origin: {
+          //   latitude: orderRequest?.origin.latitude,
+          //   longitude: orderRequest?.origin.longitude,
+          // },
+          destination: `${orderRequest?.destination.latitude},${orderRequest?.destination.longitude}`,
+          origin: `${orderRequest?.origin.latitude},${orderRequest?.origin.longitude}`,
+        });
+
+        if (!data) return;
+
+        const rideFare = calculateRideFare(rideFareConfig, {
+          distanceKm: data.distanceInMeters / 1000,
+          durationMin: data.timeInMilliSeconds / (1000 * 60),
+        });
+
+        if (rideFare) setRidePrice(rideFare);
+      } catch (error) {
+        console.error('CALCULATE_DISTANCE_ERROR: ', error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [orderRequest]);
+
+  const handlePaymentOption = useCallback(() => {
+    Platform.OS === 'android'
+      ? openModal('wallet')
+      : router.push('/(app)/wallet');
+  }, []);
 
   return (
     <>
@@ -88,32 +197,18 @@ export default function OrderDetails() {
                 </Container> */}
             <Container>
               <Fragment>
-                <ResponseTile />
+                <ResponseTile ridePrice={ridePrice} loading={loading} />
                 <Separator height={10} />
               </Fragment>
             </Container>
-            <Separator
+            {/* <Separator
               height={1}
               backgroundColor={hexWithOpacity(colors.lightgrey, 0.3)}
               style={[a.mb_lg]}
-            />
-            <Container>
-              <Row style={[a.align_center, a.mb_xs]}>
-                <Ionicons name="cash" color={'green'} />
-                <Text style={[a.ml_sm, a.text_md, a.font_bold]}>
-                  Pay In Cash
-                </Text>
-              </Row>
-              <Button
-                label={'Clear Order Request'}
-                variant="solid"
-                shape="round"
-                color="primary"
-                style={[a.w_full]}
-                onPress={handleSelectRide}>
-                <ButtonText>Select ride</ButtonText>
-              </Button>
-            </Container>
+            /> */}
+            {/* <BottomSheetFooter animatedFooterPosition={}>
+              
+            </BottomSheetFooter> */}
           </Animated.View>
         )}
       </BottomSheetScrollView>

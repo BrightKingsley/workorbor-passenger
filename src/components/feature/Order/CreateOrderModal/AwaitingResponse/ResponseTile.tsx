@@ -5,7 +5,7 @@ import {
   TouchableNativeFeedback,
   ViewProps,
 } from 'react-native';
-import {PropsWithChildren, useCallback} from 'react';
+import {PropsWithChildren, useCallback, useEffect, useState} from 'react';
 import {Ionicons} from '@expo/vector-icons';
 import {G, Path, Pattern, Polygon, Rect, Svg} from 'react-native-svg';
 import {a} from '#/lib/style/atoms';
@@ -18,6 +18,12 @@ import {Column, ListTile, Row} from '$/src/components/global';
 import {CarAwaiting, CarAwaitingGray} from '#/assets/images';
 import Skeleton from '$/src/components/global/Skeleton';
 import {MotiView} from 'moti';
+import getRidePrice, {
+  calculateDistance,
+  calculateRideFare,
+  rideFareConfig,
+} from '$/src/lib/utils/api/getRidePrice';
+import {useAppSelector} from '$/src/hooks/store';
 
 const imageUri =
   'https://images.unsplash.com/photo-1621569642780-4864752e847e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=668&q=80';
@@ -26,12 +32,17 @@ export default function ResponseTile({
   id = Math.random().toString(),
   photo = imageUri,
   title = 'react',
+  ridePrice,
+  loading,
 }: {
   id?: string | number;
   photo?: string;
   title?: string;
+  ridePrice: number;
+  loading: boolean;
 }) {
   const {closeAllModals, openModal} = useModalControls();
+  const {orderRequest} = useAppSelector(state => state.order);
 
   const handleTilePress = useCallback(() => {
     openModal('ride-info', {});
@@ -41,7 +52,9 @@ export default function ResponseTile({
     closeAllModals();
   }, []);
 
-  return (
+  return loading ? (
+    <ResponseTileLoader />
+  ) : (
     <View
       style={[
         a.rounded_md,
@@ -118,7 +131,7 @@ export default function ResponseTile({
         trailing={
           <Column
             style={[a.align_end, a.justify_center, a.z_20, a.right_0, a.px_md]}>
-            <Text style={[a.text_lg, a.font_bold]}>${'2000'}</Text>
+            <Text style={[a.text_lg, a.font_bold]}>${ridePrice}</Text>
             <Text
               style={[
                 a.text_sm,
@@ -130,7 +143,7 @@ export default function ResponseTile({
                   textDecorationLine: 'line-through',
                 },
               ]}>
-              ${'2000'}
+              ${ridePrice}
             </Text>
           </Column>
         }

@@ -4,6 +4,7 @@ const baseRoutes = {
   users: '/users',
   order: '/order',
   chat: '/chat',
+  wallet: '/wallet',
 };
 
 const createAuthRoutes = (route: string) => {
@@ -106,6 +107,29 @@ const createChatRoutes = (route: string) => {
   );
 };
 
+const createWalletRoutes = (route: string) => {
+  return new Proxy(
+    {} as {
+      [key in 'details' | 'transactions' | 'top-up']: {
+        route: string;
+        route_(id: string): string;
+      };
+    },
+    {
+      get(_, key) {
+        return {
+          get route() {
+            return `${route}/${String(key)}`;
+          },
+          route_(id: string) {
+            return `${route}/${String(key)}/${id}`;
+          },
+        };
+      },
+    },
+  );
+};
+
 const apiRoutes = {
   get auth() {
     const route = baseRoutes.auth;
@@ -122,6 +146,10 @@ const apiRoutes = {
   get order() {
     const route = baseRoutes.order;
     return createOrderRoutes(route);
+  },
+  get wallet() {
+    const route = baseRoutes.wallet;
+    return createWalletRoutes(route);
   },
 };
 

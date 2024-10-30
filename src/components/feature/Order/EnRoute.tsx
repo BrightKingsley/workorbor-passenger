@@ -46,8 +46,6 @@ export default function EnRoute() {
   const handleCallPress = () => {
     const phoneNumber = `tel:${'08021248576'}`;
 
-    console.log({phoneNumber});
-
     Linking.openURL(phoneNumber).catch(err =>
       console.error('An error occurred while opening the phone app:', err),
     );

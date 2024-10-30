@@ -31,7 +31,6 @@ export default function Order() {
       const responseData = await getOrder(orderId as string);
       if (!responseData) return;
       setOrder(responseData.order);
-      console.log({responseData});
     } catch (error) {
       console.error('GET_ORDERS: ', error);
     } finally {
@@ -67,7 +66,9 @@ export default function Order() {
               <Column style={[a.bg_(colors.light)]}>
                 <Column>
                   <Text family="Bold" style={[a.text_2xl]}>
-                    {'Trip with Kingsley'}
+                    {order.status === 'pending'
+                      ? 'Pending'
+                      : `Trip with ${order?.rider?.firstname}`}
                   </Text>
                   <Text style={[a.text_sm, a.text_(colors.grayblue)]}>
                     {formatDate(order?.orderTime)}
@@ -170,7 +171,7 @@ export default function Order() {
                 </Text>
                 <Column>
                   <Row style={[a.align_center, a.justify_between, a.mt_2xl]}>
-                    <Text>From . Bolt</Text>
+                    <Text>From . Workorbor</Text>
                     <Text>{order.fare || '$2000'}</Text>
                   </Row>
                   <Row style={[a.mt_md, a.align_center, a.justify_between]}>
