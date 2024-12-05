@@ -17,6 +17,30 @@ import PingAnimation from '$/src/components/global/PingAnimation';
 import {MotiView} from 'moti';
 import Skeleton from '$/src/components/global/Skeleton';
 
+import {getReceiptTemplate} from '$/src/templates/receipt';
+import axios from 'axios';
+
+const apiKey = 'ps_b4c49ba64a7fcc7da4638fae22e8b309';
+
+async function generatePdf() {
+  try {
+    const response = await axios.post(
+      'https://api.pdfstore.dev/generate',
+      {
+        projectId: '61',
+        templateUrl: 'https://chwee.vercel.app',
+      },
+      {
+        headers: {
+          authorization: `Bearer ${apiKey}`,
+        },
+      },
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
 export default function Order() {
   const {order: orderId} = useLocalSearchParams();
   const {getOrder} = useApi().order;
@@ -48,6 +72,9 @@ export default function Order() {
     fetchOrder();
   }, []);
 
+  useEffect(() => {
+    console.log('ORDER: ', order);
+  }, [order]);
   if (!order) return null;
 
   return (
@@ -67,8 +94,8 @@ export default function Order() {
                 <Column>
                   <Text family="Bold" style={[a.text_2xl]}>
                     {order.status === 'pending'
-                      ? 'Pending'
-                      : `Trip with ${order?.rider?.firstname}`}
+                      ? 'Trip Pending'
+                      : `Trip with ${order?.rider?.firstName}`}
                   </Text>
                   <Text style={[a.text_sm, a.text_(colors.grayblue)]}>
                     {formatDate(order?.orderTime)}
@@ -171,17 +198,18 @@ export default function Order() {
                 </Text>
                 <Column>
                   <Row style={[a.align_center, a.justify_between, a.mt_2xl]}>
+                    
                     <Text>From . Workorbor</Text>
-                    <Text>{order.fare || '$2000'}</Text>
+                    <Text>${parseFloat(order.fare?.toString()) || '$400'}</Text>
                   </Row>
-                  <Row style={[a.mt_md, a.align_center, a.justify_between]}>
+                  {/* <Row style={[a.mt_md, a.align_center, a.justify_between]}>
                     <Text>Booking fee</Text>
                     <Text>{'$50'}</Text>
-                  </Row>
-                  <Row style={[a.mt_md, a.align_center, a.justify_between]}>
+                  </Row> */}
+                  {/* <Row style={[a.mt_md, a.align_center, a.justify_between]}>
                     <Text style={[a.text_(colors.primary)]}>Discount</Text>
                     <Text style={[a.text_(colors.primary)]}>{'-$300'}</Text>
-                  </Row>
+                  </Row> */}
                 </Column>
                 <Separator
                   style={[a.my_xl]}
@@ -194,7 +222,7 @@ export default function Order() {
                       Total
                     </Text>
                     <Text family="Bold" style={[a.text_2xl]}>
-                      {'$2300'}
+                      {order.fare || '$2300'}
                     </Text>
                   </Row>
 
@@ -205,16 +233,21 @@ export default function Order() {
                         Cash
                       </Text>
                     </Row>
-                    <Text style={[a.text_(colors.darkgray)]}>{'-$300'}</Text>
+                    <Text style={[a.text_(colors.darkgray)]}>
+                      ${order.fare}
+                    </Text>
                   </Row>
-                  <Button
-                    style={[a.bg_(colors.lightgrey), a.mt_xl]}
-                    shape="round"
-                    variant="solid">
-                    <ButtonText style={[a.text_(colors.darkgray)]}>
-                      Get Receipt
-                    </ButtonText>
-                  </Button>
+                  {/*{ order.status ==="completed" && (
+                    <Button
+                      onPress={() => generatePdf()}
+                      style={[a.bg_(colors.lightgrey), a.mt_xl]}
+                      shape="round"
+                      variant="solid">
+                      <ButtonText style={[a.text_(colors.darkgray)]}>
+                        {order.status} Get Receipt
+                      </ButtonText>
+                    </Button>
+                  )} */}
                 </Column>
               </Column>
             </Container>

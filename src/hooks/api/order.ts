@@ -59,6 +59,7 @@ export default function useOrderApi() {
   }, []);
 
   const createOrder = useCallback(async () => {
+    console.log({orderRequest});
     try {
       if (!orderRequest) return Alert.alert('Invalid Order Request');
       const data = await fetchData<{orderId: string}>(
@@ -76,7 +77,7 @@ export default function useOrderApi() {
         console.error('Unexpected Error:', error);
       }
     }
-  }, []);
+  }, [orderRequest]);
 
   const cancelRequest = useCallback(async () => {
     try {

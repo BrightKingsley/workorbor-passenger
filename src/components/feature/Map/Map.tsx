@@ -1,48 +1,27 @@
-import useLocationService from '#/hooks/useLocationService';
-import {BOTTOM_TAB_HEIGHT, GOOGLE_MAPS_API_KEY} from '#/lib/constants';
-import {a} from '#/lib/style/atoms';
-import {colors} from '#/lib/theme/palette';
+import {useUser} from '@clerk/clerk-expo';
 import React, {
   ComponentProps,
-  LegacyRef,
-  PropsWithChildren,
-  RefAttributes,
+  memo,
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import MapView, {
-  LatLng,
-  Marker,
-  PROVIDER_GOOGLE,
-  Region,
-  Polyline,
-  PROVIDER_DEFAULT,
-} from 'react-native-maps';
-import MapViewDirections, {
-  MapDirectionsResponse,
-  MapViewDirectionsDestination,
-} from 'react-native-maps-directions';
-import {
-  ActivityIndicator,
-  Image,
-  ImageStyle,
-  Platform,
-  Pressable,
-  useWindowDimensions,
-} from 'react-native';
-import {color} from '#/lib/ui/tokens';
-import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
+import {ActivityIndicator, Image, ImageStyle} from 'react-native';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+
 // import LottieView from 'lottie-react-native';
-import MarkerYellow from '#/assets/animation/marker-aqua.json';
 import {useAppSelector} from '#/hooks/store';
+import {GOOGLE_MAPS_API_KEY} from '#/lib/constants';
+import {a} from '#/lib/style/atoms';
+import {colors} from '#/lib/theme/palette';
+
+import {Column} from '../../global';
+import {Text} from '../../global/Themed';
 import {customMapStyle} from './style';
 import {DirectionsProps, MapProps, MarkerProps} from './types';
-import {Text, View} from '../../global/Themed';
-import {Column} from '../../global';
-import BalloonMarker from './Markers/Marker';
-import {useUser} from '@clerk/clerk-expo';
-import PingAnimation from '../../global/PingAnimation';
 
 const DELTAS = {
   latitudeDelta: 1,
@@ -50,17 +29,15 @@ const DELTAS = {
 };
 
 export default function Map({
-  minZoomLevel = 10,
   onMapReady,
   initialRegion,
   style = {},
   children,
   ...mapProps
 }: MapProps) {
-  const mapRef = useRef<MapView>();
+  const mapRef = useRef<MapView>(null);
 
   const {user} = useUser();
-
   const {currentPosition, lastPosition} = useAppSelector(
     state => state.location,
   );
@@ -68,29 +45,29 @@ export default function Map({
 
   const [directions, setDirections] = useState<DirectionsProps | null>(null);
 
-  const markers: MarkerProps[] = [
-    {
-      coords: {
-        latitude: orderRequest?.origin?.latitude!,
-        longitude: orderRequest?.origin?.longitude!,
-      },
-      description: 'pick up',
-      identifier: 'origin',
-    },
-    {
-      coords: {
-        latitude: orderRequest?.destination?.latitude!,
-        longitude: orderRequest?.destination?.longitude!,
-      },
-      description: 'destination',
-      identifier: 'destination',
-    },
-  ];
+  // const markers: MarkerProps[] = [
+  //   {
+  //     coords: {
+  //       latitude: orderRequest?.origin?.latitude!,
+  //       longitude: orderRequest?.origin?.longitude!,
+  //     },
+  //     description: 'pick up',
+  //     identifier: 'origin',
+  //   },
+  //   {
+  //     coords: {
+  //       latitude: orderRequest?.destination?.latitude!,
+  //       longitude: orderRequest?.destination?.longitude!,
+  //     },
+  //     description: 'destination',
+  //     identifier: 'destination',
+  //   },
+  // ];
 
-  const originLocation = markers.find(
-    marker =>
-      marker.identifier === 'origin' && marker.coords.latitude !== undefined,
-  );
+  // const originLocation = markers.find(
+  //   marker =>
+  //     marker.identifier === 'origin' && marker.coords.latitude !== undefined,
+  // );
 
   useEffect(() => {
     if (orderRequest?.origin && orderRequest?.destination) {
@@ -99,85 +76,105 @@ export default function Map({
           latitude: orderRequest?.origin?.latitude!,
           longitude: orderRequest?.origin?.longitude!,
         },
-        // origin: {latitude: 10.3121757, longitude: 10.3121757},
         destination: {
           latitude: orderRequest?.destination?.latitude!,
           longitude: orderRequest?.destination?.longitude!,
         },
-        // destination: {latitude: 10.2650001, longitude: 10.2650001},
         strokeWidth: 2,
         strokeColor: colors.primary,
-        onReady: result => {},
+        // onReady: result => {
+        //   console.log('ON_MAP_READY: ', result);
+        // },
       });
     } else setDirections(null);
   }, [orderRequest]);
 
-  const _markers: (MarkerProps | undefined)[] = [
-    !originLocation
-      ? {
-          coords: currentPosition?.coords!,
-          description: 'your are here',
-          identifier: 'current',
-          alt: (
-            <Image
-              source={{uri: user?.imageUrl}}
-              style={[a.w_full, a.h_full] as ImageStyle}
-            />
-          ),
-        }
-      : undefined,
-    orderRequest?.origin
-      ? {
-          coords: {
-            latitude: orderRequest?.origin?.latitude || 0,
-            longitude: orderRequest?.origin?.longitude || 0,
-          },
-          identifier: 'origin',
-        }
-      : undefined,
-    orderRequest?.destination
-      ? {
-          coords: {
-            latitude: orderRequest?.destination?.latitude || 0,
-            longitude: orderRequest?.destination?.longitude || 0,
-          },
-          identifier: 'destination',
-        }
-      : undefined,
-  ];
+  const markers = useMemo(
+    () => [
+      currentPosition || lastPosition
+        ? {
+            coords: (currentPosition || lastPosition)?.coords!,
+            description: 'you are here',
+            identifier: 'current',
+            alt: (
+              <Image
+                source={{uri: user?.imageUrl}}
+                style={[a.w_full, a.h_full] as ImageStyle}
+              />
+            ),
+          }
+        : // : {
+          //     coords: {
+          //       latitude: 6.3156,
+          //       longitude: -10.8074,
+          //     },
+          //     description: 'you are here',
+          //     identifier: 'current',
+          //     alt: (
+          //       <Image
+          //         source={{uri: user?.imageUrl}}
+          //         style={[a.w_full, a.h_full] as ImageStyle}
+          //       />
+          //     ),
+          //   },
+          undefined,
+      orderRequest?.origin
+        ? {
+            coords: {
+              latitude: orderRequest?.origin?.latitude || 0,
+              longitude: orderRequest?.origin?.longitude || 0,
+            },
+            identifier: 'origin',
+          }
+        : undefined,
+      orderRequest?.destination
+        ? {
+            coords: {
+              latitude: orderRequest?.destination?.latitude || 0,
+              longitude: orderRequest?.destination?.longitude || 0,
+            },
+            identifier: 'destination',
+          }
+        : undefined,
+    ],
+    [currentPosition, lastPosition, orderRequest, , user],
+  );
 
-  const initRegion: Region = {
-    ...DELTAS,
-    latitude:
-      originLocation && originLocation?.coords.latitude
-        ? originLocation?.coords.latitude
-        : (currentPosition || lastPosition)?.coords.latitude!,
-    longitude:
-      originLocation && originLocation?.coords.longitude
-        ? originLocation?.coords.longitude
-        : (currentPosition || lastPosition)?.coords.longitude!,
-  };
+  const initRegion = useMemo(
+    () => ({
+      ...DELTAS,
+      latitude: (currentPosition || lastPosition)?.coords.latitude! ?? 6.3156,
+      longitude:
+        (currentPosition || lastPosition)?.coords.longitude! ?? -10.8074,
+    }),
+    [currentPosition, lastPosition],
+  );
 
-  const initializeMapItems = () => {
-    mapRef?.current?.fitToSuppliedMarkers(['destination', 'origin'], {
-      edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
-      animated: true,
-    });
-    mapRef?.current?.animateToRegion(initRegion);
-    mapRef?.current?.animateCamera({
-      center: {latitude: initRegion.latitude, longitude: initRegion.longitude},
-      zoom: 16,
-    });
-  };
+  const initializeMapItems = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.fitToSuppliedMarkers(['destination', 'origin'], {
+        edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
+        animated: true,
+      });
+      mapRef.current.animateToRegion(initRegion);
+      mapRef.current.animateCamera({
+        center: {
+          latitude: initRegion.latitude,
+          longitude: initRegion.longitude,
+        },
+        zoom: 16,
+      });
+    }
+  }, [initRegion]);
 
   useEffect(() => {
     initializeMapItems();
-  }, [originLocation]);
+  }, [initializeMapItems]);
 
   if (!(initRegion.latitude && initRegion.longitude))
     return (
       <Column style={[a.align_center, a.justify_center, a.h_full]}>
-        <ActivityIndicator size={50} color={colors.primary} />
+        <ActivityIndicator size={50} color={colors.primarydarker} />
         <Text style={[a.mt_2xl]}>Getting current position</Text>
       </Column>
     );
@@ -186,20 +183,17 @@ export default function Map({
     <MapView
       customMapStyle={customMapStyle}
       userInterfaceStyle="dark"
-      ref={mapRef as LegacyRef<MapView>}
-      // minZoomLevel={10}
+      ref={mapRef}
       onMapReady={onMapReady}
       initialRegion={{
         ...(initialRegion || initRegion),
         ...DELTAS,
       }}
-      onMapLoaded={() => {
-        initializeMapItems();
-      }}
+      onMapLoaded={initializeMapItems}
       provider={PROVIDER_GOOGLE}
       style={[a.top_(0), a.right_(0), a.w_full, a.h_full, style]}
       {...mapProps}>
-      {_markers?.map((marker, i) =>
+      {markers.map((marker, i) =>
         marker?.coords?.latitude && marker?.coords?.longitude ? (
           <CustomMarker
             key={i}
@@ -216,33 +210,27 @@ export default function Map({
           destination={directions.destination}
           apikey={GOOGLE_MAPS_API_KEY}
           strokeWidth={directions.strokeWidth || 4}
-          strokeColor={directions.strokeColor || colors.primarydarker}
+          strokeColor={directions.strokeColor || colors.primary}
           resetOnChange
           onReady={result => directions.onReady?.(result)}
         />
-        // <></>
       )}
       {children}
     </MapView>
   );
 }
 
-const CustomMarker = ({
-  index,
-  ...markerProps
-}: ComponentProps<typeof Marker> & {index: number}) => {
-  const [showLabel, setShowLabel] = useState(true);
-  const label = markerProps.description;
-
-  return (
-    <Marker
-      tracksInfoWindowChanges
-      style={[a.overflow_visible, a.w_(100), a.h_(100)]}
-      onPress={() => {
-        setShowLabel(prev => !prev);
-      }}
-      {...markerProps}>
-      {/* {markerProps.children || (
+const CustomMarker = memo(
+  ({
+    // index,
+    ...markerProps
+  }: ComponentProps<typeof Marker> & {index: number}) => {
+    return (
+      <Marker
+        tracksInfoWindowChanges
+        style={[a.overflow_visible, a.w_(100), a.h_(100)]}
+        {...markerProps}>
+        {/* {markerProps.children || (
         <View style={[a.relative, a.align_center, a.justify_center]}>
           {showLabel && label && <Popup label={label} />}
           <LottieView
@@ -254,35 +242,34 @@ const CustomMarker = ({
           />
         </View>
       )} */}
-      {/* <BalloonMarker>{markerProps.children}</BalloonMarker> */}
-      {/* {markerProps.identifier === 'current' && (
-        // <View style={[a.w_(300), a.h_(300)]}>
-        <PingAnimation coreSize={30} color={colors.primary} pingSize={300} />
-        // </View>
+        {/* <BalloonMarker>{markerProps.children}</BalloonMarker> */}
+        {/* {markerProps.identifier === 'current' && (
+        <PingAnimation coreSize={30} color={colors.yellow_2} pingSize={300} />
       )} */}
-    </Marker>
-  );
-};
+      </Marker>
+    );
+  },
+);
 
-const Popup = React.memo(({label}: {label: string}) => {
-  return (
-    <View
-      style={[
-        a.rounded_sm,
-        a.p_sm,
-        a.absolute,
-        a.z_10,
-        a.bg_('white'),
-        a.bottom_(-40),
-        {
-          shadowColor: '#000',
-          shadowOffset: {width: 0, height: 2},
-          shadowOpacity: 0.5,
-          shadowRadius: 2,
-          elevation: 2,
-        },
-      ]}>
-      <Text style={[a.text_center]}>{label}</Text>
-    </View>
-  );
-});
+// const Popup = memo(({label}: {label: string}) => {
+//   return (
+//     <View
+//       style={[
+//         a.rounded_sm,
+//         a.p_sm,
+//         a.absolute,
+//         a.z_10,
+//         a.bg_('white'),
+//         a.bottom_(-40),
+//         {
+//           shadowColor: '#000',
+//           shadowOffset: {width: 0, height: 2},
+//           shadowOpacity: 0.5,
+//           shadowRadius: 2,
+//           elevation: 2,
+//         },
+//       ]}>
+//       <Text style={[a.text_center]}>{label}</Text>
+//     </View>
+//   );
+// });

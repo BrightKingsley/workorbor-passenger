@@ -158,14 +158,13 @@ export default function WhereTo() {
     list: Place[];
     loading: boolean;
   }>({list: [], loading: true});
-  const {currentAddress, currentPosition} = useAppSelector(
+  const {currentAddress, currentPosition, lastPosition} = useAppSelector(
     state => state.location,
   );
   const [originInput, setOriginInput] = useState('');
   const [destinationInput, setDestinationInput] = useState('');
   const {orderRequest} = useAppSelector(state => state.order);
 
-  const {getCurrentAddress} = useLocationService();
   const dispatch = useAppDispatch();
   const {openModal, closeModal} = useModalControls();
 
@@ -180,23 +179,20 @@ export default function WhereTo() {
 
   useEffect(() => {
     (async () => {
-      if (currentAddress) return;
-      setLoading(true);
-      const ADDRESS = await getCurrentAddress();
-      setLoading(false);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      if (!currentPosition) return;
+      if (!(currentPosition || lastPosition)) return;
       const data = await fetchNearbyRestaurants({
-        latitude: currentPosition?.coords.latitude,
-        longitude: currentPosition?.coords.longitude,
+        latitude:
+          currentPosition?.coords.latitude ||
+          lastPosition?.coords.latitude ||
+          0,
+        longitude:
+          currentPosition?.coords.longitude ||
+          lastPosition?.coords.longitude ||
+          0,
       });
       if (data) setNearbyPlaces({list: data.results, loading: false});
     })();
-  }, [currentPosition]);
+  }, [currentPosition, lastPosition]);
 
   return (
     <Container safeArea={false}>

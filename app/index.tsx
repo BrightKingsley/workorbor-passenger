@@ -1,3 +1,6 @@
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs(); //
 import {ErrorBoundaryProps} from 'expo-router';
 import React from 'react';
 import {ActivityIndicator, Animated, View} from 'react-native';

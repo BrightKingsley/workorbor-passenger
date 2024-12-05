@@ -10,6 +10,7 @@ const sk = {
     update_rider_location: 'update_rider_location',
     available_rides: 'available_rides',
     ride_completed: 'ride_completed',
+    ride_started: 'ride_started',
     ride_cancelled: 'ride_cancelled',
   },
 } as const;

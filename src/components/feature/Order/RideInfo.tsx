@@ -44,7 +44,7 @@ export default function RideInfo() {
           </Text>
         </View>
         <Column style={[{gap: 10}]}>
-          <InfoRow label="Fare" value="$1300" />
+          <InfoRow label="Fare" value={`$${orderRequest?.fare}`} />
           <InfoRow label="Wait Time" value="$10/Min" />
           <InfoRow label="Booking Fee" value="2%" />
           <InfoRow label="Discount" value="15%" />

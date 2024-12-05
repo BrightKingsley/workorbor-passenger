@@ -1,5 +1,5 @@
 import {useLocalSearchParams, useRouter} from 'expo-router';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import React from 'react';
 import {KeyboardAvoidingView, View} from 'react-native';
 
@@ -26,9 +26,6 @@ export default function VerifyOtp() {
     setInput(val);
   };
 
-  useEffect(() => {
-  }, [input]);
-
   const handleCompleteOtp = () => {
     setTimeout(async () => {
       setLoading(prev => ({...prev, login: true}));
@@ -48,31 +45,31 @@ export default function VerifyOtp() {
     }, 500);
   };
 
-  const onPressVerify = async () => {
-    if (!isLoaded) {
-      return;
-    }
+  // const onPressVerify = async () => {
+  //   if (!isLoaded) {
+  //     return;
+  //   }
 
-    // Use the code the user provided to attempt verification
-    try {
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
-      });
+  //   // Use the code the user provided to attempt verification
+  //   try {
+  //     const signUpAttempt = await signUp.attemptEmailAddressVerification({
+  //       code,
+  //     });
 
-      // If verification was completed, set the session to active
-      // and redirect the user
-      if (signUpAttempt.status === 'complete') {
-        await setActive({session: signUpAttempt.createdSessionId});
-        router.replace('/(app)/(tabs)');
-      } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2));
-      }
-    } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
+  //     // If verification was completed, set the session to active
+  //     // and redirect the user
+  //     if (signUpAttempt.status === 'complete') {
+  //       await setActive({session: signUpAttempt.createdSessionId});
+  //       router.replace('/(app)/(tabs)');
+  //     } else {
+  //       // If the status is not complete, check why. User may need to
+  //       // complete further steps.
+  //       console.error(JSON.stringify(signUpAttempt, null, 2));
+  //     }
+  //   } catch (err: any) {
+  //     console.error(JSON.stringify(err, null, 2));
+  //   }
+  // };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={[a.flex_1]}>

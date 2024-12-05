@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import React from 'react';
 import {KeyboardAvoidingView, View} from 'react-native';
 
@@ -13,7 +13,7 @@ export default function VerifySignUp() {
   const [error, setError] = useState(false);
   const [, setLoading] = useState({login: false, google: false});
 
-  const [code, setCode] = React.useState('');
+  const [, setCode] = React.useState('');
 
   const {signup} = useApi().auth;
 
@@ -21,9 +21,6 @@ export default function VerifySignUp() {
     setError(false);
     setCode(val);
   };
-
-  useEffect(() => {
-  }, [code]);
 
   const handleCompleteOtp = async (code: string) => {
     setLoading(prev => ({...prev, login: true}));

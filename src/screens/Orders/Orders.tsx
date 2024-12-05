@@ -558,21 +558,21 @@ export default function Orders({status}: {status: 'pending' | 'completed'}) {
                         </Row>
                       </Column>
                     }
-                    trailing={
-                      <Button
-                        style={[a.bg_(colors.lightgrey), a.px_lg, a.py_md]}
-                        variant="solid"
-                        shape="round">
-                        <Row style={[a.align_center]}>
-                          <Feather name="rotate-ccw" size={18} />
-                          <ButtonText
-                            family="Medium"
-                            style={[a.text_(colors.dark)]}>
-                            Rebook
-                          </ButtonText>
-                        </Row>
-                      </Button>
-                    }
+                    // trailing={
+                    //   <Button
+                    //     style={[a.bg_(colors.lightgrey), a.px_lg, a.py_md]}
+                    //     variant="solid"
+                    //     shape="round">
+                    //     <Row style={[a.align_center]}>
+                    //       <Feather name="rotate-ccw" size={18} />
+                    //       <ButtonText
+                    //         family="Medium"
+                    //         style={[a.text_(colors.dark)]}>
+                    //         Rebook
+                    //       </ButtonText>
+                    //     </Row>
+                    //   </Button>
+                    // }
                   />
                 )
               }

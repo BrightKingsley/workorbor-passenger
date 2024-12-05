@@ -35,6 +35,7 @@ import {
   calculateRideFare,
   rideFareConfig,
 } from '$/src/lib/utils/api/getRidePrice';
+import {updateOrderRequest} from '$/src/store/slices/order/helpers';
 
 export const snapPoints = [280, '50%'];
 
@@ -90,7 +91,6 @@ export default function OrderDetails() {
   const dispatch = useAppDispatch();
   const {closeModal, openModal} = useModalControls();
   const {modalRef} = useModals();
-  const {createOrder} = useApi().order;
 
   const router = useRouter();
 
@@ -145,14 +145,17 @@ export default function OrderDetails() {
           durationMin: data.timeInMilliSeconds / (1000 * 60),
         });
 
-        if (rideFare) setRidePrice(rideFare);
+        if (rideFare) {
+          setRidePrice(rideFare);
+          updateOrderRequest(dispatch, {fare: ridePrice});
+        }
       } catch (error) {
         console.error('CALCULATE_DISTANCE_ERROR: ', error);
       } finally {
         setLoading(false);
       }
     })();
-  }, [orderRequest]);
+  }, []);
 
   const handlePaymentOption = useCallback(() => {
     Platform.OS === 'android'

@@ -22,6 +22,8 @@ import Animated, {
   ZoomIn,
   ZoomOut,
 } from 'react-native-reanimated';
+import {OrderPhase} from '$/src/store/slices/order/types';
+import {Container} from '../../utils';
 
 // NOTE: snapPoints holds the default height point for modal
 
@@ -29,13 +31,13 @@ const AnimatedIonIcon = Animated.createAnimatedComponent(Ionicons);
 
 let SNAP_POINTS = '35%';
 
-export const snapPoints = [SNAP_POINTS];
+export const snapPoints = ['50%',];
 
 export const enablePanDownToClose = false;
 
 export default function EnRoute() {
   const {openModal, closeAllModals} = useModalControls();
-  const {riderInfo} = useAppSelector(state => state.order);
+  const {riderInfo, orderPhase} = useAppSelector(state => state.order);
 
   const {cancelRide} = useApi().order;
   const router = useRouter();
@@ -67,8 +69,11 @@ export default function EnRoute() {
   }, []);
 
   return (
-    <View style={[a.px_md, a.flex_1]}>
-      <BottomSheetScrollView showsVerticalScrollIndicator={false} style={[]}>
+    <View style={[a.px_md, a.h_(400)]}>
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        style={[]}
+        contentContainerStyle={[a.flex_1, ]}>
         <Button
           onPress={handleProfilePress}
           variant="ghost"
@@ -183,6 +188,15 @@ export default function EnRoute() {
             </Text>
           </Column>
         </Row>
+        {orderPhase !== OrderPhase.enroute && (
+          <Container style={[a.mx_auto]}>
+            <Row style={[a.mt_3xl]}>
+              <Text style={[a.text_center]}>
+                Waiting for Rider to start the trip...
+              </Text>
+            </Row>
+          </Container>
+        )}
         {showProfile && (
           <Animated.View entering={FadeIn} exiting={FadeOut}>
             <Column style={[{gap: 10}]}>

@@ -39,7 +39,7 @@ export default function Account() {
 export function AccountScreen({account}: {account: string}) {
   const {user} = useUser();
   const {signOut} = useAuth();
-  const {openModal, closeModal} = useModalControls();
+  const {openModal, closeModalAnimated} = useModalControls();
   const {activeModals} = useModals();
   const safeInsets = useSafeAreaInsets();
 
@@ -47,10 +47,10 @@ export function AccountScreen({account}: {account: string}) {
 
   const handleEditPress = useCallback(() => {
     isModalActive
-      ? closeModal()
+      ? closeModalAnimated()
       : openModal('edit', {
           enablePanDownToClose: true,
-          backdropComponent: createCustomBackdrop(closeModal),
+          backdropComponent: createCustomBackdrop(closeModalAnimated),
         });
   }, [isModalActive]);
 

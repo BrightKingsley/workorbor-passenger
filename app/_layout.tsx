@@ -1,4 +1,6 @@
-<script src="http://192.168.0.197:8097"></script>;
+{
+  /* <script src="http://192.168.0.197:8097"></script>; */
+}
 import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //
@@ -45,9 +47,12 @@ import {colors} from '../src/lib/theme/palette';
 import {hexWithOpacity} from '../src/lib/ui/helpers';
 import {RouteTracker, SocketContainer} from '$/src/components/utils';
 import {ModalProvider} from '$/src/components/global/modals/ModalState';
-import useLocationService from '$/src/hooks/useLocationService';
 
 import * as Sentry from '@sentry/react-native';
+import * as TaskManager from 'expo-task-manager';
+import * as Location from 'expo-location';
+
+// Define the background location task
 
 Sentry.init({
   dsn: 'https://7fe76dab3ab51dbdec9b6b3d48bd456b@o4508120609783808.ingest.us.sentry.io/4508120612012032',
@@ -82,22 +87,25 @@ const tokenCache = {
   },
 };
 
+TaskManager.defineTask('background-location-task', ({data, error}: any) => {
+  if (error) {
+    console.error('Background task error:', error);
+    return;
+  }
+  if (data) {
+    const {locations} = data;
+    console.log('Background locations:', locations);
+    // Handle the location updates here (e.g., dispatch to a store or send to server)
+  }
+});
+
 function RootLayoutInner() {
   useLoadedFonts();
-  useLocationService();
 
   const [isReady, setIsReady] = React.useState(false);
   const {isLoaded, isSignedIn} = useAuth();
   const segments = useSegments();
   const router = useRouter();
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsReady(true);
-    }, 6000);
-
-    return () => clearTimeout(timeout);
-  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -147,11 +155,11 @@ const RootLayout = () => {
           <SafeAreaProvider style={[a.flex_1, a.w_full]}>
             <StatusBar animated={true} translucent={true} />
             <GestureHandlerRootView style={a.h_full}>
-              <ModalProvider>
-                <RootLayoutInner />
-                <RouteTracker />
-                <SocketContainer />
-              </ModalProvider>
+              {/* <ModalProvider> */}
+              <RootLayoutInner />
+              <RouteTracker />
+              <SocketContainer />
+              {/* </ModalProvider> */}
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </LocalizationProvider>

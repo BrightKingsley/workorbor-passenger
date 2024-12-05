@@ -24,6 +24,7 @@ export enum OrderPhase {
   awaitingRide = 'awaiting-ride',
   enroute = 'enroute',
   complete = 'complete',
+  accepted = 'accepted',
   nil = 'nil',
 }
 
@@ -39,6 +40,7 @@ export interface RideOrderRequest {
     longitude?: number;
     address?: string;
   };
+  fare?: number;
 }
 export interface RideOrderResponse {
   availableRiders: Rider[];

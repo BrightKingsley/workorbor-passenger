@@ -41,7 +41,7 @@ const createAuthRoutes = (route: string) => {
 const createUsersRoutes = (route: string) => {
   return new Proxy(
     {} as {
-      [key in 'search']: {
+      [key in 'search' | 'update']: {
         route: string;
         route_(id: string): string;
       };

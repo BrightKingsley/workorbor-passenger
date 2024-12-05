@@ -19,6 +19,8 @@ import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
 import {hexWithOpacity} from '#/lib/ui/helpers';
 import {updateOrderRequest} from '$/src/store/slices/order/helpers';
+import {setOrderPhase} from '$/src/store/slices/order/slice';
+import {OrderPhase} from '$/src/store/slices/order/types';
 
 import {Button, Column, Row, Separator} from '../../global';
 import {ButtonText} from '../../global/Button';
@@ -30,12 +32,13 @@ import {Container} from '../../utils';
 import PlacesAutoComplete from './PlacesAutoComplete/PlacesAutoComplete';
 
 export const snapPoints = ['95%'];
-export const enablePanDownToClose = true;
+export const enablePanDownToClose = false;
 
 export default function SelectDestination() {
   const {currentAddress, currentPosition} = useAppSelector(
     state => state.location,
   );
+
   const {orderRequest} = useAppSelector(state => state.order);
   const {getCurrentAddress} = useLocationService();
   const {closeModal, openModal} = useModalControls();
@@ -46,13 +49,16 @@ export default function SelectDestination() {
   const [destinationInput, setDestinationInput] = useState(
     orderRequest?.destination ? orderRequest.destination?.address : '',
   );
-  useEffect(() => {
-    if (orderRequest) setDestinationInput(orderRequest.destination?.address);
-  }, [orderRequest]);
 
   const dispatch = useAppDispatch();
 
-  // Handle origin location updates
+  useEffect(() => {
+    dispatch(setOrderPhase(OrderPhase.creation));
+    if (orderRequest) {
+      setDestinationInput(orderRequest.destination?.address);
+    }
+  }, [orderRequest, dispatch]);
+
   const handleGetOriginDetails = useCallback(
     (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
       if (details) {
@@ -68,7 +74,6 @@ export default function SelectDestination() {
     [dispatch],
   );
 
-  // Handle destination location updates
   const handleGetDestinationDetails = useCallback(
     (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
       if (currentLocationUsed && currentAddress && currentPosition) {
@@ -93,17 +98,23 @@ export default function SelectDestination() {
     [currentLocationUsed, currentAddress, currentPosition, dispatch],
   );
 
-  // Fetch current address if not already present
-  useEffect(() => {
-    const fetchAddress = async () => {
-      if (!currentAddress) {
-        setLoading(true);
-        await getCurrentAddress();
-        setLoading(false);
-      }
-    };
-    fetchAddress();
-  }, [currentAddress, getCurrentAddress]);
+  const handleUseCurrentLocation = useCallback(async () => {
+    setCurrentLocationUsed(prev => !prev);
+    updateOrderRequest(dispatch, {
+      origin: {
+        address: currentAddress?.formattedAddress!,
+        latitude: currentPosition?.coords.latitude,
+        longitude: currentPosition?.coords.longitude,
+      },
+    });
+    if (!currentAddress) {
+      setLoading(true);
+      await getCurrentAddress();
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {}, [getCurrentAddress]);
 
   const createOrder = useCallback(() => {
     if (orderRequest?.origin && orderRequest?.destination) {
@@ -111,14 +122,12 @@ export default function SelectDestination() {
     }
   }, [orderRequest, openModal]);
 
-  // const onCloseModal = useCallback(async () => {
-  //   await closeModal();
-  //   setTimeout(() => {
-  //     openModal('where-to', {});
-  //   }, 1000);
-  // }, [closeModal, openModal]);
+  // useEffect(() => {
+  //   return () => {
+  //     openModal('where-to');
+  //   };
+  // }, []);
 
-  // Memoize elements to avoid unnecessary renders
   const originComponent = useMemo(
     () =>
       currentLocationUsed ? (
@@ -207,7 +216,7 @@ export default function SelectDestination() {
         <ToggleButton
           accessibilityLabel="PinButton"
           isActive={currentLocationUsed}
-          switchActive={() => setCurrentLocationUsed(prev => !prev)}
+          switchActive={handleUseCurrentLocation}
           style={[a.h_(32), a.w_(50), a.bg_(colors.lightgrey)]}
           circleSize={30}
         />

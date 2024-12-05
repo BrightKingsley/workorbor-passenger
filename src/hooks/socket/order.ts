@@ -4,27 +4,17 @@ import {socket} from '$/src/lib/utils/socket';
 import {EventName} from '$/src/lib/utils/socket/socket';
 import {useUser} from '@clerk/clerk-expo';
 import useLocationService from '$/src/hooks/useLocationService';
-import {playAudio, stopAudio} from './actions';
 import {AlertSound} from '$/src/assets/audio';
+import {useAppSelector} from '../store';
 
 export function useOrderSocket() {
   const {user} = useUser();
-  const {
-    currentAddress,
-    currentPosition,
-    getCurrentAddress,
-    getCurrentPosition,
-  } = useLocationService();
+  const {getCurrentAddress, getCurrentPosition} = useLocationService();
+
+  const {lastPosition} = useAppSelector(state => state.location);
 
   useEffect(() => {
     if (!user) return;
-
-    if (!socket.id) return;
-    socket.emit<EventName>('update_rider_socket', {
-      riderId: user?.id,
-      socketId: socket?.id,
-    });
-
     if (!socket.id) return;
     socket.emit<EventName>('update_passenger_socket', {
       passengerId: user?.id,
@@ -36,12 +26,15 @@ export function useOrderSocket() {
     if (!user) return;
     const interval = setInterval(() => {
       (async () => {
+        console.log('INTERVAL_RUNNING');
         try {
           const currentPosition = (await getCurrentPosition()) || {
-            coords: {latitude: 10, longitude: 10},
+            coords: {
+              latitude: lastPosition?.coords.latitude,
+              longitude: lastPosition?.coords.longitude,
+            },
           };
           const currentAddress = await getCurrentAddress();
-
           if (!currentPosition) {
             return;
           }
@@ -50,6 +43,7 @@ export function useOrderSocket() {
             location: {
               latitude: currentPosition.coords.latitude,
               longitude: currentPosition.coords.longitude,
+              address: currentAddress,
             },
           });
         } catch (error) {
@@ -59,19 +53,6 @@ export function useOrderSocket() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    socket.on('order_request', () => {
-      (async () => {
-        const audioFile = AlertSound;
-        const sound = await playAudio(audioFile);
-        setTimeout(() => {
-          if (!sound) return;
-          stopAudio(sound);
-        }, 4000);
-      })();
-    });
   }, []);
 
   return null;

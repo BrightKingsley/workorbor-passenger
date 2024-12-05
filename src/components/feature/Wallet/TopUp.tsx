@@ -1,5 +1,5 @@
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 
 import {a} from '$/src/lib/style/atoms';
@@ -10,14 +10,36 @@ import {ButtonText} from '../../global/Button';
 import {createCustomBackdrop} from '../../global/modals/ModalBackdrop';
 import {useModalControls} from '../../global/modals/ModalState';
 import {Text} from '../../global/Themed';
+import useApi from '$/src/hooks/api';
 
 export const snapPoints = Platform.OS === 'ios' ? ['35%'] : ['50%', '80%'];
 export const enablePanDownToClose = true;
 export const backdropComponent = createCustomBackdrop();
 
-export default function TopUp() {
+export default function TopUp({close}: {close(): void}) {
   const [amount, setAmount] = useState('');
-  const {closeModal} = useModalControls();
+  const [buttonPressed, setButtonPressed] = useState(false);
+  // const {closeModal} = useModalControls();
+  const {topUp} = useApi().wallet;
+
+  const handleTopUp = useCallback(async () => {
+    setButtonPressed(true);
+  }, [amount]);
+
+  useEffect(() => {
+    if (!buttonPressed) return;
+    console.warn('HANDLE_TOP_UP: ', amount);
+    (async () => {
+      try {
+        const result = await topUp(amount);
+        if (result == 'success') close();
+      } catch (error) {
+        console.error('HANDLE_TOP_UP: ', error);
+      } finally {
+        setButtonPressed(false);
+      }
+    })();
+  }, [amount, buttonPressed]);
 
   return (
     <>
@@ -97,7 +119,7 @@ export default function TopUp() {
             onPress={() => {
               // const topUpAmount = parseFloat(amount);
               // topUpBalance(parseFloat(topUpAmount));
-              closeModal();
+              handleTopUp();
             }}
             style={{paddingVertical: 8}}>
             <ButtonText style={[a.text_2xl]}>Confirm</ButtonText>

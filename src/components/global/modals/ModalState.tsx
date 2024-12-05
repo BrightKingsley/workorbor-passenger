@@ -6,87 +6,8 @@ import {useNonReactiveCallback} from '$/src/hooks/useNonReactiveCallbacks';
 import {moveStringToEnd} from '$/src/lib/utils/helpers/arrays';
 
 import modalContent from './ModalContent';
-
-export interface AddAppPasswordModal {
-  name: 'app-password';
-}
-export interface DeleteAccountModal {
-  name: 'delete-account';
-}
-export interface ChangePasswordModal {
-  name: 'change-password';
-}
-export interface ChangePasswordModal {
-  name: 'change-password';
-}
-export interface ChangeHandleModal {
-  name: 'change-handle';
-}
-export interface VerifyEmailModal {
-  name: 'verify-email';
-  showReminder?: boolean;
-  onSuccess?: () => void;
-}
-export interface ChangeEmailModal {
-  name: 'change-email';
-}
-export interface SendModal {
-  name: 'send';
-}
-export interface ConfirmationModal {
-  name: 'confirmation';
-}
-export interface CheckoutConfirmationModal {
-  name: 'checkout-confirmation-modal';
-  title: string;
-  data: {pay: number | any; get: number | any};
-  confirmationAction?(): void;
-}
-export interface TransferConfirmationModal {
-  name: 'confirm-transfer';
-  type: 'wallet-to-wallet' | 'bank-to-wallet' | 'wallet-to-bank';
-}
-export interface RequestPayModal {
-  name: 'request-pay-modal';
-}
-export interface UpdateWalletModal {
-  name: 'update-wallet';
-}
-export interface CreateWalletModal {
-  name: 'create-wallet';
-}
-export interface DepositModal {
-  name: 'deposit';
-  title: string;
-}
-export interface ManageCardModal {
-  name: 'manage-cards';
-}
-
-// export type Modal =
-//   // Account
-//   | AddAppPasswordModal
-//   | DeleteAccountModal
-//   | ChangePasswordModal
-//   | ChangeHandleModal
-//   | VerifyEmailModal
-//   | ChangeEmailModal
-
-//   // Send
-//   | SendModal
-//   | ConfirmationModal
-//   | CheckoutConfirmationModal
-//   | RequestPayModal
-//   | TransferConfirmationModal
-
-//   // Wallet
-//   | UpdateWalletModal
-//   | CreateWalletModal
-//   // Deposit
-//   | DepositModal
-
-//   // Cards
-//   | ManageCardModal;
+import {useRouter, useSegments} from 'expo-router';
+import {a} from '$/src/lib/style/atoms';
 
 export type Modal = keyof typeof modalContent;
 
@@ -103,12 +24,14 @@ const ModalContext = React.createContext<{
 const ModalControlContext = React.createContext<{
   openModal: (modal: Modal, props?: Partial<BottomSheetProps>) => void;
   closeModal: () => boolean;
+  closeModalAnimated: () => boolean;
   closeAllModals: () => void;
   setupModal: (modalRef: React.RefObject<BottomSheetMethods>) => void;
   modalProps: Partial<BottomSheetProps>;
 }>({
   openModal: () => {},
   closeModal: () => false,
+  closeModalAnimated: () => false,
   closeAllModals: () => {},
   setupModal: () => {},
   modalProps: {children: <></>},
@@ -130,6 +53,8 @@ export let unstable_closeModal: () => boolean = () => {
 };
 
 export function ModalProvider({children}: React.PropsWithChildren<{}>) {
+  const segments = useSegments();
+
   const [activeModals, setActiveModals] = React.useState<Modal[]>([]);
   const [modalProps, setModalProps] = React.useState<Partial<BottomSheetProps>>(
     {
@@ -140,11 +65,15 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     React.useState<React.RefObject<BottomSheetMethods> | null>(null);
 
   const setupModal = useNonReactiveCallback((ref: typeof modalRef) => {
-    setModalRef(ref);
+    if (!modalRef || !modalRef.current) {
+      console.log('SETUP_MODAL', ref);
+      setModalRef(ref);
+    }
   });
 
   const openModal = useCallback(
     (modal: Modal, props?: Partial<BottomSheetProps>) => {
+      console.log('OPEN_MODAL:ModalState.tsx => ', modal, activeModals);
       setActiveModals(modals => {
         const sortedModals = moveStringToEnd<Modal>(modals, modal);
         return sortedModals;
@@ -162,6 +91,8 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
   //   return wasActive;
   // });
   const closeModal = useCallback(() => {
+    console.log('👀👀👀CLOSE_MODAL:ModalState.tsx => ', {modalRef});
+    console.debug({modalRef});
     modalRef?.current?.close();
     let wasActive = true;
     setTimeout(() => {
@@ -170,36 +101,57 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
         return modals.slice(0, -1);
       });
       wasActive = active;
-    }, 300);
+    }, 100);
+
+    // if (segments[segments.length - 1] === '(tabs)' && !activeModals.length)
+    //   setTimeout(() => {
+    //     openModal('where-to');
+    //   }, 100);
 
     return wasActive;
   }, []);
 
+  const closeModalAnimated = useCallback(() => {
+    console.log('👀👀👀CLOSE_MODAL:ModalState.tsx => ', {modalRef});
+    console.debug({modalRef});
+    modalRef?.current?.close();
+    let wasActive = true;
+    setTimeout(() => {
+      let active = activeModals.length > 0;
+      setActiveModals(modals => {
+        return modals.slice(0, -1);
+      });
+      wasActive = active;
+    }, 100);
+    return wasActive;
+  }, [modalRef]);
+
   const closeAllModals = useNonReactiveCallback(() => {
     setActiveModals([]);
+    console.log({segments});
+    if (segments[segments.length - 1] === '(tabs)')
+      setTimeout(() => {
+        openModal(activeModals[activeModals.length - 1] || 'where-to');
+      }, 100);
   });
 
   unstable_openModal = openModal;
   unstable_closeModal = closeModal;
-
-  // const state = React.useMemo(
-  //   () => ({
-  //     isModalActive: activeModals.length > 0,
-  //     activeModals,
-  //   }),
-  //   [activeModals.length],
-  // );
-
   const state = {
     activeModals,
     isModalActive: activeModals.length > 0,
     modalRef,
   };
 
+  useEffect(() => {
+    console.log('ACTIVE_MODALS:  ', activeModals);
+  }, [activeModals]);
+
   const methods = React.useMemo(
     () => ({
       openModal,
       closeModal,
+      closeModalAnimated,
       closeAllModals,
       setupModal,
     }),

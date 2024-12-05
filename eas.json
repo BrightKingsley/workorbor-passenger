@@ -8,9 +8,12 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "22.0.0"
     },
-    "production": {}
+    "production": {
+      "node": "22.0.0"
+    }
   },
   "submit": {
     "production": {}

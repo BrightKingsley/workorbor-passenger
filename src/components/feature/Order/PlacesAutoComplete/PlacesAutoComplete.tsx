@@ -101,7 +101,8 @@ export default function PlacesAutoComplete({
         key: GOOGLE_MAPS_API_KEY,
         language: 'en',
         // components: 'country:LR',
-        components: `country:${__DEV__ ? 'NG' : 'LR'}`,
+        // components: `country:${__DEV__ ? 'NG' : 'LR'}`,
+        components: `country:${__DEV__ ? 'NG' : 'NG'}`,
       }}
       renderRow={(data: GooglePlaceData) => (
         <React.Fragment>

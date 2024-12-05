@@ -46,7 +46,42 @@ export default function useUsersApi() {
     [],
   );
 
+  const update = useCallback(
+    async (
+      {
+        firstName,
+        lastName,
+        phoneNumber,
+      }: {firstName: string; lastName: string; phoneNumber: string},
+      handleErrors?: (errors: ClerkAPIError[]) => void,
+    ) => {
+      try {
+        const data = await fetchData<{
+          message: string;
+          users: User[];
+        }>('post', `${apiRoutes.users.update.route}`, {
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+        });
+        // console.log('DATA: ', data, data.users);
+        return data.users;
+      } catch (error) {
+        if (error instanceof ApiError) {
+          console.error(
+            `API Error: ${error.message} (Status: ${error.status}, ${error.statusText})`,
+          );
+        } else {
+          console.error('Unexpected Error:', error);
+        }
+        return null;
+      }
+    },
+    [],
+  );
+
   return {
     search,
+    update,
   };
 }
