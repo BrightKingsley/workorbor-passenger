@@ -24,6 +24,7 @@ import axios from 'axios';
 import {GOOGLE_MAPS_API_KEY} from '$/src/lib/constants';
 import {updateOrderRequest} from '$/src/store/slices/order/helpers';
 import PingAnimation from '../../global/PingAnimation';
+import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 
 interface Geometry {
   location: {
@@ -226,7 +227,7 @@ export default function WhereTo() {
             </Row>
           </Button>
         </View>
-        <ScrollView
+        <BottomSheetScrollView
           contentContainerStyle={[a.pb_2xl]}
           showsVerticalScrollIndicator={false}
           style={[a.mt_md]}>
@@ -286,7 +287,7 @@ export default function WhereTo() {
               </Fragment>
             ))
           )}
-        </ScrollView>
+        </BottomSheetScrollView>
       </View>
     </Container>
   );

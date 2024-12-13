@@ -10,6 +10,7 @@ import {
   clearOrderResponse,
   setOrderPhase,
   setRider,
+  updateRiderLocation,
 } from '$/src/store/slices/order/slice';
 import {clearChatId, setChatId} from '$/src/store/slices/chat';
 import {OrderPhase, VehicleType} from '$/src/store/slices/order/types';
@@ -18,7 +19,7 @@ export default function OrderSocket() {
   const {user} = useUser();
   const dispatch = useAppDispatch();
   const {orderRequest} = useAppSelector(state => state.order);
-  const {closeAllModals, closeModal} = useModalControls();
+  const {closeAllModals, closeModal, openModal} = useModalControls();
 
   // Emit passenger socket update only when socket ID or user ID changes
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function OrderSocket() {
   // Memoize handlers to avoid unnecessary re-renders
   const handleAvailableRides = useCallback(
     (data: any) => {
+      console.log('AVAILABLE_RIDE: ', data.riderLocation, data);
       dispatch(setOrderPhase(OrderPhase.accepted));
       dispatch(
         setRider({
@@ -48,6 +50,8 @@ export default function OrderSocket() {
           photo: data.photo,
           lastName: data.lastName,
           firstName: data.firstName,
+          phoneNumber: data.phoneNumber,
+          primaryPhoneNumber: data.primaryPhoneNumber,
         }),
       );
       dispatch(setChatId(data.chatId));
@@ -73,8 +77,11 @@ export default function OrderSocket() {
   const handleRideCancelled = useCallback(() => {
     dispatch(clearChatId());
     dispatch(clearOrderResponse());
-    closeAllModals();
+    closeModal();
     Alert.alert('Ride cancelled');
+    setTimeout(() => {
+      openModal('where-to');
+    }, 200);
   }, [dispatch, closeAllModals]);
 
   // Memoize socket event listeners
@@ -84,6 +91,14 @@ export default function OrderSocket() {
     socket.on<EventName>('ride_started', handleRideStarted);
     socket.on<EventName>('ride_cancelled', handleRideCancelled);
 
+    socket.on(
+      'rider_current_location',
+      (location: {latitude: number; longitude: number}) => {
+        console.log('🥶🥶🥶RIDER_LIVE_LOCATION: ', location);
+        dispatch(updateRiderLocation(location));
+      },
+    );
+
     // Cleanup listeners on unmount or re-render to avoid memory leaks
     return () => {
       socket.off<EventName>('available_rides', handleAvailableRides);
@@ -91,7 +106,12 @@ export default function OrderSocket() {
       socket.off<EventName>('ride_started', handleRideStarted);
       socket.off<EventName>('ride_cancelled', handleRideCancelled);
     };
-  }, [handleAvailableRides, handleRideCompleted, handleRideStarted, handleRideCancelled]);
+  }, [
+    handleAvailableRides,
+    handleRideCompleted,
+    handleRideStarted,
+    handleRideCancelled,
+  ]);
 
   return null;
 }

@@ -46,6 +46,7 @@ export default function OrdersTabLayout() {
       />
       <MaterialTopTabs
         screenOptions={{
+          lazy: false,
           tabBarLabelStyle: {
             fontWeight: 'bold',
             fontFamily: 'DMSans_700Bold',

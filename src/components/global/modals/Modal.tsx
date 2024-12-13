@@ -78,7 +78,6 @@ function Modal() {
     return {};
   }, [activeModal]);
 
-  console.log("👿👿👿",{activeModalsLength:activeModals.length, isModalActive, });
   if (!isModalActive || !activeModals.length) return null;
   return (
     <BottomSheet

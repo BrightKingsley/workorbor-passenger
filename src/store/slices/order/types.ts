@@ -16,6 +16,7 @@ export type Rider = {
   photo: string;
   lastName: string;
   firstName: string;
+  phoneNumber: string;
 };
 
 export enum OrderPhase {

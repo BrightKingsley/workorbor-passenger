@@ -24,6 +24,7 @@ import {GOOGLE_MAPS_API_KEY} from '#/lib/constants';
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
 import {hexWithOpacity} from '#/lib/ui/helpers';
+import {useAppSelector} from '$/src/hooks/store';
 import {matchAndCutText} from '$/src/lib/utils/helpers/strings';
 
 import {ListTile, Row, Separator} from '../../../global';
@@ -53,6 +54,7 @@ export default function PlacesAutoComplete({
   const [inputText, setInputText] = useState(inputProps.value);
   const [selectedPlaceDetails, setSelectedDetails] =
     useState<GooglePlaceDetail | null>(null);
+  const {currentAddress} = useAppSelector(state => state.location);
 
   // const keyboard = useAnimatedKeyboard();
   // console.log({keyboard});
@@ -102,7 +104,8 @@ export default function PlacesAutoComplete({
         language: 'en',
         // components: 'country:LR',
         // components: `country:${__DEV__ ? 'NG' : 'LR'}`,
-        components: `country:${__DEV__ ? 'NG' : 'NG'}`,
+        // components: `country:${__DEV__ ? 'NG' : 'NG'}`,
+        components: `country:${currentAddress?.countryCode || 'LR'}`,
       }}
       renderRow={(data: GooglePlaceData) => (
         <React.Fragment>

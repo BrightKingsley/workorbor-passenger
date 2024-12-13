@@ -67,12 +67,12 @@ export const footerComponent = (props: BottomSheetFooterProps) => {
       }
       bottomInset={24}>
       <Container>
-        <Button onPress={handlePaymentOption} variant="ghost">
+        {/* <Button onPress={handlePaymentOption} variant="ghost">
           <Row style={[a.align_center, a.mb_xs]}>
             <Ionicons name="cash" color={'green'} />
             <Text style={[a.ml_sm, a.text_md, a.font_bold]}>Pay In Cash</Text>
           </Row>
-        </Button>
+        </Button> */}
         <Button
           label={'Clear Order Request'}
           variant="solid"

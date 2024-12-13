@@ -8,7 +8,7 @@ type ChatState = {
 };
 
 const initialChatState: ChatState = {
-  chatId: 'first_chat',
+  chatId: null,
   // messages: Array.from({length: 10}, () => null).map((_, i) => ({
   //   id: i.toString(),
   //   sender: 'senderId',

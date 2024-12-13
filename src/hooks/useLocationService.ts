@@ -233,6 +233,7 @@ export default function useLocationService() {
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
+
       dispatch(setCurrentPosition({currentPosition: position}));
       return position;
     } catch (error) {
@@ -263,7 +264,9 @@ export default function useLocationService() {
           if (!position) return null;
         }
 
-        const {latitude, longitude} = currentPosition.coords;
+        const latitude = currentPosition?.coords.latitude || 0;
+        const longitude = currentPosition?.coords.longitude || 0;
+
         const response: AxiosResponse<{
           results: Location.LocationGeocodedAddress[];
         }> = await axios.get(getGeocodeUrl({lat: latitude, lng: longitude}));

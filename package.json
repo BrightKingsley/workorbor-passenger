@@ -31,7 +31,7 @@
     "@sentry/react-native": "~5.24.3",
     "axios": "^1.7.2",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "expo": "~51.0.39",
+    "expo": "^51",
     "expo-auth-session": "~5.5.2",
     "expo-av": "~14.0.7",
     "expo-background-fetch": "~12.0.1",

@@ -75,7 +75,6 @@ export default function Order() {
   useEffect(() => {
     console.log('ORDER: ', order);
   }, [order]);
-  if (!order) return null;
 
   return (
     <View style={[a.flex_1]}>
@@ -93,7 +92,7 @@ export default function Order() {
               <Column style={[a.bg_(colors.light)]}>
                 <Column>
                   <Text family="Bold" style={[a.text_2xl]}>
-                    {order.status === 'pending'
+                    {order?.status === 'pending'
                       ? 'Trip Pending'
                       : `Trip with ${order?.rider?.firstName}`}
                   </Text>
@@ -151,7 +150,7 @@ export default function Order() {
                       />
                     </View>
                     <Text style={[a.ml_3xl, a.text_sm]}>
-                      {order.pickupLocation.address}
+                      {order?.pickupLocation.address}
                     </Text>
                   </Row>
                   <Row style={[a.mt_sm]}>
@@ -159,7 +158,7 @@ export default function Order() {
                       <PingAnimation pingSize={30} color={colors.primary} />
                     </View>
                     <Text style={[a.ml_3xl, a.text_sm]}>
-                      {order.dropOffLocation.address}
+                      {order?.dropOffLocation.address}
                     </Text>
                   </Row>
                 </Column>
@@ -198,9 +197,10 @@ export default function Order() {
                 </Text>
                 <Column>
                   <Row style={[a.align_center, a.justify_between, a.mt_2xl]}>
-                    
                     <Text>From . Workorbor</Text>
-                    <Text>${parseFloat(order.fare?.toString()) || '$400'}</Text>
+                    <Text>
+                      ${parseFloat(order?.fare?.toString()) || '$400'}
+                    </Text>
                   </Row>
                   {/* <Row style={[a.mt_md, a.align_center, a.justify_between]}>
                     <Text>Booking fee</Text>
@@ -222,7 +222,7 @@ export default function Order() {
                       Total
                     </Text>
                     <Text family="Bold" style={[a.text_2xl]}>
-                      {order.fare || '$2300'}
+                      {order?.fare || '$2300'}
                     </Text>
                   </Row>
 
@@ -234,17 +234,17 @@ export default function Order() {
                       </Text>
                     </Row>
                     <Text style={[a.text_(colors.darkgray)]}>
-                      ${order.fare}
+                      ${order?.fare}
                     </Text>
                   </Row>
-                  {/*{ order.status ==="completed" && (
+                  {/*{ order?.status ==="completed" && (
                     <Button
                       onPress={() => generatePdf()}
                       style={[a.bg_(colors.lightgrey), a.mt_xl]}
                       shape="round"
                       variant="solid">
                       <ButtonText style={[a.text_(colors.darkgray)]}>
-                        {order.status} Get Receipt
+                        {order?.status} Get Receipt
                       </ButtonText>
                     </Button>
                   )} */}
@@ -332,7 +332,7 @@ function OrderLoading({refreshing}: {refreshing: boolean}) {
                   </View>
 
                   {/* <Text style={[a.ml_3xl, a.text_sm]}>
-                    {order.pickupLocation.address}
+                    {order?.pickupLocation.address}
                   </Text> */}
                   <View style={[a.ml_lg]}>
                     <Skeleton width={200} height={15} />
@@ -344,7 +344,7 @@ function OrderLoading({refreshing}: {refreshing: boolean}) {
                   </View>
 
                   {/* <Text style={[a.ml_3xl, a.text_sm]}>
-                    {order.dropOffLocation.address}
+                    {order?.dropOffLocation.address}
                   </Text> */}
                   <View style={[a.ml_lg, a.mt_sm]}>
                     <Skeleton width={200} height={15} />

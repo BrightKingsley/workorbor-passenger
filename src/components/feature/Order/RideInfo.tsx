@@ -20,7 +20,7 @@ import ViewHeader from '../../global/ViewHeader';
 // NOTE: snapPoints holds the default height point for modal
 export const snapPoints = ['70%'];
 
-export const enablePanDownToClose = true;
+export const enablePanDownToClose = false;
 
 export default function RideInfo() {
   const {closeModal} = useModalControls();

@@ -31,12 +31,12 @@ const AnimatedIonIcon = Animated.createAnimatedComponent(Ionicons);
 
 let SNAP_POINTS = '35%';
 
-export const snapPoints = ['50%',];
+export const snapPoints = ['50%'];
 
 export const enablePanDownToClose = false;
 
 export default function EnRoute() {
-  const {openModal, closeAllModals} = useModalControls();
+  const {openModal, closeAllModals, closeModal} = useModalControls();
   const {riderInfo, orderPhase} = useAppSelector(state => state.order);
 
   const {cancelRide} = useApi().order;
@@ -46,7 +46,7 @@ export default function EnRoute() {
   const [showProfile, setShowProfile] = useState(false);
 
   const handleCallPress = () => {
-    const phoneNumber = `tel:${'08021248576'}`;
+    const phoneNumber = `tel:${riderInfo?.phoneNumber}`;
 
     Linking.openURL(phoneNumber).catch(err =>
       console.error('An error occurred while opening the phone app:', err),
@@ -65,7 +65,7 @@ export default function EnRoute() {
 
   const handleCancelPress = useCallback(() => {
     cancelRide();
-    closeAllModals();
+    closeModal();
   }, []);
 
   return (
@@ -73,7 +73,10 @@ export default function EnRoute() {
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}
         style={[]}
-        contentContainerStyle={[a.flex_1, ]}>
+        contentContainerStyle={[a.flex_1]}>
+        <Container>
+          <ViewHeader canGoBack backPressHandler={closeAllModals} />
+        </Container>
         <Button
           onPress={handleProfilePress}
           variant="ghost"
@@ -110,31 +113,33 @@ export default function EnRoute() {
         </Button>
 
         <Row style={[a.justify_around, a.mt_lg]}>
-          <Column style={[a.align_center]}>
-            <Button
-              shape="round"
-              variant="outline"
-              onPress={handleCallPress}
-              style={[
-                a.w_(50),
-                a.h_(50),
-                a.align_center,
-                a.justify_center,
-                a.py_0,
-                a.px_0,
-                a.border_tint(colors.darkgray),
-              ]}>
-              <AnimatedIonIcon
-                entering={ZoomIn}
-                color={colors.darkgray}
-                name="call-outline"
-                size={30}
-              />
-            </Button>
-            <Text style={[a.text_xs, a.text_(colors.darkgray), a.mt_xs]}>
-              Call Rider
-            </Text>
-          </Column>
+          {riderInfo?.phoneNumber && (
+            <Column style={[a.align_center]}>
+              <Button
+                shape="round"
+                variant="outline"
+                onPress={handleCallPress}
+                style={[
+                  a.w_(50),
+                  a.h_(50),
+                  a.align_center,
+                  a.justify_center,
+                  a.py_0,
+                  a.px_0,
+                  a.border_tint(colors.darkgray),
+                ]}>
+                <AnimatedIonIcon
+                  entering={ZoomIn}
+                  color={colors.darkgray}
+                  name="call-outline"
+                  size={30}
+                />
+              </Button>
+              <Text style={[a.text_xs, a.text_(colors.darkgray), a.mt_xs]}>
+                Call Driver
+              </Text>
+            </Column>
+          )}
 
           <Column style={[a.align_center]}>
             <Button
@@ -188,15 +193,15 @@ export default function EnRoute() {
             </Text>
           </Column>
         </Row>
-        {orderPhase !== OrderPhase.enroute && (
-          <Container style={[a.mx_auto]}>
-            <Row style={[a.mt_3xl]}>
-              <Text style={[a.text_center]}>
-                Waiting for Rider to start the trip...
-              </Text>
-            </Row>
-          </Container>
-        )}
+        <Container style={[a.mx_auto]}>
+          <Row style={[a.mt_3xl]}>
+            <Text style={[a.text_center]}>
+              {orderPhase !== OrderPhase.enroute
+                ? 'Waiting for Driver to start the trip...'
+                : 'Trip started. Your driver will be at your location soon...'}
+            </Text>
+          </Row>
+        </Container>
         {showProfile && (
           <Animated.View entering={FadeIn} exiting={FadeOut}>
             <Column style={[{gap: 10}]}>

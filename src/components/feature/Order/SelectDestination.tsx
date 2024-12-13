@@ -77,9 +77,13 @@ export default function SelectDestination() {
   const handleGetDestinationDetails = useCallback(
     (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
       if (currentLocationUsed && currentAddress && currentPosition) {
+        // COMEBACK: Check if this is actually needed
         updateOrderRequest(dispatch, {
           origin: {
-            address: currentAddress.formattedAddress!,
+            address: currentAddress
+              ? currentAddress?.['formattedAddress'] ||
+                `${currentAddress?.['name']}, ${currentAddress?.['locality']}, ${currentAddress?.subAdministrativeArea}`
+              : '',
             latitude: currentPosition.coords.latitude,
             longitude: currentPosition.coords.longitude,
           },
@@ -100,9 +104,19 @@ export default function SelectDestination() {
 
   const handleUseCurrentLocation = useCallback(async () => {
     setCurrentLocationUsed(prev => !prev);
+    console.log(
+      '✅✅✅',
+      currentAddress,
+      currentAddress
+        ? currentAddress?.['formattedAddress'] || currentAddress?.['name']
+        : '',
+    );
     updateOrderRequest(dispatch, {
       origin: {
-        address: currentAddress?.formattedAddress!,
+        address: currentAddress
+          ? currentAddress?.['formattedAddress'] ||
+            `${currentAddress?.['name']}, ${currentAddress?.['locality']}, ${currentAddress?.subAdministrativeArea}`
+          : '',
         latitude: currentPosition?.coords.latitude,
         longitude: currentPosition?.coords.longitude,
       },
@@ -112,9 +126,7 @@ export default function SelectDestination() {
       await getCurrentAddress();
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {}, [getCurrentAddress]);
+  }, [currentAddress, dispatch]);
 
   const createOrder = useCallback(() => {
     if (orderRequest?.origin && orderRequest?.destination) {
@@ -169,7 +181,8 @@ export default function SelectDestination() {
                 </View>
                 <View style={[a.flex_1, a.ml_lg]}>
                   <Text style={[a.text_md]}>
-                    {currentAddress?.formattedAddress}
+                    {currentAddress?.['formattedAddress'] ||
+                      `${currentAddress?.['name']}, ${currentAddress?.['locality']}, ${currentAddress?.subAdministrativeArea}`}
                   </Text>
                 </View>
               </>
@@ -179,7 +192,7 @@ export default function SelectDestination() {
       ) : (
         <PlacesAutoComplete
           placeholder="Pick-up"
-          autoFocus={!currentLocationUsed}
+          // autoFocus={!currentLocationUsed}
           listViewStyles={[a.top_(120)]}
           getDetails={handleGetOriginDetails}
           value={originInput}

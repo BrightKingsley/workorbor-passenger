@@ -5,7 +5,7 @@ import {LogBox} from 'react-native';
 LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //
 
-import {ClerkProvider, useAuth} from '@clerk/clerk-expo';
+import {ClerkProvider, useAuth, useUser} from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
 import {
@@ -42,7 +42,7 @@ import {ReduxProviders} from '#/store/provider';
 import i18n, {IS_RTL, setLanguage} from '../locales';
 import {LocalizationProvider} from '../locales/localizationContext';
 import t from '../locales/translate';
-import {Row} from '../src/components/global';
+import {Row, Splash} from '../src/components/global';
 import {colors} from '../src/lib/theme/palette';
 import {hexWithOpacity} from '../src/lib/ui/helpers';
 import {RouteTracker, SocketContainer} from '$/src/components/utils';
@@ -51,6 +51,7 @@ import {ModalProvider} from '$/src/components/global/modals/ModalState';
 import * as Sentry from '@sentry/react-native';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import {useAppSelector} from '$/src/hooks/store';
 
 // Define the background location task
 
@@ -104,6 +105,8 @@ function RootLayoutInner() {
 
   const [isReady, setIsReady] = React.useState(false);
   const {isLoaded, isSignedIn} = useAuth();
+  const {isLoading} = useAppSelector(state => state.auth);
+  const {user} = useUser();
   const segments = useSegments();
   const router = useRouter();
 
@@ -120,7 +123,7 @@ function RootLayoutInner() {
       segments,
     });
 
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       router.replace('/(auth)/sign-in');
       return;
     }
@@ -128,7 +131,18 @@ function RootLayoutInner() {
     if (!inTabsGroup) router.replace('/(app)/(tabs)/');
   }, [isSignedIn]);
 
-  return <Slot />;
+  return (
+    <>
+      {isLoading && (
+        <Splash
+          backgroundColor={hexWithOpacity(colors.primarylighter, 0.5)}
+          spinnerColor={colors.primary}
+          isReady={isLoaded}
+        />
+      )}
+      <Stack screenOptions={{headerShown: false}} />
+    </>
+  );
 }
 
 const RootLayout = () => {

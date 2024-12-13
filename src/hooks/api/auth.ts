@@ -1,6 +1,6 @@
 import {ApiError} from '#/lib/utils/api/axios';
 import apiRoutes from '#/lib/utils/api/routes';
-import {setUser} from '#/store/slices/auth';
+import {setAuthLoading, setUser} from '#/store/slices/auth';
 import {useNavigation} from '@react-navigation/native';
 import {useCallback} from 'react';
 import {useAppDispatch} from '../store';
@@ -39,6 +39,7 @@ export default function useAuthApi() {
 
   const google = useCallback(async () => {
     try {
+      dispatch(setAuthLoading(true));
       const {createdSessionId, setActive, signUp, signIn} =
         await startGoogleOAuthFlow();
       if (createdSessionId) {
@@ -52,11 +53,15 @@ export default function useAuthApi() {
       } else {
       }
     } catch (err) {
+      console.error('GOOGLE_SIGN_IN: ', err);
+    } finally {
+      dispatch(setAuthLoading(false));
     }
   }, []);
 
   const apple = useCallback(async () => {
     try {
+      dispatch(setAuthLoading(true));
       const {createdSessionId, setActive, signUp, signIn} =
         await startAppleOAuthFlow();
       if (createdSessionId) {
@@ -70,6 +75,9 @@ export default function useAuthApi() {
       } else {
       }
     } catch (err) {
+      console.error('APPLE_SIGN_IN: ', err);
+    } finally {
+      dispatch(setAuthLoading(false));
     }
   }, []);
 

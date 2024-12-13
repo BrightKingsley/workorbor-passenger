@@ -19,7 +19,7 @@ import {Container} from '../../utils';
 
 export const snapPoints = ['70%'];
 
-export const enablePanDownToClose = true;
+export const enablePanDownToClose = false;
 
 export default function RideInfo() {
   const {closeModal} = useModalControls();
@@ -28,7 +28,7 @@ export default function RideInfo() {
   return (
     <Container style={[a.flex_1]}>
       <ViewHeader
-        title="Rider Details"
+        title="Driver Details"
         canGoBack
         backPressHandler={closeModal}
       />

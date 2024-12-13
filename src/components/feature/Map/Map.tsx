@@ -13,10 +13,14 @@ import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 
 // import LottieView from 'lottie-react-native';
-import {useAppSelector} from '#/hooks/store';
+import {useAppDispatch, useAppSelector} from '#/hooks/store';
 import {GOOGLE_MAPS_API_KEY} from '#/lib/constants';
 import {a} from '#/lib/style/atoms';
 import {colors} from '#/lib/theme/palette';
+import {
+  setCurrentAddress,
+  setCurrentPosition,
+} from '$/src/store/slices/location';
 
 import {Column} from '../../global';
 import {Text} from '../../global/Themed';
@@ -38,36 +42,14 @@ export default function Map({
   const mapRef = useRef<MapView>(null);
 
   const {user} = useUser();
-  const {currentPosition, lastPosition} = useAppSelector(
+  const {currentPosition, lastPosition, currentAddress} = useAppSelector(
     state => state.location,
   );
-  const {orderRequest} = useAppSelector(state => state.order);
+  const {orderRequest, riderInfo} = useAppSelector(state => state.order);
 
   const [directions, setDirections] = useState<DirectionsProps | null>(null);
 
-  // const markers: MarkerProps[] = [
-  //   {
-  //     coords: {
-  //       latitude: orderRequest?.origin?.latitude!,
-  //       longitude: orderRequest?.origin?.longitude!,
-  //     },
-  //     description: 'pick up',
-  //     identifier: 'origin',
-  //   },
-  //   {
-  //     coords: {
-  //       latitude: orderRequest?.destination?.latitude!,
-  //       longitude: orderRequest?.destination?.longitude!,
-  //     },
-  //     description: 'destination',
-  //     identifier: 'destination',
-  //   },
-  // ];
-
-  // const originLocation = markers.find(
-  //   marker =>
-  //     marker.identifier === 'origin' && marker.coords.latitude !== undefined,
-  // );
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (orderRequest?.origin && orderRequest?.destination) {
@@ -103,21 +85,7 @@ export default function Map({
               />
             ),
           }
-        : // : {
-          //     coords: {
-          //       latitude: 6.3156,
-          //       longitude: -10.8074,
-          //     },
-          //     description: 'you are here',
-          //     identifier: 'current',
-          //     alt: (
-          //       <Image
-          //         source={{uri: user?.imageUrl}}
-          //         style={[a.w_full, a.h_full] as ImageStyle}
-          //       />
-          //     ),
-          //   },
-          undefined,
+        : undefined,
       orderRequest?.origin
         ? {
             coords: {
@@ -136,6 +104,15 @@ export default function Map({
             identifier: 'destination',
           }
         : undefined,
+      riderInfo?.location?.coords
+        ? {
+            coords: {
+              latitude: riderInfo?.location?.coords?.latitude || 0,
+              longitude: riderInfo?.location?.coords?.longitude || 0,
+            },
+            identifier: 'destination',
+          }
+        : undefined,
     ],
     [currentPosition, lastPosition, orderRequest, , user],
   );
@@ -143,33 +120,85 @@ export default function Map({
   const initRegion = useMemo(
     () => ({
       ...DELTAS,
-      latitude: (currentPosition || lastPosition)?.coords.latitude! ?? 6.3156,
+      // latitude: (currentPosition || lastPosition)?.coords?.latitude! ?? 6.3156,
+      latitude: (currentPosition || lastPosition)?.coords?.latitude!,
       longitude:
-        (currentPosition || lastPosition)?.coords.longitude! ?? -10.8074,
+        // (currentPosition || lastPosition)?.coords?.longitude! ?? -10.8074,
+        (currentPosition || lastPosition)?.coords?.longitude!,
     }),
     [currentPosition, lastPosition],
   );
 
   const initializeMapItems = useCallback(() => {
+    console.log('MAP_ITEMS_INITIALIZED');
     if (mapRef.current) {
-      mapRef.current.fitToSuppliedMarkers(['destination', 'origin'], {
-        edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
-        animated: true,
-      });
-      mapRef.current.animateToRegion(initRegion);
-      mapRef.current.animateCamera({
-        center: {
+      console.log('MAP_CURRENT', currentAddress);
+      (async () => {
+        if (currentAddress) return;
+        console.log('NO_CURRENT_ADDRESS:', currentAddress);
+        const address = await mapRef.current?.addressForCoordinate({
           latitude: initRegion.latitude,
           longitude: initRegion.longitude,
+        });
+        console.log('ADDRESS FROM MAP: ', address);
+
+        if (address) {
+          console.log('COUNTRY_CODE: ', address.countryCode);
+          dispatch(setCurrentAddress({currentAddress: address}));
+        }
+      })();
+
+      mapRef.current.fitToCoordinates(
+        [
+          {
+            latitude: orderRequest?.origin?.latitude || 0,
+            longitude: orderRequest?.origin?.longitude || 0,
+          },
+          {
+            latitude: orderRequest?.destination?.latitude || 0,
+            longitude: orderRequest?.destination?.longitude || 0,
+          },
+        ],
+        {
+          edgePadding: {top: 50, right: 150, bottom: 150, left: 150},
+          animated: true,
         },
-        zoom: 16,
+      );
+      mapRef.current.animateToRegion({
+        latitude: orderRequest
+          ? orderRequest?.origin?.latitude || 0
+          : initRegion?.latitude,
+        longitude: orderRequest
+          ? orderRequest?.origin?.longitude || 0
+          : initRegion?.longitude,
+        latitudeDelta: orderRequest
+          ? orderRequest?.origin?.latitude || 0
+          : initRegion?.latitude,
+        longitudeDelta: orderRequest
+          ? orderRequest?.origin?.longitude || 0
+          : initRegion?.longitude,
+      });
+      mapRef.current.animateCamera({
+        center: {
+          latitude: orderRequest
+            ? orderRequest?.origin?.latitude || 0
+            : initRegion?.latitude,
+          longitude: orderRequest
+            ? orderRequest?.origin?.longitude || 0
+            : initRegion?.longitude,
+        },
+        zoom: 14,
       });
     }
-  }, [initRegion]);
+  }, [initRegion, orderRequest, currentPosition]);
 
   useEffect(() => {
     initializeMapItems();
-  }, [initializeMapItems]);
+  }, [initializeMapItems, orderRequest]);
+
+  useEffect(() => {
+    console.log({riderInfo: riderInfo?.location.coords});
+  }, [riderInfo]);
 
   if (!(initRegion.latitude && initRegion.longitude))
     return (
@@ -184,9 +213,9 @@ export default function Map({
       customMapStyle={customMapStyle}
       userInterfaceStyle="dark"
       ref={mapRef}
-      onMapReady={onMapReady}
+      // onMapReady={initializeMapItems}
       initialRegion={{
-        ...(initialRegion || initRegion),
+        ...initRegion,
         ...DELTAS,
       }}
       onMapLoaded={initializeMapItems}
@@ -211,6 +240,21 @@ export default function Map({
           apikey={GOOGLE_MAPS_API_KEY}
           strokeWidth={directions.strokeWidth || 4}
           strokeColor={directions.strokeColor || colors.primary}
+          resetOnChange
+          onReady={result => directions.onReady?.(result)}
+        />
+      )}
+
+      {directions && riderInfo?.location?.coords && (
+        <MapViewDirections
+          origin={directions.origin}
+          destination={{
+            latitude: riderInfo.location.coords.latitude,
+            longitude: riderInfo.location.coords.longitude,
+          }}
+          apikey={GOOGLE_MAPS_API_KEY}
+          strokeWidth={directions.strokeWidth || 4}
+          strokeColor={'orange'}
           resetOnChange
           onReady={result => directions.onReady?.(result)}
         />

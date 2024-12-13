@@ -107,8 +107,7 @@ export default function Home() {
           a.mt_(safeInsets.top),
         ]}>
         <Button
-          // onPress={handleWalletPress}
-          onPress={() => closeAllModals()}
+          onPress={handleWalletPress}
           variant="ghost"
           shape="round"
           style={walletButtonStyle}>
@@ -143,7 +142,9 @@ export default function Home() {
               }
             />
           </PingAnimation>
-          <Text style={[a.mx_auto, a.mt_2xl]}>Finding Available Riders...</Text>
+          <Text style={[a.mx_auto, a.mt_2xl]}>
+            Finding Available Drivers...
+          </Text>
         </View>
       )}
     </>

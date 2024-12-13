@@ -11,7 +11,7 @@ export function useOrderSocket() {
   const {user} = useUser();
   const {getCurrentAddress, getCurrentPosition} = useLocationService();
 
-  const {lastPosition} = useAppSelector(state => state.location);
+  // const {lastPosition} = useAppSelector(state => state.location);
 
   useEffect(() => {
     if (!user) return;
@@ -20,40 +20,40 @@ export function useOrderSocket() {
       passengerId: user?.id,
       socketId: socket?.id,
     });
-  }, [socket.id, user?.id, user]);
+  }, [socket?.id, user]);
 
-  useEffect(() => {
-    if (!user) return;
-    const interval = setInterval(() => {
-      (async () => {
-        console.log('INTERVAL_RUNNING');
-        try {
-          const currentPosition = (await getCurrentPosition()) || {
-            coords: {
-              latitude: lastPosition?.coords.latitude,
-              longitude: lastPosition?.coords.longitude,
-            },
-          };
-          const currentAddress = await getCurrentAddress();
-          if (!currentPosition) {
-            return;
-          }
-          socket.emit<EventName>('update_rider_location', {
-            uId: user?.id,
-            location: {
-              latitude: currentPosition.coords.latitude,
-              longitude: currentPosition.coords.longitude,
-              address: currentAddress,
-            },
-          });
-        } catch (error) {
-          console.error('INTERVAL_ERROR', error);
-        }
-      })();
-    }, 5000);
+  // useEffect(() => {
+  //   if (!user) return;
+  //   const interval = setInterval(() => {
+  //     (async () => {
+  //       console.log('INTERVAL_RUNNING');
+  //       try {
+  //         const currentPosition = (await getCurrentPosition()) || {
+  //           coords: {
+  //             latitude: lastPosition?.coords.latitude,
+  //             longitude: lastPosition?.coords.longitude,
+  //           },
+  //         };
+  //         const currentAddress = await getCurrentAddress();
+  //         if (!currentPosition) {
+  //           return;
+  //         }
+  //         socket.emit<EventName>('update_rider_location', {
+  //           uId: user?.id,
+  //           location: {
+  //             latitude: currentPosition.coords.latitude,
+  //             longitude: currentPosition.coords.longitude,
+  //             address: currentAddress,
+  //           },
+  //         });
+  //       } catch (error) {
+  //         console.error('INTERVAL_ERROR', error);
+  //       }
+  //     })();
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return null;
 }

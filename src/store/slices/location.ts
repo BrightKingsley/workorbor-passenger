@@ -1,10 +1,13 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import * as Location from 'expo-location';
+import {Address} from 'react-native-maps';
 
 type LocationState = {
   currentPosition: Location.LocationObject | null;
   lastPosition: Location.LocationObject | null;
-  currentAddress: Location.LocationGeocodedAddress | null;
+  currentAddress:
+    | (Partial<Location.LocationGeocodedAddress> & Partial<Address>)
+    | null;
 };
 
 const initialState: LocationState = {

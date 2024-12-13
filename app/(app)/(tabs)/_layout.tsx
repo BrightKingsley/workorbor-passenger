@@ -46,6 +46,7 @@ export default function TabLayout() {
 
   const homeScreenOptions = useMemo(
     (): RouteOptions => ({
+      lazy: false,
       title: 'Home',
       tabBarIcon: ({color, focused}) =>
         focused ? <HomeIcon fill={color} /> : <HomeIconOutline />,
@@ -55,6 +56,7 @@ export default function TabLayout() {
 
   const ordersScreenOptions = useMemo(
     (): RouteOptions => ({
+      lazy: false,
       title: 'orders',
       headerShown: false,
       tabBarIcon: ({color, focused}) => (
@@ -70,6 +72,7 @@ export default function TabLayout() {
 
   const accountScreenOptions = useMemo(
     (): RouteOptions => ({
+      lazy: false,
       title: 'account',
       tabBarIcon: ({color, focused}) => (
         <MaterialCommunityIcons

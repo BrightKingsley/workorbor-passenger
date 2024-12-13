@@ -33,6 +33,14 @@ const orderSlice = createSlice({
     setRider: (state, action: PayloadAction<Rider>) => {
       state.riderInfo = action.payload;
     },
+    updateRiderLocation: (
+      state,
+      action: PayloadAction<{latitude: number; longitude: number}>,
+    ) => {
+      if (state.riderInfo) {
+        state.riderInfo.location.coords = action.payload;
+      }
+    },
   },
 });
 
@@ -43,5 +51,6 @@ export const {
   setOrderResponse,
   setOrderPhase,
   setRider,
+  updateRiderLocation,
 } = orderSlice.actions;
 export default orderSlice;

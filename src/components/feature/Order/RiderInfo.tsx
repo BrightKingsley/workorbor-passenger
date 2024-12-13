@@ -99,7 +99,7 @@ export default function RiderInfo() {
               />
             </Button>
             <Text style={[a.text_xs, a.text_(colors.darkgray), a.mt_xs]}>
-              Rider Details
+              Driver Details
             </Text>
           </Column>
 

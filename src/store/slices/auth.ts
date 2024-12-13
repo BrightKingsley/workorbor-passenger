@@ -41,6 +41,12 @@ const authSlice = createSlice({
         action.payload.callback();
       }
     },
+    setAuthLoading(state, action: PayloadAction<boolean>) {
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+    },
     clearUser: state => {
       state.user = null;
       state.isAuthenticated = false;
@@ -53,5 +59,5 @@ const authSlice = createSlice({
   },
 });
 
-export const {setUser, clearUser} = authSlice.actions;
+export const {setUser, setAuthLoading, clearUser} = authSlice.actions;
 export default authSlice;

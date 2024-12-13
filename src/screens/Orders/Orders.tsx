@@ -496,7 +496,7 @@ export default function Orders({status}: {status: 'pending' | 'completed'}) {
               sections={
                 loading
                   ? transformOrders(DEFAULT_ORDERS)
-                  : transformOrders(orders)
+                  : transformOrders(orders.reverse())
               }
               keyExtractor={(item, index) => (item?._id + index).toString()}
               ItemSeparatorComponent={() => (

@@ -53,6 +53,7 @@ export default function SignIn() {
   const [error, setError] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [buttonPressed, setButtonPressed] = useState(false);
 
   const [pendingVerification, setPendingVerification] = useState(false);
   const [errors, setErrors] = useState<ClerkAPIError[]>([]);
@@ -76,33 +77,44 @@ export default function SignIn() {
   const handleGooglePress = useCallback(async () => {
     try {
       await login.google();
-    } catch (err) {
-    }
+    } catch (err) {}
   }, []);
 
   const handleApplePress = useCallback(async () => {
     try {
-      await login.google();
-    } catch (err) {
-    }
+      await login.apple();
+    } catch (err) {}
   }, []);
 
   const handleSignInPress = useCallback(async () => {
-    const emailValidation = validateEmail(email.value);
+    setButtonPressed(true);
+  }, []);
 
-    setEmail(emailValidation);
+  useEffect(() => {
+    if (!buttonPressed) return;
+    (async () => {
+      try {
+        const emailValidation = validateEmail(email.value);
 
-    if (emailValidation.error) return;
+        setEmail(emailValidation);
 
-    setLoading(true);
-    const success = await login.email(
-      {email: email.value, password: password.value},
-      handleErrors,
-      rememberMe,
-    );
-    if (!success) setError(true);
-    setLoading(false);
-  }, [email.value, password.value]);
+        if (emailValidation.error) return;
+
+        setLoading(true);
+        const success = await login.email(
+          {email: email.value, password: password.value},
+          handleErrors,
+          rememberMe,
+        );
+        if (!success) setError(true);
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+        setButtonPressed(false);
+      }
+    })();
+  }, [email.value, password.value, buttonPressed, rememberMe]);
 
   useEffect(() => {
     (async () => {

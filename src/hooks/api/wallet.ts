@@ -19,34 +19,9 @@ import {useAppDispatch, useAppSelector} from '../store';
 import useLocationService from '../useLocationService';
 
 export default function useWalletApi() {
-  const {fetchData} = useRequest();
-
-  const {getCurrentAddress, getCurrentPosition} = useLocationService();
-
   const dispatch = useAppDispatch();
 
   const {balance, transactions} = useAppSelector(state => state.wallet);
-
-  // Function to fetch wallet details, including balance and transactions
-  // const getWalletDetails = useCallback(async () => {
-  //   try {
-  //     const data = await fetchData<{balance: number; transactions: any[]}>(
-  //       'get',
-  //       apiRoutes.wallet.details.route,
-  //     );
-  //     setWalletDetails(data); // Update context with wallet details
-  //     return data;
-  //   } catch (error) {
-  //     if (error instanceof ApiError) {
-  //       console.error(
-  //         `API Error: ${error.message} (Status: ${error.status}, ${error.statusText})`,
-  //       );
-  //     } else {
-  //       console.error('Unexpected Error:', error);
-  //     }
-  //     return null;
-  //   }
-  // }, [fetchData, setWalletDetails]);
 
   const getWalletDetails = useCallback(async () => {
     try {
@@ -63,46 +38,6 @@ export default function useWalletApi() {
       return null;
     }
   }, []);
-
-  // Function to handle top-up
-  // const topUp = useCallback(
-  //   async (amount: string) => {
-  //     try {
-  //       if (!amount || isNaN(parseFloat(amount))) {
-  //         return Alert.alert(
-  //           'Invalid Amount',
-  //           'Please enter a valid top-up amount.',
-  //         );
-  //       }
-  //       const data = await fetchData<{transactionId: string}>(
-  //         'post',
-  //         apiRoutes.wallet['top-up'].route,
-  //         {
-  //           amount: parseFloat(amount),
-  //         },
-  //       );
-
-  //       // Update balance and add transaction
-  //       updateBalance(parseFloat(amount));
-  //       addTransaction({
-  //         id: data.transactionId,
-  //         amount: parseFloat(amount),
-  //         type: 'top-up',
-  //       });
-  //       return data;
-  //     } catch (error) {
-  //       if (error instanceof ApiError) {
-  //         console.error(
-  //           `API Error: ${error.message} (Status: ${error.status}, ${error.statusText})`,
-  //         );
-  //       } else {
-  //         console.error('Unexpected Error:', error);
-  //       }
-  //       return null;
-  //     }
-  //   },
-  //   [fetchData, updateBalance, addTransaction],
-  // );
 
   const topUp = useCallback(
     async (amount: string) => {
