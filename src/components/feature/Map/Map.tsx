@@ -196,10 +196,6 @@ export default function Map({
     initializeMapItems();
   }, [initializeMapItems, orderRequest]);
 
-  useEffect(() => {
-    console.log({riderInfo: riderInfo?.location.coords});
-  }, [riderInfo]);
-
   if (!(initRegion.latitude && initRegion.longitude))
     return (
       <Column style={[a.align_center, a.justify_center, a.h_full]}>

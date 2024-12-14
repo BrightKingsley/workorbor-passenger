@@ -189,16 +189,18 @@
 //   locations: Location.LocationObject[];
 // }
 
-import {useEffect, useState} from 'react';
+import axios, {AxiosResponse} from 'axios';
 import * as Location from 'expo-location';
+import {useState} from 'react';
+
+import {getGeocodeUrl, hasMovedSignificantly} from '#/lib/utils/location';
+import {snakeToCamel} from '#/lib/utils/objects';
 import {
   setCurrentAddress,
   setCurrentPosition,
   setLastPosition,
 } from '#/store/slices/location';
-import axios, {AxiosResponse} from 'axios';
-import {getGeocodeUrl, hasMovedSignificantly} from '#/lib/utils/location';
-import {snakeToCamel} from '#/lib/utils/objects';
+
 import {useAppDispatch, useAppSelector} from './store';
 
 export default function useLocationService() {
@@ -229,12 +231,24 @@ export default function useLocationService() {
   };
 
   const getCurrentPosition = async () => {
+    console.log('GET_CURRENT_POSITION');
     try {
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
 
-      dispatch(setCurrentPosition({currentPosition: position}));
+      if (
+        !currentPosition ||
+        hasMovedSignificantly({
+          currLat: position.coords.latitude,
+          currLng: position.coords.longitude,
+          prevLat: currentPosition.coords.latitude,
+          prevLng: currentPosition.coords.longitude,
+        })
+      ) {
+        dispatch(setCurrentPosition({currentPosition: position}));
+      }
+
       return position;
     } catch (error) {
       console.error('Error fetching current position:', error);
@@ -260,6 +274,7 @@ export default function useLocationService() {
           !currentPosition?.coords?.latitude ||
           !currentPosition?.coords?.longitude
         ) {
+          console.log('GETTING CURRENT POSITION_FROM_ADDRESS');
           const position = await getCurrentPosition();
           if (!position) return null;
         }
@@ -287,8 +302,8 @@ export default function useLocationService() {
     try {
       await Location.startLocationUpdatesAsync('background-location-task', {
         accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 1,
+        timeInterval: 10000,
+        distanceInterval: 10,
       });
     } catch (error) {
       console.error('Error starting location updates:', error);
@@ -303,19 +318,6 @@ export default function useLocationService() {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      await requestPermissions();
-      await getLastPosition();
-      await getCurrentPosition();
-      await startLocationUpdates();
-    })();
-
-    return () => {
-      stopLocationUpdates();
-    };
-  }, []);
-
   return {
     currentAddress,
     currentPosition,
@@ -325,6 +327,7 @@ export default function useLocationService() {
     getCurrentPosition,
     getLastPosition,
     getCurrentAddress,
+    startLocationUpdates,
     stopLocationUpdates,
   };
 }

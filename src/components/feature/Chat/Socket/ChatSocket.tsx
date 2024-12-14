@@ -14,7 +14,7 @@ export function ChatSocket() {
 
   useEffect(() => {
     if (!chatId) return;
-    console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥JOIN_ROOM:', chatId);
+    console.log('JOIN_ROOM:', chatId);
     socket.emit('join_room', chatId);
 
     return () => {
@@ -26,14 +26,14 @@ export function ChatSocket() {
     if (!user) return;
 
     const handleIncomingMessage = (data: MessageType) => {
-      console.log('INCOMING_MESSAGE:', data);
+      console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥INCOMING_MESSAGE:', data);
 
       const message = {
         id: data.id,
         sender: data.sender,
         content: data.content,
       };
-      // dispatch(addMessage(message));
+      dispatch(addMessage(message));
     };
 
     socket.on('incoming_message', handleIncomingMessage);

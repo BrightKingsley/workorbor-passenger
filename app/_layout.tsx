@@ -1,135 +1,100 @@
-{
-  /* <script src="http://192.168.0.197:8097"></script>; */
-}
+<script src="http://192.168.0.197:8097"></script>;
 import {LogBox} from 'react-native';
-LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
-LogBox.ignoreAllLogs(); //
+// LogBox.ignoreLogs(['Warning: ...', 'Error: ...']); // Ignore log notification by message
+// LogBox.ignoreAllLogs();
 
 import {ClerkProvider, useAuth, useUser} from '@clerk/clerk-expo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Localization from 'expo-localization';
-import {
-  Slot,
-  Stack,
-  useRootNavigationState,
-  useRouter,
-  useSegments,
-} from 'expo-router';
+import {Stack, useRouter, useSegments} from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import {StatusBar} from 'expo-status-bar';
-import {reloadAsync} from 'expo-updates';
 import React, {useEffect, useState} from 'react';
-import {
-  Button,
-  I18nManager,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {RootSiblingParent} from 'react-native-root-siblings';
-// @ts-expect-error
-import {setRTLTextPlugin} from 'react-native-rtl-layout';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-import {Text} from '$/src/components/global/Themed';
 import useLoadedFonts from '#/hooks/useLoadedFonts';
 import {a} from '#/lib/style/atoms';
 import {ReduxProviders} from '#/store/provider';
 
-import i18n, {IS_RTL, setLanguage} from '../locales';
 import {LocalizationProvider} from '../locales/localizationContext';
-import t from '../locales/translate';
-import {Row, Splash} from '../src/components/global';
+import {Splash} from '../src/components/global';
 import {colors} from '../src/lib/theme/palette';
 import {hexWithOpacity} from '../src/lib/ui/helpers';
-import {RouteTracker, SocketContainer} from '$/src/components/utils';
-import {ModalProvider} from '$/src/components/global/modals/ModalState';
-
-import * as Sentry from '@sentry/react-native';
-import * as TaskManager from 'expo-task-manager';
-import * as Location from 'expo-location';
-import {useAppSelector} from '$/src/hooks/store';
-
-// Define the background location task
-
-Sentry.init({
-  dsn: 'https://7fe76dab3ab51dbdec9b6b3d48bd456b@o4508120609783808.ingest.us.sentry.io/4508120612012032',
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-  // We recommend adjusting this value in production.
-  tracesSampleRate: 1.0,
-  _experiments: {
-    // profilesSampleRate is relative to tracesSampleRate.
-    // Here, we'll capture profiles for 100% of transactions.
-    profilesSampleRate: 1.0,
-  },
-});
+import {
+  LocationUpdater,
+  RouteTracker,
+  SocketContainer,
+} from '$/src/components/utils';
+import {getItemFromAsyncStore} from '$/src/lib/utils/helpers/async-store';
+import useApi from '$/src/hooks/api';
+import debounce from 'lodash.debounce';
+import axios from 'axios';
+import {handleError} from '$/src/lib/utils/errors';
+import {useAppDispatch, useAppSelector} from '$/src/hooks/store';
 
 const CLERK_PUBLISHABLE_KEY =
   'pk_test_cmVuZXdpbmctd2Vhc2VsLTQ1LmNsZXJrLmFjY291bnRzLmRldiQ';
-// const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+// Debounced function for saving token
+const saveTokenDebounced = debounce(async (key: string, value: string) => {
+  try {
+    await SecureStore.setItemAsync(key, value);
+    console.log(`Token saved successfully: ${key}`);
+  } catch (error) {
+    console.error('Error saving token:', error);
+  }
+}, 1000); // 1000ms delay to debounce writes
 
 const tokenCache = {
   async getToken(key: string) {
     try {
       return SecureStore.getItemAsync(key);
     } catch (err) {
+      console.error('Error retrieving token:', err);
       return null;
     }
   },
   async saveToken(key: string, value: string) {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
-    }
+    saveTokenDebounced(key, value);
   },
 };
-
-TaskManager.defineTask('background-location-task', ({data, error}: any) => {
-  if (error) {
-    console.error('Background task error:', error);
-    return;
-  }
-  if (data) {
-    const {locations} = data;
-    console.log('Background locations:', locations);
-    // Handle the location updates here (e.g., dispatch to a store or send to server)
-  }
-});
 
 function RootLayoutInner() {
   useLoadedFonts();
 
-  const [isReady, setIsReady] = React.useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [didRun, setDidRun] = useState(false);
   const {isLoaded, isSignedIn} = useAuth();
-  const {isLoading} = useAppSelector(state => state.auth);
-  const {user} = useUser();
+  const {user: reduxUser, isLoading} = useAppSelector(state => state.auth);
   const segments = useSegments();
+  const {user} = useUser();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    console.log('REDUX_USER✡️✡️✡️: ', reduxUser);
+  }, [reduxUser]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
     const inTabsGroup = segments[0] === '(app)';
 
-    console.info('SIGNED_IN: ', {
-      isSignedIn,
-      inTabsGroup,
-      segs: segments[0],
-      ok: '',
-      segments,
-    });
+    if (!didRun) {
+      setDidRun(true);
 
-    if (!isSignedIn || !user) {
-      router.replace('/(auth)/sign-in');
-      return;
+      // if (!isSignedIn || !user) {
+      //   router.replace('/(auth)/sign-in');
+      // } else if (inTabsGroup) {
+      //   router.replace('/(app)/(tabs)/');
+      // }
+
+      if (!isSignedIn || !user) {
+        router.replace('/(auth)/sign-in');
+        return;
+      }
+      if (!inTabsGroup) router.replace('/(app)/(tabs)/');
     }
-
-    if (!inTabsGroup) router.replace('/(app)/(tabs)/');
-  }, [isSignedIn]);
+  }, [isSignedIn, user]);
 
   return (
     <>
@@ -140,26 +105,13 @@ function RootLayoutInner() {
           isReady={isLoaded}
         />
       )}
+      <LocationUpdater />
       <Stack screenOptions={{headerShown: false}} />
     </>
   );
 }
 
-const RootLayout = () => {
-  // return (
-  //   <SafeAreaProvider style={[a.flex_1, a.w_full]}>
-  //     {/* <Splash isReady={isReady}> */}
-  //     <RootSiblingParent>
-  //       <React.Fragment>
-  //         <GestureHandlerRootView style={a.h_full}>
-  //           <Stack screenOptions={{headerShown: false}} />
-  //         </GestureHandlerRootView>
-  //       </React.Fragment>
-  //     </RootSiblingParent>
-  //     {/* </Splash> */}
-  //   </SafeAreaProvider>
-  // );
-
+export default function RootLayout() {
   return (
     <ReduxProviders>
       <ClerkProvider
@@ -169,17 +121,13 @@ const RootLayout = () => {
           <SafeAreaProvider style={[a.flex_1, a.w_full]}>
             <StatusBar animated={true} translucent={true} />
             <GestureHandlerRootView style={a.h_full}>
-              {/* <ModalProvider> */}
               <RootLayoutInner />
               <RouteTracker />
               <SocketContainer />
-              {/* </ModalProvider> */}
             </GestureHandlerRootView>
           </SafeAreaProvider>
         </LocalizationProvider>
       </ClerkProvider>
     </ReduxProviders>
   );
-};
-
-export default Sentry.wrap(RootLayout);
+}

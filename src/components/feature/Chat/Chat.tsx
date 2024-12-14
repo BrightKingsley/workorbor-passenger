@@ -192,7 +192,7 @@ const Chat = () => {
           Platform.OS === 'ios' && a.pt_2xl,
           a.pb_(safeAreaInsets.bottom),
         ]}>
-        {loading ? (
+        {loading && !messages.length ? (
           <ChatLoader />
         ) : (
           <KeyboardAvoidingView
