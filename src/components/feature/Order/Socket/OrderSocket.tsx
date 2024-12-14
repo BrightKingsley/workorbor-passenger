@@ -13,12 +13,18 @@ import {
   updateRiderLocation,
 } from '$/src/store/slices/order/slice';
 import {clearChatId, setChatId} from '$/src/store/slices/chat';
-import {OrderPhase, VehicleType} from '$/src/store/slices/order/types';
+import {
+  OrderPhase,
+  VehicleType,
+  getDistanceFromLatLonInMeters,
+} from '$/src/store/slices/order/types';
+import {getDistance} from 'geolib';
 
 export default function OrderSocket() {
   const {user} = useUser();
   const dispatch = useAppDispatch();
   const {orderRequest} = useAppSelector(state => state.order);
+  const {currentPosition} = useAppSelector(state => state.location);
   const {closeAllModals, closeModal, openModal} = useModalControls();
 
   // Emit passenger socket update only when socket ID or user ID changes
@@ -51,7 +57,6 @@ export default function OrderSocket() {
           lastName: data.lastName,
           firstName: data.firstName,
           phoneNumber: data.phoneNumber,
-          primaryPhoneNumber: data.primaryPhoneNumber,
         }),
       );
       dispatch(setChatId(data.chatId));
@@ -96,6 +101,27 @@ export default function OrderSocket() {
       (location: {latitude: number; longitude: number}) => {
         console.log('🥶🥶🥶RIDER_LIVE_LOCATION: ', location);
         dispatch(updateRiderLocation(location));
+
+        if (
+          currentPosition?.coords.latitude &&
+          currentPosition?.coords?.longitude &&
+          location
+        ) {
+          const distance = getDistance(
+            {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            },
+            {
+              latitude: currentPosition?.coords.latitude,
+              longitude: currentPosition?.coords.longitude,
+            },
+          );
+
+          if (distance <= 10) {
+            dispatch(setOrderPhase(OrderPhase.rideArrived));
+          }
+        }
       },
     );
 

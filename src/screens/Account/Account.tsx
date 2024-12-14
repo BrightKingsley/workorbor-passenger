@@ -1,6 +1,6 @@
 import {useAuth, useUser} from '@clerk/clerk-expo';
 import {useHeaderHeight} from '@react-navigation/elements';
-import {Stack, useLocalSearchParams} from 'expo-router';
+import {Stack, useLocalSearchParams, useRouter} from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import {Image, ImageStyle, View} from 'react-native';
@@ -13,7 +13,7 @@ import {Row} from '../../components/global';
 import Button, {ButtonText} from '../../components/global/Button';
 import {AnimatedText, Text} from '../../components/global/Themed';
 import {Container} from '../../components/utils';
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
 import {createCustomBackdrop} from '$/src/components/global/modals/ModalBackdrop';
 import {
@@ -22,6 +22,7 @@ import {
 } from '$/src/components/global/modals/ModalState';
 import {socket} from '$/src/lib/utils/socket';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {clearTasks} from '$/src/lib/utils/tasks';
 const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
 // Run in Node.js environments at build time to generate a list of
@@ -44,6 +45,9 @@ export function AccountScreen({account}: {account: string}) {
   const safeInsets = useSafeAreaInsets();
 
   const isModalActive = activeModals.includes('edit');
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const handleEditPress = useCallback(() => {
     isModalActive
@@ -54,6 +58,18 @@ export function AccountScreen({account}: {account: string}) {
         });
   }, [isModalActive]);
 
+  const logOut = useCallback(async () => {
+    try {
+      setLoading(true);
+      await signOut();
+      router.replace('/sign-in');
+    } catch (error) {
+      console.error('LOGOUT', error);
+    } finally {
+      setLoading(false);
+      clearTasks();
+    }
+  }, []);
   return (
     <>
       <Stack.Screen
@@ -198,7 +214,8 @@ export function AccountScreen({account}: {account: string}) {
               </>
             )}
             <Button
-              onPress={signOut}
+              loading={loading}
+              onPress={logOut}
               variant="ghost"
               shape="round"
               color="error">

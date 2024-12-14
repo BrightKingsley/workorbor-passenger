@@ -191,6 +191,7 @@
 
 import axios, {AxiosResponse} from 'axios';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 import {useState} from 'react';
 
 import {getGeocodeUrl, hasMovedSignificantly} from '#/lib/utils/location';
@@ -299,22 +300,37 @@ export default function useLocationService() {
     };
 
   const startLocationUpdates = async () => {
-    try {
-      await Location.startLocationUpdatesAsync('background-location-task', {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 10000,
-        distanceInterval: 10,
-      });
-    } catch (error) {
-      console.error('Error starting location updates:', error);
+    const {status} = await Location.requestBackgroundPermissionsAsync();
+    if (status === 'granted') {
+      try {
+        await Location.startLocationUpdatesAsync('background-location-task', {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000, // Minimum time in ms between updates
+          distanceInterval: 10, // Minimum distance in meters between updates
+          showsBackgroundLocationIndicator: true, // Shows indicator when app runs in background
+        });
+        console.log('Background location updates started.');
+      } catch (error) {
+        console.error('Error starting location updates:', error);
+      }
+    } else {
+      console.error('Background location permission not granted.');
     }
   };
 
   const stopLocationUpdates = async () => {
-    try {
-      await Location.stopLocationUpdatesAsync('background-location-task');
-    } catch (error) {
-      console.error('Error stopping location updates:', error);
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(
+      'background-location-task',
+    );
+    if (isRegistered) {
+      try {
+        await Location.stopLocationUpdatesAsync('background-location-task');
+        console.log('Stopped location updates successfully.');
+      } catch (error) {
+        console.error('Error stopping location updates:', error);
+      }
+    } else {
+      console.warn('Task "background-location-task" is not registered.');
     }
   };
 

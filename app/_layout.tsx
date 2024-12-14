@@ -30,6 +30,7 @@ import debounce from 'lodash.debounce';
 import axios from 'axios';
 import {handleError} from '$/src/lib/utils/errors';
 import {useAppDispatch, useAppSelector} from '$/src/hooks/store';
+import * as TaskManager from 'expo-task-manager';
 
 const CLERK_PUBLISHABLE_KEY =
   'pk_test_cmVuZXdpbmctd2Vhc2VsLTQ1LmNsZXJrLmFjY291bnRzLmRldiQ';
@@ -57,6 +58,26 @@ const tokenCache = {
     saveTokenDebounced(key, value);
   },
 };
+
+TaskManager.defineTask('background-location-task', ({data, error}: any) => {
+  if (error) {
+    console.error('Task Manager Error:', error);
+    return;
+  }
+  if (data) {
+    const locations = data.locations;
+    console.log('Received new locations:', locations);
+  }
+});
+
+const logRegisteredTasks = async () => {
+  const tasks = await TaskManager.getRegisteredTasksAsync();
+  console.log('Registered tasks:', tasks);
+};
+
+setTimeout(() => {
+  logRegisteredTasks();
+}, 2000);
 
 function RootLayoutInner() {
   useLoadedFonts();

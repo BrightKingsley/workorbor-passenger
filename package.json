@@ -53,6 +53,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-updates": "~0.25.27",
     "expo-web-browser": "~13.0.3",
+    "geolib": "^3.3.4",
     "i18n-js": "^4.4.3",
     "jest-expo": "~51.0.4",
     "lodash": "^4.17.21",

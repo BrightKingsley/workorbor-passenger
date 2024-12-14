@@ -38,9 +38,9 @@ export function ChatSocket() {
 
     socket.on('incoming_message', handleIncomingMessage);
 
-    return () => {
-      socket.off('incoming_message', handleIncomingMessage);
-    };
+    // return () => {
+    //   socket.off('incoming_message', handleIncomingMessage);
+    // };
   }, [user, dispatch]);
 
   return null;

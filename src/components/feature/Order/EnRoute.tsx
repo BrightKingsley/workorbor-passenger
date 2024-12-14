@@ -1,4 +1,4 @@
-import {View, Image, Platform, Linking} from 'react-native';
+import {View, Image, Linking} from 'react-native';
 // import {useModalControls} from '#/state/modals';
 // import {NigeriaIcon, UnitedKingdomIcon} from '#/lib/icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -24,6 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {OrderPhase} from '$/src/store/slices/order/types';
 import {Container} from '../../utils';
+import {isAndroid} from '$/src/platform';
 
 // NOTE: snapPoints holds the default height point for modal
 
@@ -58,9 +59,7 @@ export default function EnRoute() {
   }, []);
 
   const handleChatPress = useCallback(() => {
-    Platform.OS === 'android'
-      ? openModal('chat')
-      : router.push('/(app)/chats/4');
+    isAndroid ? openModal('chat') : router.push('/(app)/chats/4');
   }, []);
 
   const handleCancelPress = useCallback(() => {
@@ -196,9 +195,11 @@ export default function EnRoute() {
         <Container style={[a.mx_auto]}>
           <Row style={[a.mt_3xl]}>
             <Text style={[a.text_center]}>
-              {orderPhase !== OrderPhase.enroute
-                ? 'Waiting for Driver to start the trip...'
-                : 'Trip started. Your driver will be at your location soon...'}
+              {orderPhase === OrderPhase.enroute
+                ? 'Trip started. Your driver will be at your location soon...'
+                : orderPhase === OrderPhase.rideArrived
+                  ? 'Your driver has arrived. Please board the vehicle'
+                  : 'Waiting for Driver to start the trip...'}
             </Text>
           </Row>
         </Container>

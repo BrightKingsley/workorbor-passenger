@@ -48,6 +48,7 @@ export default function Map({
   const {orderRequest, riderInfo} = useAppSelector(state => state.order);
 
   const [directions, setDirections] = useState<DirectionsProps | null>(null);
+  const [markers, setMarkers] = useState<MarkerProps[]>([]);
 
   const dispatch = useAppDispatch();
 
@@ -71,51 +72,52 @@ export default function Map({
     } else setDirections(null);
   }, [orderRequest]);
 
-  const markers = useMemo(
-    () => [
-      currentPosition || lastPosition
-        ? {
-            coords: (currentPosition || lastPosition)?.coords!,
-            description: 'you are here',
-            identifier: 'current',
-            alt: (
-              <Image
-                source={{uri: user?.imageUrl}}
-                style={[a.w_full, a.h_full] as ImageStyle}
-              />
-            ),
-          }
-        : undefined,
-      orderRequest?.origin
-        ? {
-            coords: {
-              latitude: orderRequest?.origin?.latitude || 0,
-              longitude: orderRequest?.origin?.longitude || 0,
-            },
-            identifier: 'origin',
-          }
-        : undefined,
-      orderRequest?.destination
-        ? {
-            coords: {
-              latitude: orderRequest?.destination?.latitude || 0,
-              longitude: orderRequest?.destination?.longitude || 0,
-            },
-            identifier: 'destination',
-          }
-        : undefined,
-      riderInfo?.location?.coords
-        ? {
-            coords: {
-              latitude: riderInfo?.location?.coords?.latitude || 0,
-              longitude: riderInfo?.location?.coords?.longitude || 0,
-            },
-            identifier: 'destination',
-          }
-        : undefined,
-    ],
-    [currentPosition, lastPosition, orderRequest, , user],
-  );
+  useEffect(() => {
+    setMarkers(
+      [
+        currentPosition || lastPosition
+          ? {
+              coords: (currentPosition || lastPosition)?.coords!,
+              description: 'you are here',
+              identifier: 'current',
+              alt: (
+                <Image
+                  source={{uri: user?.imageUrl}}
+                  style={[a.w_full, a.h_full] as ImageStyle}
+                />
+              ),
+            }
+          : undefined,
+        orderRequest?.origin
+          ? {
+              coords: {
+                latitude: orderRequest?.origin?.latitude || 0,
+                longitude: orderRequest?.origin?.longitude || 0,
+              },
+              identifier: 'origin',
+            }
+          : undefined,
+        orderRequest?.destination
+          ? {
+              coords: {
+                latitude: orderRequest?.destination?.latitude || 0,
+                longitude: orderRequest?.destination?.longitude || 0,
+              },
+              identifier: 'destination',
+            }
+          : undefined,
+        riderInfo?.location?.coords
+          ? {
+              coords: {
+                latitude: riderInfo?.location?.coords?.latitude || 0,
+                longitude: riderInfo?.location?.coords?.longitude || 0,
+              },
+              identifier: 'rider',
+            }
+          : undefined,
+      ].filter(Boolean) as MarkerProps[],
+    );
+  }, [currentPosition, lastPosition, orderRequest, riderInfo, user]);
 
   const initRegion = useMemo(
     () => ({
@@ -147,7 +149,11 @@ export default function Map({
           dispatch(setCurrentAddress({currentAddress: address}));
         }
       })();
+    }
+  }, [initRegion, currentAddress, dispatch]);
 
+  const fitToCoordinates = useCallback(() => {
+    if (mapRef.current) {
       mapRef.current.fitToCoordinates(
         [
           {
@@ -164,6 +170,11 @@ export default function Map({
           animated: true,
         },
       );
+    }
+  }, [orderRequest]);
+
+  const animateToRegion = useCallback(() => {
+    if (mapRef.current) {
       mapRef.current.animateToRegion({
         latitude: orderRequest
           ? orderRequest?.origin?.latitude || 0
@@ -178,6 +189,11 @@ export default function Map({
           ? orderRequest?.origin?.longitude || 0
           : initRegion?.longitude,
       });
+    }
+  }, [orderRequest, initRegion]);
+
+  const animateCamera = useCallback(() => {
+    if (mapRef.current) {
       mapRef.current.animateCamera({
         center: {
           latitude: orderRequest
@@ -190,11 +206,39 @@ export default function Map({
         zoom: 14,
       });
     }
-  }, [initRegion, orderRequest, currentPosition]);
+  }, [orderRequest, initRegion]);
 
   useEffect(() => {
     initializeMapItems();
-  }, [initializeMapItems, orderRequest]);
+  }, [initializeMapItems]);
+
+  useEffect(() => {
+    fitToCoordinates();
+  }, [fitToCoordinates]);
+
+  useEffect(() => {
+    animateToRegion();
+  }, [animateToRegion]);
+
+  useEffect(() => {
+    animateCamera();
+  }, [animateCamera]);
+
+  useEffect(() => {
+    if (riderInfo?.location?.coords) {
+      const interval = setInterval(() => {
+        mapRef.current?.animateCamera({
+          center: {
+            latitude: riderInfo.location.coords.latitude,
+            longitude: riderInfo.location.coords.longitude,
+          },
+          zoom: 14,
+        });
+      }, 5000); // Update every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [riderInfo]);
 
   if (!(initRegion.latitude && initRegion.longitude))
     return (

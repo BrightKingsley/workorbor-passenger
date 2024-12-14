@@ -70,12 +70,14 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (riderInfo?.riderId) {
+    console.log('LAST_MODAL: ', activeModals[activeModals.length - 1]);
+    if (activeModals[activeModals.length - 1] === 'enroute') return;
+    if (riderInfo) {
       openModal('enroute');
     } else {
       toggleModal();
     }
-  }, [riderInfo?.riderId]);
+  }, [riderInfo, orderPhase]);
 
   const walletButtonStyle = useMemo(
     () => [
