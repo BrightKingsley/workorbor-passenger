@@ -33,31 +33,18 @@ const Message = memo(({sender, content}: MessageType) => {
           a.w_90,
           sender === user?.id && a.self_end,
         ]}>
-        {/* <Image
-          source={{uri: sender === 'me' ? PASSENGER_IMG : DRIVER_IMG}}
-          alt="user"
-          style={
-            [
-              a.rounded_full,
-              a.overflow_hidden,
-              a.w_(40),
-              a.h_(40),
-              a.bg_(colors.yellow_1),
-            ] as React.ComponentProps<typeof Image>['style']
-          }
-        /> */}
         <Animated.View
           entering={ZoomInEasyDown}
           style={[
             a.p_lg,
             a.bg_(
-              sender === 'me'
-                ? colors.primarylighter
-                : hexWithOpacity(colors.primarylighter, 0.3),
+              sender === user?.id
+                ? hexWithOpacity(colors.primarylighter, 0.3)
+                : colors.light,
             ),
-            // sender === 'me'
-            //   ? [a.rounded_b_md, a.rounded_t_lg]
-            //   : [a.rounded_b_lg, a.rounded_t_sm],
+            sender === user?.id
+              ? []
+              : [a.border, a.border_tint(colors.lightgrey)],
             a.rounded_(25),
           ]}>
           <Text style={[a.text_md]}>{content}</Text>

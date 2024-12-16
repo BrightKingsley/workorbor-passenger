@@ -62,9 +62,9 @@ export default function EnRoute() {
     isAndroid ? openModal('chat') : router.push('/(app)/chats/4');
   }, []);
 
-  const handleCancelPress = useCallback(() => {
-    cancelRide();
-    closeModal();
+  const handleCancelPress = useCallback(async () => {
+    await cancelRide();
+    closeAllModals();
   }, []);
 
   return (
@@ -196,7 +196,7 @@ export default function EnRoute() {
           <Row style={[a.mt_3xl]}>
             <Text style={[a.text_center]}>
               {orderPhase === OrderPhase.enroute
-                ? 'Trip started. Your driver will be at your location soon...'
+                ? 'Trip started. Enroute to destination'
                 : orderPhase === OrderPhase.rideArrived
                   ? 'Your driver has arrived. Please board the vehicle'
                   : 'Waiting for Driver to start the trip...'}

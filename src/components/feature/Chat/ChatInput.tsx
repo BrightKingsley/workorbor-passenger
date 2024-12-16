@@ -17,6 +17,7 @@ export default function ChatInput() {
   const {sendMessage} = useApi().chat;
 
   const [text, setText] = useState('');
+
   const handleSubmit = useCallback(async () => {
     Haptics.success();
     try {

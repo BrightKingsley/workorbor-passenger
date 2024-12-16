@@ -42,13 +42,13 @@ export default function useChatApi() {
 
   const sendMessage = useCallback(async (text: string) => {
     if (!(user && chatId && text)) return;
+    const message: MessageType = {
+      id: Math.random().toString(),
+      sender: user?.id,
+      content: text,
+    };
+    dispatch(addMessage(message));
     try {
-      const message: MessageType = {
-        id: Date.now().toString(),
-        sender: user?.id,
-        content: text,
-      };
-      dispatch(addMessage(message));
       const data = await fetchData<{chat: any}>(
         'post',
         `${apiRoutes.chat['send-message'].route}`,

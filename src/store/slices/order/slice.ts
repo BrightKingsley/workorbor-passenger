@@ -30,7 +30,7 @@ const orderSlice = createSlice({
     clearOrderResponse: state => {
       state.orderRequest = null;
     },
-    setRider: (state, action: PayloadAction<Rider>) => {
+    setRider: (state, action: PayloadAction<Rider | null>) => {
       state.riderInfo = action.payload;
     },
     updateRiderLocation: (

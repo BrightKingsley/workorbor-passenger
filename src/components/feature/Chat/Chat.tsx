@@ -56,7 +56,7 @@ const QuickButton = memo(({text}: {text: string}) => {
   const {sendMessage} = useApi().chat;
   const sendQuickMessage = useCallback(
     async () => await sendMessage(text),
-    [sendMessage, text],
+    [text],
   );
 
   return (
@@ -162,11 +162,13 @@ const Chat = () => {
   ); // Assuming each item has a height of 80
 
   const scrollToIndex = useCallback((index: number) => {
-    flatListRef.current?.scrollToIndex({
-      animated: true,
-      index,
-      viewPosition: 10,
-    });
+    if (index > messages.length) {
+      flatListRef.current?.scrollToIndex({
+        animated: true,
+        index,
+        viewPosition: 10,
+      });
+    }
   }, []);
 
   const scrollToEnd = useCallback(() => {
@@ -201,25 +203,26 @@ const Chat = () => {
             style={[a.flex_1]}>
             <Container style={[a.bg_(colors.light), animatedHeaderStyle]}>
               <ViewHeader
+                canGoBack
+                backPressHandler={closeModal}
                 titleComponent={
                   <Row style={[a.align_center, a.justify_center, a.mx_auto]}>
-                    {Platform.OS !== 'ios' && (
-                      <Button onPress={() => closeModal()}>
-                        <FontAwesome name="angle-left" size={30} />
-                      </Button>
-                    )}
-                    <Image
-                      style={[a.w_(30), a.h_(30), a.rounded_full] as ImageStyle}
-                      source={{
-                        uri: riderInfo?.photo,
-                      }}
-                    />
-                    <Text
-                      numberOfLines={1}
-                      family="Bold"
-                      style={[a.text_xl, a.ml_sm]}>
-                      {riderInfo?.firstName} {riderInfo?.lastName}
-                    </Text>
+                    <Row style={[a.align_center]}>
+                      <Image
+                        style={
+                          [a.w_(30), a.h_(30), a.rounded_full] as ImageStyle
+                        }
+                        source={{
+                          uri: riderInfo?.photo,
+                        }}
+                      />
+                      <Text
+                        numberOfLines={1}
+                        family="Bold"
+                        style={[a.text_xl, a.ml_sm]}>
+                        {riderInfo?.firstName} {riderInfo?.lastName}
+                      </Text>
+                    </Row>
                   </Row>
                 }
               />

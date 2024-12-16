@@ -131,7 +131,8 @@ export function ModalProvider({children}: React.PropsWithChildren<{}>) {
     console.log({segments});
     if (segments[segments.length - 1] === '(tabs)')
       setTimeout(() => {
-        openModal(activeModals[activeModals.length - 1] || 'where-to');
+        // openModal(activeModals[activeModals.length - 1] || 'where-to');
+        openModal('where-to');
       }, 100);
   });
 

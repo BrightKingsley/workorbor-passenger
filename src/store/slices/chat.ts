@@ -40,6 +40,7 @@ const chatSlice = createSlice({
       };
     },
     addMessage(state, action: PayloadAction<MessageType>) {
+      console.log('MESSAGE_PAYLOAD: ', action.payload);
       return {
         ...state,
         messages: [...state.messages, action.payload],

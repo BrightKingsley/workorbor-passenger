@@ -23,9 +23,9 @@ import {getDistance} from 'geolib';
 export default function OrderSocket() {
   const {user} = useUser();
   const dispatch = useAppDispatch();
-  const {orderRequest} = useAppSelector(state => state.order);
+  const {orderRequest, orderPhase} = useAppSelector(state => state.order);
   const {currentPosition} = useAppSelector(state => state.location);
-  const {closeAllModals, closeModal, openModal} = useModalControls();
+  const {closeAllModals, openModal} = useModalControls();
 
   // Emit passenger socket update only when socket ID or user ID changes
   useEffect(() => {
@@ -71,23 +71,22 @@ export default function OrderSocket() {
   }, [dispatch]);
 
   const handleRideCompleted = useCallback(() => {
+    Alert.alert('Ride completed');
     dispatch(clearChatId());
     dispatch(clearOrderRequest());
     dispatch(clearOrderResponse());
-    Alert.alert('Ride completed');
     closeAllModals();
-    closeModal();
-  }, [dispatch, closeAllModals, closeModal]);
+  }, [dispatch]);
 
   const handleRideCancelled = useCallback(() => {
+    Alert.alert('Ride cancelled');
     dispatch(clearChatId());
     dispatch(clearOrderResponse());
-    closeModal();
-    Alert.alert('Ride cancelled');
-    setTimeout(() => {
-      openModal('where-to');
-    }, 200);
-  }, [dispatch, closeAllModals]);
+    dispatch(clearOrderRequest());
+    dispatch(setRider(null));
+    dispatch(setOrderPhase(OrderPhase.nil));
+    closeAllModals();
+  }, [dispatch]);
 
   // Memoize socket event listeners
   useEffect(() => {
@@ -103,8 +102,8 @@ export default function OrderSocket() {
         dispatch(updateRiderLocation(location));
 
         if (
-          currentPosition?.coords.latitude &&
-          currentPosition?.coords?.longitude &&
+          orderRequest?.origin.latitude &&
+          orderRequest?.origin?.longitude &&
           location
         ) {
           const distance = getDistance(
@@ -113,12 +112,14 @@ export default function OrderSocket() {
               longitude: location.longitude,
             },
             {
-              latitude: currentPosition?.coords.latitude,
-              longitude: currentPosition?.coords.longitude,
+              latitude: orderRequest?.origin.latitude,
+              longitude: orderRequest?.origin.longitude,
             },
           );
 
-          if (distance <= 10) {
+          console.log({distance});
+
+          if (distance <= 10 && orderPhase !== OrderPhase.enroute) {
             dispatch(setOrderPhase(OrderPhase.rideArrived));
           }
         }

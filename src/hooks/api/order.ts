@@ -4,12 +4,16 @@ import {useCallback} from 'react';
 import {ApiError} from '#/lib/utils/api/axios';
 import apiRoutes from '#/lib/utils/api/routes';
 // import {NavigationProps} from '#/navigation/types';
-import {OrderRequest} from '#/store/slices/order/types';
+import {OrderPhase, OrderRequest} from '#/store/slices/order/types';
 import useRequest from './useRequest';
 import {useAppDispatch, useAppSelector} from '../store';
 import {Alert} from 'react-native';
 import {updateOrderRequest} from '$/src/store/slices/order/helpers';
-import {clearOrderRequest} from '$/src/store/slices/order/slice';
+import {
+  clearOrderRequest,
+  setOrderPhase,
+  setRider,
+} from '$/src/store/slices/order/slice';
 
 // import {useAppDispatch} from '../store';
 
@@ -108,6 +112,8 @@ export default function useOrderApi() {
         {orderId: orderRequest.orderId},
       );
       dispatch(clearOrderRequest());
+      dispatch(setOrderPhase(OrderPhase.nil));
+      dispatch(setRider(null));
     } catch (error) {
       if (error instanceof ApiError) {
         console.error(
